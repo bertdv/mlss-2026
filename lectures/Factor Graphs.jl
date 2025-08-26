@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.13
+# v0.20.16
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/ffg-example-1.png?raw=true"
@@ -564,12 +564,17 @@ md"""
 The figure above (a screen recording from the [RxInfer webpage](http://rxinfer.com)) is an animated GIF illustrating how RxInfer operates. The model is represented as a graph, where each node passes messages to its neighbors. When messages meet on an edge, the belief about the variable associated with that edge is updated.
 """
 
+# ╔═╡ bb402d81-1938-409d-897c-1f86d0970fe5
+TODO(
+	md"The example below needs some math work, see [github issue](https://github.com/bmlip/course/pull/156#issuecomment-3223104105)."
+)
+
 # ╔═╡ a1c957c1-69b7-4178-ab59-c0b2439bb01a
 code_example("Bayesian Linear Regression by Message Passing"; big=true)
 
 # ╔═╡ 9658c106-d294-11ef-01db-cfcff611ed81
 md"""
-Assume we want to estimate some function ``f: \mathbb{R} \rightarrow \mathbb{R}`` from a given data set ``D = \{(x_1,y_1), \ldots, (x_N,y_N)\}``.
+Assume we want to estimate some function ``f^D: \mathbb{R} \rightarrow \mathbb{R}`` from a given data set ``D = \{(x_1,y_1), \ldots, (x_N,y_N)\}``.
 
 """
 
@@ -630,7 +635,7 @@ We first generate data by a "secret" function ``f`` that is parameterized by wei
 """
 
 # ╔═╡ aec4726a-954e-4e76-aae5-2dd6c979b12d
-secret_true_w = [1.0; 2.0; 0.25]
+secret_true_w = [1.0; 2.0; 0.25];
 
 # ╔═╡ 96ef3cfb-ca18-46d6-bcac-0122c2c85fba
 f(x::Vector)::Real = secret_true_w' * x;
@@ -653,18 +658,13 @@ md"""
 Create the feature vector ``x = [1.0; z; z^2]``:
 """
 
-# ╔═╡ e668dc06-7a38-47e0-819b-5af5f509be3b
-md"""
-Set the observation noise variance
-"""
-
-# ╔═╡ ba7a2dbd-f068-4249-bc29-77f2d0804676
-data_noise_σ² = 2.0;
-
 # ╔═╡ 3a045b5c-9d87-46a6-a404-85c4bd77dd61
 md"""
 Now we can generate the observed ``y`` coordinates in the data set:
 """
+
+# ╔═╡ ba7a2dbd-f068-4249-bc29-77f2d0804676
+data_noise_σ² = 2.0;
 
 # ╔═╡ f153c139-94c8-42af-9628-24455ee70cd1
 md"""
@@ -887,9 +887,6 @@ Yes, since the generative model ``p(x^n,z^n|\theta)`` is (one big) Gaussian.
 For answer, see drawing for answer (d).
 
 """)
-
-# ╔═╡ aa3dd6ba-9f2b-42c0-8157-c9b650dd16a4
-TODO("FONS: Answer d did not get included in the answer above")
 
 # ╔═╡ a6e155eb-7376-4e57-8e63-628934e14e78
 md"""
@@ -1147,18 +1144,18 @@ end
 result = infer(model=my_model(), data=(y1=y1_hat, y2 = y2_hat,))
 
 # ╔═╡ defb2149-294b-47a8-99ed-1b3746b275f1
-Text("Sum-product message passing result: p(x|y1,y2) = \n\t𝒩($(mean(result.posteriors[:x])),$(var(result.posteriors[:x])))")
-
-# ╔═╡ c95bf9a4-2e7b-4b3a-a161-56f3fd16ad0f
-# TODO: could also write this as:
-var"p(x|y1,y2)" = convert(Normal, result.posteriors[:x])
+Text("Sum-product message passing result: p(x|y1,y2) = \n\t𝒩($(
+	round(mean(result.posteriors[:x]); digits=3)
+),$(
+	round(var(result.posteriors[:x]); digits=3)
+))")
 
 # ╔═╡ b3656d6c-4717-4fcd-90c6-ae4f4aa5e1be
 
 
 # ╔═╡ b15f28ce-c8c1-439b-aeca-74a58d2557e2
 md"""
-We calculate mean and variance of p(x|y1,y2) manually by multiplying 3 Gaussians (see lesson 4 for details)
+We calculate mean and variance of `p(x|y1,y2)` manually by multiplying 3 Gaussians (see lesson 4 for details)
 """
 
 # ╔═╡ 86e67c05-068d-4de4-80f3-1a20cc8a43ea
@@ -1252,7 +1249,7 @@ RxInfer = "~4.4.2"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.5"
+julia_version = "1.11.6"
 manifest_format = "2.0"
 project_hash = "5ad1eecd681556b7eddbd0fd3d9f72efb0e21df1"
 
@@ -3271,6 +3268,7 @@ version = "1.9.2+0"
 # ╟─96587a66-d294-11ef-2c7a-9fd7bea76582
 # ╟─89e2757e-a09f-40c6-8dd7-9b4b4d232e17
 # ╟─c4b5b124-e52a-41fc-b27e-a58181622e5c
+# ╟─bb402d81-1938-409d-897c-1f86d0970fe5
 # ╟─a1c957c1-69b7-4178-ab59-c0b2439bb01a
 # ╟─9658c106-d294-11ef-01db-cfcff611ed81
 # ╟─96594d44-d294-11ef-22b8-95165fb08ce4
@@ -3284,12 +3282,11 @@ version = "1.9.2+0"
 # ╠═79a0d02b-368f-4371-854c-cf2cea9328e5
 # ╟─05b733c6-2faf-4463-a0fd-48455757a28c
 # ╟─1c9c7994-672c-42a3-8ae7-8ce092ada9f0
-# ╟─f6fc4fad-70fb-432f-b77d-8e6ad42eef6c
 # ╠═99265e22-e8dc-40fe-989f-0d2a6c72faac
+# ╟─f6fc4fad-70fb-432f-b77d-8e6ad42eef6c
 # ╠═e20e9048-1271-41c7-97d3-635f320aa365
-# ╟─e668dc06-7a38-47e0-819b-5af5f509be3b
-# ╠═ba7a2dbd-f068-4249-bc29-77f2d0804676
 # ╟─3a045b5c-9d87-46a6-a404-85c4bd77dd61
+# ╠═ba7a2dbd-f068-4249-bc29-77f2d0804676
 # ╠═34ebbbe1-2a6b-422b-aeb1-cd2953acddca
 # ╟─f153c139-94c8-42af-9628-24455ee70cd1
 # ╟─aca1f927-bc3b-48f6-af5c-12ee2ea4a49b
@@ -3317,7 +3314,6 @@ version = "1.9.2+0"
 # ╟─05375a01-4d1b-44cc-b1c4-a5eb4b6c5c5b
 # ╟─206c34b3-1873-460b-911e-f2cd4f8886af
 # ╟─45251c19-6eae-41e7-b0ed-8bd70a67d4e0
-# ╠═aa3dd6ba-9f2b-42c0-8157-c9b650dd16a4
 # ╟─a6e155eb-7376-4e57-8e63-628934e14e78
 # ╟─9dc870d7-a5f3-447c-96ee-ad23199bc253
 # ╟─e8a35c28-6d6d-4066-8251-f091f28622a9
@@ -3348,7 +3344,6 @@ version = "1.9.2+0"
 # ╠═053e9dde-c088-4f15-9ca6-98b8185a8a11
 # ╠═07b09ac1-7fa7-4b62-b130-97315adb6fa7
 # ╟─defb2149-294b-47a8-99ed-1b3746b275f1
-# ╠═c95bf9a4-2e7b-4b3a-a161-56f3fd16ad0f
 # ╟─b3656d6c-4717-4fcd-90c6-ae4f4aa5e1be
 # ╟─b15f28ce-c8c1-439b-aeca-74a58d2557e2
 # ╠═86e67c05-068d-4de4-80f3-1a20cc8a43ea
