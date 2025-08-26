@@ -24,14 +24,20 @@ macro bind(def, element)
     #! format: on
 end
 
-# ╔═╡ 3987d441-b9c8-4bb1-8b2d-0cc78d78819e
-using Plots, LaTeXStrings, Plots.PlotMeasures
+# ╔═╡ b32d2d36-f3a5-406f-adf6-c7b8ebe6cc77
+using MarkdownLiteral: @mdx
+
+# ╔═╡ 17182feb-2c58-4485-aadc-114003376607
+using Random
 
 # ╔═╡ df312e6a-503f-486f-b7ec-15404070960c
 using Distributions, StatsPlots, SpecialFunctions
 
 # ╔═╡ caba8eee-dfea-45bc-a8a7-1dd20a1fa994
 using BmlipTeachingTools
+
+# ╔═╡ 3987d441-b9c8-4bb1-8b2d-0cc78d78819e
+using Plots, LaTeXStrings, Plots.PlotMeasures
 
 # ╔═╡ 6a23b828-d294-11ef-371a-05d061144a43
 title("Bayesian Machine Learning")
@@ -62,18 +68,17 @@ md"""
 
 """
 
-# ╔═╡ 6a24376c-d294-11ef-348a-e9027bd0ec29
+# ╔═╡ 4f6a2d4f-bd89-4b0c-b544-397de2e34e72
 md"""
 $(challenge_statement("Predicting a Coin Toss"))
 
 ##### Problem 
 
-  * We observe the following sequence of heads (outcome ``=1``) and tails (outcome ``=0``) when tossing the same coin repeatedly:
+  * We observe the following sequence of heads (outcome ``=1``) and tails (outcome ``=0``) when tossing the same coin repeatedly. Number of tosses: $(@bind intro_N Slider(1:20; default=7, show_value=true))
+"""
 
-```math
-D=\{1011001\}\,.
-```
-
+# ╔═╡ daa1df0e-4ec5-4fb1-a355-a42c35bd35b9
+md"""
   * What is the probability that heads comes up next?
 
 ##### Solution
@@ -708,8 +713,37 @@ let
 	)
 end
 
+# ╔═╡ ee3da94c-5e87-4a0b-8373-c01e339d28aa
+md"""
+##### Pick Your Own Parameters
+
+
+α = $(@bind beta_pdf_a NumberField(.1:.1:100; default=6.0)), 
+β = $(@bind beta_pdf_b NumberField(.1:.1:100; default=2.0))
+"""
+
+# ╔═╡ 261620b0-9580-4d9e-b7de-d7972ea549cd
+let
+	α = beta_pdf_a
+	β = beta_pdf_b
+	x = 0:0.01:1
+
+	y = pdf.(Beta(α, β), x)
+	plot(x, y; 
+		# label="α=$α, β=$β", 
+		 ylim=(0, clamp(maximum(y)*1.05, 4, 4)),
+		label=nothing, 
+		xlabel="μ", 
+		ylabel="Density",
+		 size=(600,250)
+	)
+	
+end
+
 # ╔═╡ 6a294790-d294-11ef-270b-5b2152431426
 md"""
+#### Choosing a Prior
+
 Before observing any data, you can express your state-of-knowledge about the coin by choosing values for ``\alpha`` and ``\beta`` that reflect your beliefs. Stronger yet, you *must* choose values for ``\alpha`` and ``\beta``, because the Bayesian framework does not allow you to walk away from your responsibility to explicitly state your beliefs before the experiment.  
 
 """
@@ -912,6 +946,15 @@ So, this coin is biased!
 
 # ╔═╡ 9da43d0f-e605-41b7-9bc6-db5be95bc87f
 secret_distribution = Bernoulli(0.4);
+
+# ╔═╡ b791e819-f5a0-4c44-983b-07d8497516fb
+@mdx """
+
+```math
+D=\\{$(Int.(rand(MersenneTwister(234), secret_distribution, intro_N)))\\}\\,.
+```
+
+"""
 
 # ╔═╡ 280e0819-674e-4a58-854d-5a66e0777074
 md"""
@@ -1558,7 +1601,9 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+MarkdownLiteral = "736d6165-7244-6769-4267-6b50796e6954"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 
@@ -1566,6 +1611,7 @@ StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 BmlipTeachingTools = "~1.1.0"
 Distributions = "~0.25.119"
 LaTeXStrings = "~1.4.0"
+MarkdownLiteral = "~0.1.2"
 Plots = "~1.40.13"
 SpecialFunctions = "~2.5.1"
 StatsPlots = "~0.15.7"
@@ -1577,7 +1623,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "e6b44220ab71d6056dfacd46f1084fdb2c1c6bfe"
+project_hash = "dcbf704cb9c8d90e5e5aca147f7d66c1c2f60dce"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -1719,6 +1765,12 @@ deps = ["ColorTypes", "FixedPointNumbers", "Reexport"]
 git-tree-sha1 = "37ea44092930b1811e666c3bc38065d7d87fcc74"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
 version = "0.13.1"
+
+[[deps.CommonMark]]
+deps = ["PrecompileTools"]
+git-tree-sha1 = "351d6f4eaf273b753001b2de4dffb8279b100769"
+uuid = "a80b9123-70ca-4bc0-993e-6e3bcb318db6"
+version = "0.9.1"
 
 [[deps.Compat]]
 deps = ["TOML", "UUIDs"]
@@ -2214,6 +2266,12 @@ version = "0.5.16"
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 version = "1.11.0"
+
+[[deps.MarkdownLiteral]]
+deps = ["CommonMark", "HypertextLiteral"]
+git-tree-sha1 = "f7d73634acd573bf3489df1ee0d270a5d6d3a7a3"
+uuid = "736d6165-7244-6769-4267-6b50796e6954"
+version = "0.1.2"
 
 [[deps.MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
@@ -3052,7 +3110,9 @@ version = "1.9.2+0"
 # ╟─6a23b828-d294-11ef-371a-05d061144a43
 # ╟─6be2e966-4048-44d0-a37e-95060e3fe30b
 # ╟─6a23df9e-d294-11ef-3ddf-a51d4cea00fc
-# ╟─6a24376c-d294-11ef-348a-e9027bd0ec29
+# ╟─4f6a2d4f-bd89-4b0c-b544-397de2e34e72
+# ╟─b791e819-f5a0-4c44-983b-07d8497516fb
+# ╟─daa1df0e-4ec5-4fb1-a355-a42c35bd35b9
 # ╟─6a24b9e4-d294-11ef-3ead-9d272fbf89be
 # ╟─6a24c3e6-d294-11ef-3581-2755a9ba15ba
 # ╟─e2de9415-7bd8-4e95-abeb-53fc068ee950
@@ -3120,9 +3180,10 @@ version = "1.9.2+0"
 # ╟─6a28d81e-d294-11ef-2a9f-d32daa5556ae
 # ╟─6a28e674-d294-11ef-391b-0d33fd609fb8
 # ╟─6a28f466-d294-11ef-3af9-e34de9736c71
-# ╟─3987d441-b9c8-4bb1-8b2d-0cc78d78819e
 # ╟─51bed1cc-c960-46fe-bc09-2b684df3b0cc
 # ╟─513414c7-0a54-4767-a583-7d779f8fbc55
+# ╟─ee3da94c-5e87-4a0b-8373-c01e339d28aa
+# ╟─261620b0-9580-4d9e-b7de-d7972ea549cd
 # ╟─6a294790-d294-11ef-270b-5b2152431426
 # ╟─b872cd69-d534-4b04-bb76-d85bb7ef0ea9
 # ╟─1ba1939d-9986-4b97-9273-4f2434f1d385
@@ -3201,8 +3262,11 @@ version = "1.9.2+0"
 # ╟─6a2ccd16-d294-11ef-22ee-a5cff62ccd9c
 # ╟─f5d8d021-3157-464f-93a2-b3054779e55f
 # ╟─1f92c406-6792-4af6-9132-35efd8223bc5
+# ╠═b32d2d36-f3a5-406f-adf6-c7b8ebe6cc77
+# ╠═17182feb-2c58-4485-aadc-114003376607
 # ╠═df312e6a-503f-486f-b7ec-15404070960c
 # ╠═caba8eee-dfea-45bc-a8a7-1dd20a1fa994
+# ╠═3987d441-b9c8-4bb1-8b2d-0cc78d78819e
 # ╟─7a764a14-a5df-4f76-8836-f0a571fc3519
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
