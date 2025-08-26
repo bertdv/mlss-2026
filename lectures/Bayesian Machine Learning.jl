@@ -73,17 +73,18 @@ md"""
 $(challenge_statement("Predicting a Coin Toss"))
 
 ##### Problem 
+We observe the following sequence of heads (outcome ``=1``) and tails (outcome ``=0``) when tossing the same coin repeatedly.
 
-  * We observe the following sequence of heads (outcome ``=1``) and tails (outcome ``=0``) when tossing the same coin repeatedly. Number of tosses: $(@bind intro_N Slider(1:20; default=7, show_value=true))
+Number of tosses: $(@bind intro_N Slider(1:20; default=7, show_value=true))
 """
 
 # ╔═╡ daa1df0e-4ec5-4fb1-a355-a42c35bd35b9
 md"""
-  * What is the probability that heads comes up next?
+What is the probability that heads comes up next?
 
 ##### Solution
 
-  * Later in this lecture. 
+Later in this lecture. 
 """
 
 # ╔═╡ 6a24b9e4-d294-11ef-3ead-9d272fbf89be
@@ -718,14 +719,14 @@ md"""
 ##### Pick Your Own Parameters
 
 
-α = $(@bind beta_pdf_a NumberField(.1:.1:100; default=6.0)), 
-β = $(@bind beta_pdf_b NumberField(.1:.1:100; default=2.0))
+α = $(@bind beta_pdf_a NumberField(.1:.1:1000; default=6.0)), 
+β = $(@bind beta_pdf_b NumberField(.1:.1:1000; default=2.0))
 """
 
 # ╔═╡ 261620b0-9580-4d9e-b7de-d7972ea549cd
 let
-	α = beta_pdf_a
-	β = beta_pdf_b
+	α = isnan(beta_pdf_a) ? 0.1 : beta_pdf_a
+	β = isnan(beta_pdf_b) ? 0.1 : beta_pdf_b
 	x = 0:0.01:1
 
 	y = pdf.(Beta(α, β), x)
