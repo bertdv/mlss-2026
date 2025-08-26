@@ -24,11 +24,14 @@ macro bind(def, element)
     #! format: on
 end
 
+# ╔═╡ 9edd80d4-d088-4b2f-8843-abaa7a5d9c5e
+using Random
+
 # ╔═╡ 5638c1d0-db95-49e4-bd80-528f79f2947e
 using HCubature, LinearAlgebra# Numerical integration package
 
-# ╔═╡ 9edd80d4-d088-4b2f-8843-abaa7a5d9c5e
-using Random
+# ╔═╡ 03a36e87-2378-4efc-bcac-9c0609b52784
+using MarkdownLiteral: @mdx
 
 # ╔═╡ c97c495c-f7fe-4552-90df-e2fb16f81d15
 using BmlipTeachingTools
@@ -81,27 +84,42 @@ Consider a data set as shown in the figure below
 """
 
 
-# ╔═╡ ba57ecbb-b64e-4dd8-8398-a90af1ac71f3
-begin
-	N = 100;
-	generative_dist = MvNormal([0,1.], [0.8 0.5; 0.5 1.0]);
-	D = rand(generative_dist, N);
-	x_dot = rand(generative_dist);
-	
-	let
-		scatter(D[1,:], D[2,:], marker=:x, markerstrokewidth=3, label=L"D")
-		scatter!([x_dot[1]], [x_dot[2]], label=L"x_\bullet")
-		plot!(range(0, 2), [1., 1., 1.], fillrange=2, alpha=0.4, color=:gray,label=L"S")
-	end
-end
+# ╔═╡ 3200f4f9-4c43-46c0-8bdb-9afc95d116e0
+md"""
+
+##### Setup 
+
+We have a dataset `D` of observations. `D` is a Matrix, where each column is an observation ``\in \mathbb{R}^2``:
+"""
+
+# ╔═╡ 4e6c4e40-f744-49e7-9d67-cf982c9fc58d
+md"""
+We now draw an extra observation ``x_\bullet = (a,b)`` from the same data-generating process:
+"""
+
+# ╔═╡ 148f82be-5012-4c12-9002-6a8bcbf5ad08
+md"""
+> ``D`` and ``x_\bullet`` are shown in the plot above.
+"""
+
+# ╔═╡ b1b9bc8f-2653-42af-ad49-6aaaba2ae70e
+
+
+# ╔═╡ c2208520-020b-400a-8bb4-c8fb6786ccf3
+md"""
+##### Problem 
+
+What is the probability that ``x_\bullet`` lies within the shaded rectangle ``S = \{ (x,y) \in \mathbb{R}^2 | 0 \leq x \leq 2, 1 \leq y \leq 2 \} ``?
+"""
+
+# ╔═╡ 3d05a2eb-87aa-4d6a-9caf-feb5758e000a
+S = [[0.0, 2.0], [1.0, 2.0]]
+
+# ╔═╡ 55380883-d269-4f61-bec6-2944765db271
+
 
 # ╔═╡ 02853a5c-f6aa-4af8-8a25-bfffd4b96afc
 md"""
-
-##### Problem 
-
-- Consider a set of observations ``D=\{x_1,…,x_N\}`` in the 2-dimensional plane (see Figure). All observations were generated using the same process. We now draw an extra observation ``x_\bullet = (a,b)`` from the same data-generating process. What is the probability that ``x_\bullet`` lies within the shaded rectangle ``S = \{ (x,y) \in \mathbb{R}^2 | 0 \leq x \leq 2, 1 \leq y \leq 2 \} ``?
-
 
 ##### Solution 
 
@@ -747,34 +765,83 @@ Let's plot the joint, marginal, and conditional distributions for some Gaussians
 
 """
 
+# ╔═╡ 59599e04-3e81-4518-b232-3264d9bde4f7
+let
+
+	# up_or_down_one_order_of_magnitude = 10 .^ (-1.0:0.1:1.0)
+	range = [(0:.1:1)..., (1.2:.2:2)..., (2.5:.5:10)...]
+
+	Σb11 = @bind example_Σ_11 Scrubbable(range; default=0.3)
+	Σb12 = @bind example_Σ_12 Scrubbable(range; default=0.7)
+	Σb22 = @bind example_Σ_22 Scrubbable(range; default=2.0)
+
+	grid2(xs...) = @htl """<div style="display: inline-grid; grid-template-columns: auto auto;">$(xs)</div>"""
+	
+	
+	a(s) = @htl """<span style="color: var(--cm-color-variable) !important; font-weight: 700;">$s</span>"""
+
+
+	
+	@htl """
+	<code style="
+		display: flex; 
+		white-space: pre;
+		align-items: center;
+	"
+	>$(a(:μ)) = $(
+		@bind example_μ Scrubbable([1.0 2.0])
+	), $(a(:Σ)) = $(
+		grid2(Σb11, Σb12, Σb12, Σb22)
+	)</code>
+	
+	
+	
+	"""
+end
+
 # ╔═╡ b9a99fcc-d294-11ef-3de4-5369d9796de7
 let
 	# Define the joint distribution p(x,y)
-	μ = [1.0; 2.0]
-	Σ = [0.3 0.7;
-	     0.7 2.0]
-	joint = MvNormal(μ,Σ)
-	
-	# Define the marginal distribution p(x)
-	marginal_x = Normal(μ[1], sqrt(Σ[1,1]))
-	
-	# Plot p(x,y)
-	x_range = y_range = range(-2,stop=5,length=1000)
-	joint_pdf = [ pdf(joint, [x_range[i];y_range[j]]) for  j=1:length(y_range), i=1:length(x_range)]
-	plot_1 = heatmap(x_range, y_range, joint_pdf, title = L"p(x, y)")
-	
-	# Plot p(x)
-	plot_2 = plot(range(-2,stop=5,length=1000), pdf.(marginal_x, range(-2,stop=5,length=1000)), title = L"p(x)", label="", fill=(0, 0.1))
-	
-	# Plot p(y|x = 0.1)
-	x = 0.1
-	conditional_y_m = μ[2]+Σ[2,1]*inv(Σ[1,1])*(x-μ[1])
-	conditional_y_s2 = Σ[2,2] - Σ[2,1]*inv(Σ[1,1])*Σ[1,2]
-	conditional_y = Normal(conditional_y_m, sqrt.(conditional_y_s2))
-	plot_3 = plot(range(-2,stop=5,length=1000), pdf.(conditional_y, range(-2,stop=5,length=1000)), title = L"p(y|x = %$x)", label="", fill=(0, 0.1))
+	μ = vec(example_μ)
+	Σ = [
+		example_Σ_11 example_Σ_12
+		example_Σ_12 example_Σ_22
+	]
 
-	# Combined
-	plot(plot_1, plot_2, plot_3, layout=(1,3), size=(1200,300))
+	ohno = [:😔, :😤, :😖, :🥶]
+
+	try 
+		
+		
+		joint = MvNormal(μ,Σ)
+		
+		# Define the marginal distribution p(x)
+		marginal_x = Normal(μ[1], sqrt(Σ[1,1]))
+		
+		# Plot p(x,y)
+		x_range = y_range = range(-2,stop=5,length=100)
+		
+		joint_pdf = [ pdf(joint, [x_range[i];y_range[j]]) for  j=1:length(y_range), i=1:length(x_range)]
+		plot_1 = heatmap(x_range, y_range, joint_pdf, title = L"p(x, y)")
+		
+		# Plot p(x)
+		plot_2 = plot(range(-2,stop=5,length=1000), pdf.(marginal_x, range(-2,stop=5,length=1000)), title = L"p(x)", label="", fill=(0, 0.1))
+		
+		# Plot p(y|x = 0.1)
+		x = 0.1
+		conditional_y_m = μ[2]+Σ[2,1]*inv(Σ[1,1])*(x-μ[1])
+		conditional_y_s2 = Σ[2,2] - Σ[2,1]*inv(Σ[1,1])*Σ[1,2]
+		conditional_y = Normal(conditional_y_m, sqrt.(conditional_y_s2))
+		plot_3 = plot(range(-2,stop=5,length=1000), pdf.(conditional_y, range(-2,stop=5,length=1000)), title = L"p(y|x = %$x)", label="", fill=(0, 0.1))
+	
+		# Combined
+		plot(plot_1, plot_2, plot_3, layout=(1,3), size=(1200,300))
+		
+	catch e
+		str = sprint(showerror, e)
+		Text("$str $(rand(ohno))")
+	end
+
 end
 
 # ╔═╡ b9a9b8e0-d294-11ef-348d-c197c4ce2b8c
@@ -951,26 +1018,6 @@ md"""
 Let's solve the challenge from the beginning of the lecture. We apply maximum likelihood estimation to fit a 2-dimensional Gaussian model (``m``) to data set ``D``. Next, we evaluate ``p(x_\bullet \in S | m)`` by (numerical) integration of the Gaussian pdf over ``S``: ``p(x_\bullet \in S | m) = \int_S p(x|m) \mathrm{d}x``.
 
 """
-
-# ╔═╡ b9ac5190-d294-11ef-0a99-a9d369b34045
-let
-	# Maximum likelihood estimation of 2D Gaussian
-	N = length(sum(D,dims=1))
-	μ = 1/N * sum(D,dims=2)[:,1]
-	D_min_μ = D - repeat(μ, 1, N)
-	Σ = Hermitian(1/N * D_min_μ*D_min_μ')
-	m = MvNormal(μ, convert(Matrix, Σ));
-	
-	contour(range(-3, 4, length=100), range(-3, 4, length=100), (x, y) -> pdf(m, [x, y]))
-	
-	# Numerical integration of p(x|m) over S:
-	(val,err) = hcubature((x)->pdf(m,x), [0., 1.], [2., 2.])
-	@debug("p(x⋅∈S|m) ≈ $(val)")
-	
-	scatter!(D[1,:], D[2,:]; marker=:x, markerstrokewidth=3, label=L"D")
-	scatter!([x_dot[1]], [x_dot[2]]; label=L"x_\bullet")
-	plot!(range(0, 2), [1., 1., 1.]; fillrange=2, alpha=0.4, color=:gray, label=L"S")
-end
 
 # ╔═╡ b9a85716-d294-11ef-10e0-a7b08b800a98
 md"""
@@ -1728,7 +1775,94 @@ In short, Gaussian-distributed variables remain Gaussian in linear systems, but 
 
 # ╔═╡ f78bc1f5-cf7b-493f-9c5c-c2fbd6788616
 md"""
-# Code
+# Appendix
+"""
+
+# ╔═╡ 026da6b9-dee1-485e-af00-3b9e35f71b6b
+md"""
+#### Introduction
+"""
+
+# ╔═╡ 6ffabd68-4c38-4024-a21b-1d6fa7c3a6d7
+d(x; kwargs...) = PlutoUI.ExperimentalLayout.Div([x]; kwargs...)
+
+# ╔═╡ 7a8e77b8-1692-41b7-88ef-26560aad5f08
+begin
+	intro_bonds = PlutoUI.ExperimentalLayout.Div([
+	d(@bindname(N, Slider(3:100; default=90, show_value=true)); style="flex: 1 0 max-content"),
+	d(@bind(redraw_button_clicked_count, CounterButton("Redraw x.")); style="flex: 1 1 50%")
+];
+	style="display: flex; flex-drection: row; flex-wrap: wrap;
+    ")
+end
+
+# ╔═╡ 9fc14c8b-98bc-4fe9-9b58-6c5774ac5f64
+intro_bonds
+
+# ╔═╡ ce16666b-aa90-42ae-b3a7-690e71301024
+# macro StableRandom(x=nothing)
+# 	:(MersenneTwister($(hash(__source__)) + hash($(esc(x)))))
+# end
+
+# ╔═╡ 724cac08-a54d-4dea-8416-0bce33c75405
+stable_rand(args...; seed=nothing) = rand(MersenneTwister(543432 + hash(seed)), args...)
+
+# ╔═╡ 92efa7c1-dde6-4b21-bf3b-0fa91931620c
+secret_generative_dist = MvNormal([0,1.], [0.8 0.5; 0.5 1.0]);
+
+# ╔═╡ 46465948-90e1-480f-b656-74bf542756ef
+D = stable_rand(secret_generative_dist, N)
+
+# ╔═╡ c48bd024-4afb-4e5e-af2d-56b2466511c7
+x_dot = stable_rand(secret_generative_dist; seed=redraw_button_clicked_count)
+
+# ╔═╡ 3d0f7af2-082d-4305-a271-349d41fcd166
+md"""
+#### Challenge solution
+"""
+
+# ╔═╡ eaf6794e-66a1-45f0-95ff-7d13983aafa2
+baseplot() = plot(; xlim=(-3,3), ylim=(-2,3))
+
+# ╔═╡ ba57ecbb-b64e-4dd8-8398-a90af1ac71f3
+let
+	baseplot()
+	scatter!(D[1,:], D[2,:], marker=:x, markerstrokewidth=3, label=L"D")
+	scatter!([x_dot[1]], [x_dot[2]], label=L"x_\bullet")
+	plot!(S[1], fill(S[2][1], 2), fillrange=S[2][2], alpha=0.4, color=:gray,label=L"S")
+end
+
+# ╔═╡ b9ac5190-d294-11ef-0a99-a9d369b34045
+let
+	baseplot()
+	
+	# Maximum likelihood estimation of 2D Gaussian
+	μ = 1/N * sum(D,dims=2)[:,1]
+	D_min_μ = D - repeat(μ, 1, N)
+	Σ = Hermitian(1/N * D_min_μ*D_min_μ')
+	global m = MvNormal(μ, convert(Matrix, Σ));
+	
+	contour!(range(-3, 4, length=100), range(-3, 4, length=100), (x, y) -> pdf(m, [x, y]))
+	scatter!(D[1,:], D[2,:]; marker=:x, markerstrokewidth=3, label=L"D")
+	scatter!([x_dot[1]], [x_dot[2]]; label=L"x_\bullet")
+	plot!(range(0, 2), [1., 1., 1.]; fillrange=2, alpha=0.4, color=:gray, label=L"S")
+end
+
+# ╔═╡ dbf97d8d-62f2-4996-a6aa-5ae4601d456b
+let
+	# We can use HCubature.jl to numerically evaluate the integral and get a good approximation.
+
+	(val,err) = hcubature(
+		(x)->pdf(m,x), # function to integrate
+		first.(S), last.(S), # start and end coordinates
+	)
+	
+	@mdx "Answer: ``p(x_⋅ ∈ S | m) ≈ $(round(val; digits=4))``"
+end
+
+# ╔═╡ bc7a875f-e4fa-43fd-b001-cec6aadea3bc
+md"""
+#### Packages
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1739,15 +1873,17 @@ Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 HCubature = "19dc6840-f33b-545b-b366-655c7e3ffd49"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+MarkdownLiteral = "736d6165-7244-6769-4267-6b50796e6954"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [compat]
-BmlipTeachingTools = "~1.2.0"
+BmlipTeachingTools = "~1.2.1"
 Distributions = "~0.25.120"
 HCubature = "~1.7.0"
 LaTeXStrings = "~1.4.0"
+MarkdownLiteral = "~0.1.2"
 Plots = "~1.40.17"
 SpecialFunctions = "~2.5.1"
 """
@@ -1758,7 +1894,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "26811b1fd9205302df71e77acd2ee768b00bf473"
+project_hash = "f6c44687d731b851ea0223c70813eb11a6df263c"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -1791,9 +1927,9 @@ version = "0.1.9"
 
 [[deps.BmlipTeachingTools]]
 deps = ["HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoTeachingTools", "PlutoUI", "Reexport"]
-git-tree-sha1 = "2e6f3d3748599bcdf8de11677824b58564ea9d2d"
+git-tree-sha1 = "65337543996a6be4383f92aed118716dcafa6b0d"
 uuid = "656a7065-6f73-6c65-7465-6e646e617262"
-version = "1.2.0"
+version = "1.2.1"
 
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1849,6 +1985,12 @@ version = "0.13.1"
 git-tree-sha1 = "8010b6bb3388abe68d95743dcbea77650bb2eddf"
 uuid = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
 version = "1.0.3"
+
+[[deps.CommonMark]]
+deps = ["PrecompileTools"]
+git-tree-sha1 = "351d6f4eaf273b753001b2de4dffb8279b100769"
+uuid = "a80b9123-70ca-4bc0-993e-6e3bcb318db6"
+version = "0.9.1"
 
 [[deps.Compat]]
 deps = ["TOML", "UUIDs"]
@@ -1984,9 +2126,9 @@ version = "0.8.5"
 
 [[deps.Fontconfig_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Expat_jll", "FreeType2_jll", "JLLWrappers", "Libdl", "Libuuid_jll", "Zlib_jll"]
-git-tree-sha1 = "301b5d5d731a0654825f1f2e906990f7141a106b"
+git-tree-sha1 = "f85dac9a96a01087df6e3a749840015a0ca3817d"
 uuid = "a3f928ae-7b40-5064-980b-68af3947d34b"
-version = "2.16.0+0"
+version = "2.17.1+0"
 
 [[deps.Format]]
 git-tree-sha1 = "9c68794ef81b08086aeb32eeaf33531668d5f5fc"
@@ -2218,9 +2360,9 @@ version = "1.18.0+0"
 
 [[deps.Libmount_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "a31572773ac1b745e0343fe5e2c8ddda7a37e997"
+git-tree-sha1 = "706dfd3c0dd56ca090e86884db6eda70fa7dd4af"
 uuid = "4b2f31a3-9ecc-558c-b454-b3730dcb73e9"
-version = "2.41.0+0"
+version = "2.41.1+0"
 
 [[deps.Libtiff_jll]]
 deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "LERC_jll", "Libdl", "XZ_jll", "Zlib_jll", "Zstd_jll"]
@@ -2230,9 +2372,9 @@ version = "4.7.1+0"
 
 [[deps.Libuuid_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "321ccef73a96ba828cd51f2ab5b9f917fa73945a"
+git-tree-sha1 = "d3c8af829abaeba27181db4acb485b18d15d89c6"
 uuid = "38a345b3-de98-5d2b-a5d3-14cd9215e700"
-version = "2.41.0+0"
+version = "2.41.1+0"
 
 [[deps.LinearAlgebra]]
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
@@ -2279,6 +2421,12 @@ version = "0.5.16"
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 version = "1.11.0"
+
+[[deps.MarkdownLiteral]]
+deps = ["CommonMark", "HypertextLiteral"]
+git-tree-sha1 = "f7d73634acd573bf3489df1ee0d270a5d6d3a7a3"
+uuid = "736d6165-7244-6769-4267-6b50796e6954"
+version = "0.1.2"
 
 [[deps.MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
@@ -2443,9 +2591,9 @@ version = "0.4.5"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "fcfec547342405c7a8529ea896f98c0ffcc4931d"
+git-tree-sha1 = "8329a3a4f75e178c11c1ce2342778bcbbbfa7e3c"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.70"
+version = "0.7.71"
 
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
@@ -3035,7 +3183,17 @@ version = "1.9.2+0"
 # ╟─b9a46c3e-d294-11ef-116f-9b97e0118e5b
 # ╟─82025c2f-a21f-4080-b301-3ffe3715442d
 # ╟─b9a48c60-d294-11ef-3b90-03053fcd82fb
+# ╟─7a8e77b8-1692-41b7-88ef-26560aad5f08
 # ╟─ba57ecbb-b64e-4dd8-8398-a90af1ac71f3
+# ╟─3200f4f9-4c43-46c0-8bdb-9afc95d116e0
+# ╠═46465948-90e1-480f-b656-74bf542756ef
+# ╟─4e6c4e40-f744-49e7-9d67-cf982c9fc58d
+# ╠═c48bd024-4afb-4e5e-af2d-56b2466511c7
+# ╟─148f82be-5012-4c12-9002-6a8bcbf5ad08
+# ╟─b1b9bc8f-2653-42af-ad49-6aaaba2ae70e
+# ╟─c2208520-020b-400a-8bb4-c8fb6786ccf3
+# ╠═3d05a2eb-87aa-4d6a-9caf-feb5758e000a
+# ╟─55380883-d269-4f61-bec6-2944765db271
 # ╟─02853a5c-f6aa-4af8-8a25-bfffd4b96afc
 # ╟─71f1c8ee-3b65-4ef8-b36f-3822837de410
 # ╟─b9a4eb62-d294-11ef-06fa-af1f586cbc15
@@ -3044,7 +3202,7 @@ version = "1.9.2+0"
 # ╟─b9a5589a-d294-11ef-3fc3-0552a69df7b2
 # ╟─9501922f-b928-46e2-8f23-8eb9c64f6198
 # ╟─b9a5889c-d294-11ef-266e-d90225222e10
-# ╠═56510a09-073c-4fc8-b0b7-17b20dbb95f0
+# ╟─56510a09-073c-4fc8-b0b7-17b20dbb95f0
 # ╟─a82378ae-d1be-43f9-b63a-2f897767d1fb
 # ╟─36eff7bc-72f2-4b48-a109-1861af6834aa
 # ╟─87f400ac-36f2-4778-a3ba-06dd7652e279
@@ -3083,6 +3241,7 @@ version = "1.9.2+0"
 # ╟─db730ca7-4850-49c7-a93d-746d393b509b
 # ╟─b9a885a8-d294-11ef-079e-411d3f1cda03
 # ╟─b9a9565c-d294-11ef-1b67-83d1ab18035b
+# ╟─59599e04-3e81-4518-b232-3264d9bde4f7
 # ╟─b9a99fcc-d294-11ef-3de4-5369d9796de7
 # ╟─b9a9b8e0-d294-11ef-348d-c197c4ce2b8c
 # ╟─b9a9dca8-d294-11ef-04ec-a9202c319f89
@@ -3095,8 +3254,9 @@ version = "1.9.2+0"
 # ╟─922f0eb6-9e29-4b6c-9701-cb7b2f07bb7a
 # ╟─9bd38e28-73d4-4c6c-a1fe-35c7a0e750b3
 # ╟─b9ac2d3c-d294-11ef-0d37-65a65525ad28
-# ╠═5638c1d0-db95-49e4-bd80-528f79f2947e
+# ╟─9fc14c8b-98bc-4fe9-9b58-6c5774ac5f64
 # ╟─b9ac5190-d294-11ef-0a99-a9d369b34045
+# ╠═dbf97d8d-62f2-4996-a6aa-5ae4601d456b
 # ╟─b9a85716-d294-11ef-10e0-a7b08b800a98
 # ╟─0d303dba-51d4-4413-8001-73ed98bf74df
 # ╟─4a2cd378-0960-4089-81ad-87bf1be9a3b2
@@ -3146,6 +3306,16 @@ version = "1.9.2+0"
 # ╟─b9abf984-d294-11ef-1eaa-3358379f8b44
 # ╟─b9ac09c4-d294-11ef-2cb8-270289d01f25
 # ╟─f78bc1f5-cf7b-493f-9c5c-c2fbd6788616
+# ╟─026da6b9-dee1-485e-af00-3b9e35f71b6b
+# ╠═6ffabd68-4c38-4024-a21b-1d6fa7c3a6d7
+# ╠═ce16666b-aa90-42ae-b3a7-690e71301024
+# ╠═724cac08-a54d-4dea-8416-0bce33c75405
+# ╠═92efa7c1-dde6-4b21-bf3b-0fa91931620c
+# ╟─3d0f7af2-082d-4305-a271-349d41fcd166
+# ╠═5638c1d0-db95-49e4-bd80-528f79f2947e
+# ╠═eaf6794e-66a1-45f0-95ff-7d13983aafa2
+# ╠═03a36e87-2378-4efc-bcac-9c0609b52784
+# ╟─bc7a875f-e4fa-43fd-b001-cec6aadea3bc
 # ╠═c97c495c-f7fe-4552-90df-e2fb16f81d15
 # ╠═3ec821fd-cf6c-4603-839d-8c59bb931fa9
 # ╠═00482666-0772-4e5d-bb35-df7b6fb67a1b

@@ -17,6 +17,8 @@ This course covers the fundamentals of a Bayesian (i.e., probabilistic) approach
 <h2 style="color:red;">
 News and Announcements
 </h2>
+
+- See Piazza
 <!---
 - (13-Nov-2024) Please sign up for Piazza (Q&A platform) at [signup link](https://piazza.com/tue.nl/winter2025/5ssd0). As much as possible we will use the Piazza site for new announcements as well.
 --->
@@ -32,20 +34,16 @@ News and Announcements
 
 In principle, all the necessary materials can be downloaded from the links below. This course is based on [Pluto.jl](https://plutojl.org/).
 
-<!--
-
 ### Lecture Notes
 
-The lecture notes are mandatory material for the exam:
+The lecture notes form the mandatory preparation material for the exam. They can be accessed through the Table below. Optionally, you may download PDF bundles of the lecture notes here. Please note, however, that the PDF files do not include interactive links and omit the answers to proofs and exercises. For this reason, we strongly recommend using the online materials via the links in the Table.
 
 - Bert de Vries, [PDF bundle of all lecture notes for lessons B0 through B12](https://github.com/bertdv/BMLIP/blob/master/output/BMLIP-5SSD0-lecture-notes.pdf), version 30-Oct-2024.
 - Wouter Kouw, [PDF bundle of all probabilistic programming lecture notes for lessons W1 through W4](https://github.com/bertdv/BMLIP/blob/master/output/BMLIP-5SSD0-prob-prog.pdf) version 30-Oct-2024.
 
--->
-
 ### Books
 
-The following book is optional but very useful for additional reading:
+The following (freely downloadable) book is optional but very useful for additional reading:
 
 - [Christopher M.
 Bishop](http://research.microsoft.com/en-us/um/people/cmbishop/index.htm) (2006), [Pattern Recognition and Machine Learning](https://www.microsoft.com/en-us/research/people/cmbishop/prml-book/).
@@ -289,16 +287,12 @@ You can access all lecture materials online through the links below:
 
 ### Exam Rules
 
-- You can not bring a formula sheet, nor use a phone or calculator at the exam. Any needed formulas are supplied in the pre-amble of the exam.
+- You can not bring a formula sheet, nor use a phone or calculator at the exam. This [Formula Sheet](https://github.com/bmlip/course/blob/main/assets/files/5SSD0_formula_sheet.pdf) will be provided in the preamble of the exam. You can use the formula sheet when making any exercises. 
 
 
 ### Exam Preparation
 
-- The written exam will be a multiple-choice exam, just like the examples below. This year there will be no probabilistic programming question in the written exam.
-
-- Consult the <a href="https://bmlip.github.io/course/lectures/Course%20Syllabus.html">Course Syllabus</a> (lecture notes for 1st class) for advice on how to study the materials.
-
-- When doing exercises from the above table, feel free to make use of Sam Roweis' cheat sheets for <a href="https://github.com/bmlip/course/blob/main/assets/files/Roweis-1999-matrix-identities.pdf">Matrix identities</a> and <a href="https://github.com/bmlip/course/blob/main/assets/files/Roweis-1999-gaussian-identities.pdf">Gaussian identities</a>.
+- The written exam will be a multiple-choice exam, just like the examples below. This year, there will be no probabilistic programming question in the written exam.
 
 - In addition to the materials in the above table, we provide two representative practice written exams:
 

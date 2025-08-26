@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.15
+# v0.20.16
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/scientific-inquiry-loop-w-BML-eqs.png?raw=true"
@@ -24,14 +24,20 @@ macro bind(def, element)
     #! format: on
 end
 
+# ╔═╡ b32d2d36-f3a5-406f-adf6-c7b8ebe6cc77
+using MarkdownLiteral: @mdx
+
+# ╔═╡ 17182feb-2c58-4485-aadc-114003376607
+using Random
+
 # ╔═╡ df312e6a-503f-486f-b7ec-15404070960c
 using Distributions, StatsPlots, SpecialFunctions
 
-# ╔═╡ 3987d441-b9c8-4bb1-8b2d-0cc78d78819e
-using Plots, LaTeXStrings, Plots.PlotMeasures
-
 # ╔═╡ caba8eee-dfea-45bc-a8a7-1dd20a1fa994
 using BmlipTeachingTools
+
+# ╔═╡ 3987d441-b9c8-4bb1-8b2d-0cc78d78819e
+using Plots, LaTeXStrings, Plots.PlotMeasures
 
 # ╔═╡ 6a23b828-d294-11ef-371a-05d061144a43
 title("Bayesian Machine Learning")
@@ -62,23 +68,23 @@ md"""
 
 """
 
-# ╔═╡ 6a24376c-d294-11ef-348a-e9027bd0ec29
+# ╔═╡ 4f6a2d4f-bd89-4b0c-b544-397de2e34e72
 md"""
 $(challenge_statement("Predicting a Coin Toss"))
 
 ##### Problem 
+We observe the following sequence of heads (outcome ``=1``) and tails (outcome ``=0``) when tossing the same coin repeatedly.
 
-  * We observe the following sequence of heads (outcome ``=1``) and tails (outcome ``=0``) when tossing the same coin repeatedly: 
+Number of tosses: $(@bind intro_N Slider(1:20; default=7, show_value=true))
+"""
 
-```math
-D=\{1011001\}\,.
-```
-
-  * What is the probability that heads comes up next?
+# ╔═╡ daa1df0e-4ec5-4fb1-a355-a42c35bd35b9
+md"""
+What is the probability that heads comes up next?
 
 ##### Solution
 
-  * Later in this lecture. 
+Later in this lecture. 
 """
 
 # ╔═╡ 6a24b9e4-d294-11ef-3ead-9d272fbf89be
@@ -539,9 +545,6 @@ The second term ("complexity", also known as "information gain") is technically 
 
 """
 
-# ╔═╡ 80edf8a4-e738-4bdb-bea3-0967926da645
-TODO("Fons, can we move teh OPTIONAL Slide KL divergence to a mini?")
-
 # ╔═╡ 6a2814b0-d294-11ef-3a76-9b93c1fcd4d5
 md"""
 Models with high evidence ``p(D|m)`` prefer both high accuracy and low complexity. Therefore, models with high evidence tend to predict the training data ``D`` well (high accuracy), yet also try to preserve the information encoded by the prior (low complexity). These types of models are said to *generalize* well, since they can be applied to different data sets without specific adaptations for each data set.  
@@ -711,8 +714,37 @@ let
 	)
 end
 
+# ╔═╡ ee3da94c-5e87-4a0b-8373-c01e339d28aa
+md"""
+##### Pick Your Own Parameters
+
+
+α = $(@bind beta_pdf_a NumberField(.1:.1:1000; default=6.0)), 
+β = $(@bind beta_pdf_b NumberField(.1:.1:1000; default=2.0))
+"""
+
+# ╔═╡ 261620b0-9580-4d9e-b7de-d7972ea549cd
+let
+	α = isnan(beta_pdf_a) ? 0.1 : beta_pdf_a
+	β = isnan(beta_pdf_b) ? 0.1 : beta_pdf_b
+	x = 0:0.01:1
+
+	y = pdf.(Beta(α, β), x)
+	plot(x, y; 
+		# label="α=$α, β=$β", 
+		 ylim=(0, clamp(maximum(y)*1.05, 4, 4)),
+		label=nothing, 
+		xlabel="μ", 
+		ylabel="Density",
+		 size=(600,250)
+	)
+	
+end
+
 # ╔═╡ 6a294790-d294-11ef-270b-5b2152431426
 md"""
+#### Choosing a Prior
+
 Before observing any data, you can express your state-of-knowledge about the coin by choosing values for ``\alpha`` and ``\beta`` that reflect your beliefs. Stronger yet, you *must* choose values for ``\alpha`` and ``\beta``, because the Bayesian framework does not allow you to walk away from your responsibility to explicitly state your beliefs before the experiment.  
 
 """
@@ -899,9 +931,9 @@ For large ``N``, the gain goes to ``1`` and ``\left. p(x_\bullet=1|D)\right|_{N\
 """
 
 # ╔═╡ 6a2abb16-d294-11ef-0243-d376e8a39bb0
-code_example("Bayesian Evolution for the Coin Toss")
+code_example("Bayesian Evolution for the Coin Toss"; big=true)
 
-# ╔═╡ 6a2acb7e-d294-11ef-185c-9d49ce79c31b
+# ╔═╡ 54cb380d-8864-4158-ba68-55027ae68971
 md"""
 Let's code an example for a sequence of coin tosses, where we assume that the true coin generates data ``x_n \in \{0,1\}`` by a Bernoulli distribution:
 
@@ -911,11 +943,29 @@ p(x_n|\mu=0.4)=0.4^{x_n} \cdot 0.6^{1-x_n}
 
 So, this coin is biased!
 
-To predict the outcomes of future coin tosses, we'll compare **two models**. Both models have the same data-generating distribution (also Bernoulli):
+"""
+
+# ╔═╡ 9da43d0f-e605-41b7-9bc6-db5be95bc87f
+secret_distribution = Bernoulli(0.4);
+
+# ╔═╡ b791e819-f5a0-4c44-983b-07d8497516fb
+@mdx """
+
+```math
+D=\\{$(Int.(rand(MersenneTwister(234), secret_distribution, intro_N)))\\}\\,.
+```
+
+"""
+
+# ╔═╡ 280e0819-674e-4a58-854d-5a66e0777074
+md"""
+### Two Models
+To predict the outcomes of future coin tosses, we'll compare **two models**: ``m_1`` and ``m_2``. Both models have the same data-generating distribution (also Bernoulli):
 
 ```math
 p(x_n|\mu,m_k) = \mu^{x_n} (1-\mu)^{1-x_n} \quad \text{for }k=1,2 \,,
 ```
+
 
 but they have different priors:
 
@@ -926,39 +976,51 @@ p(\mu|m_2) &= \mathrm{Beta}(\mu|\alpha=8,\beta=13). \\
 \end{aligned}
 ```
 
-You can verify that model ``m_2`` has the best prior, since
+"""
 
-```math
-\begin{align*}
-p(x_n=1|m_1) &= \left.\frac{\alpha}{\alpha+\beta}\right|_{m_1} = 100/600 \approx 0.17 \\
-p(x_n=1|m_2) &= \left.\frac{\alpha}{\alpha+\beta}\right|_{m_2} = 8/21 \approx 0.38 \,,
-\end{align*}
-```
+# ╔═╡ e47b6eb6-2bb3-4c2d-bda6-f1535f2f94c4
+priors = [
+	Beta(100., 500.), 
+	Beta(8., 13.)
+];
 
-(but you are not supposed to know that the real coin has a probability ``0.4`` for heads.) 
-
-Let's run ``500`` tosses:
+# ╔═╡ e55126ef-e956-464d-8ae0-32b077649f21
+md"""
+> #### We can already guess which one is better!
+> 
+> You can verify that model ``m_2`` has the best prior, since
+> 
+> ```math
+> \begin{align*}
+> p(x_n=1|m_1) &= \left.\frac{\alpha}{\alpha+\beta}\right|_{m_1} = 100/600 \approx 0.17 \\
+> p(x_n=1|m_2) &= \left.\frac{\alpha}{\alpha+\beta}\right|_{m_2} = 8/21 \approx 0.38 \,,
+> \end{align*}
+> ```
+> 
+> (but you are not supposed to know that the real coin has a probability ``0.4`` for heads.) 
+> 
 
 """
 
-# ╔═╡ 8bfc4f37-4bf8-42a3-bd55-f046c8d2624a
-TODO("What code do we want to show, and what do we want to hide? We might want to move cells with hidden code to the end of this section.")
+# ╔═╡ f67136ff-f33c-436e-823b-9c530d257ab0
+md"""
+### Simulation
 
-# ╔═╡ 51829800-1781-49ae-8ee7-ac15c0bfcb88
-# computes log10 of Gamma function
-function log10gamma(num)
-    num = convert(BigInt, num)
-    return log10(gamma(num))
-end
-
-# ╔═╡ de7a1b82-f1c4-4eff-b372-ac76cf11c015
-μ  = 0.4;                        # specify model parameter
+Let's run ``500`` tosses:
+"""
 
 # ╔═╡ d1d2bb84-7083-435a-9c19-4c02074143e3
-n_tosses = 500                   # specify number of coin tosses
+n_tosses = 500;
 
 # ╔═╡ 9c751f8e-f7ed-464f-b63c-41e318bbff2d
-samples = rand(n_tosses) .<= μ   # Flip 500 coins
+samples = rand(secret_distribution, n_tosses)
+
+# ╔═╡ 6922b899-499e-4f73-a6be-ca427fdc14ea
+md"""
+### Bayesian Machine Learning
+
+Now, let's update our posteriors iteratively. For every toss, we do a **Bayesian update step** to compute the new posterior for the distribution of ``\mu``. This posterior then becomes the **prior** for the next step.
+"""
 
 # ╔═╡ e99e7650-bb72-4576-8f2a-c3994533b644
 function handle_coin_toss(prior::Beta, observation::Bool)
@@ -966,8 +1028,15 @@ function handle_coin_toss(prior::Beta, observation::Bool)
 	return posterior
 end
 
+# ╔═╡ 51829800-1781-49ae-8ee7-ac15c0bfcb88
+# computes log10 of Gamma function
+function log10gamma(num::Real)::Real
+    num = convert(BigInt, num)
+    return log10(gamma(num))
+end
+
 # ╔═╡ 7a624d2f-812a-47a0-a609-9fe299de94f5
-function log_evidence_prior(prior::Beta, N::Int64, n::Int64)
+function log_evidence_prior(prior::Beta, N::Int64, n::Int64)::Real
     log10gamma(prior.α + prior.β) - 
 	log10gamma(prior.α) - 
 	log10gamma(prior.β) + 
@@ -978,70 +1047,107 @@ end
 
 # ╔═╡ 3a903a4d-1fb0-4566-8151-9c86dfc40ceb
 begin
-	priors = [Beta(100., 500.), Beta(8., 13.)]  # specify prior distributions 
-	n_models = length(priors)
-	
 	# save a sequence of posterior distributions for every prior, starting with the prior itself
+	prior_distributions = [d for d in priors]
 	posterior_distributions = [[d] for d in priors] 
 	log_evidences = [[] for _ in priors] 
+
 
 	# for every sample we want to update our posterior
 	for (N, sample) in enumerate(samples)
 		# at every sample we want to update all distributions
-	    for (i, prior) in enumerate(priors)
+		for (i, prior) in enumerate(prior_distributions)
 
 			# do bayesian updating
-	        posterior = handle_coin_toss(prior, sample)
+			posterior = handle_coin_toss(prior, sample)
 			
 			# add posterior to vector of posterior distributions
-	        push!(posterior_distributions[i], posterior)
-	        
-	        # compute log evidence and add to vector
-	        log_evidence = log_evidence_prior(posterior_distributions[i][N], N, sum(samples[1:N]))
-	        push!(log_evidences[i], log_evidence)
+			push!(posterior_distributions[i], posterior)
+			
+			# compute log evidence and add to vector
+			log_evidence = log_evidence_prior(posterior_distributions[i][N], N, sum(samples[1:N]))
+			push!(log_evidences[i], log_evidence)
 	
-	        # the prior for the next sample is the posterior from the current sample
-	        priors[i] = posterior
-	    end
+			# the prior for the next sample is the posterior from the current sample
+			prior_distributions[i] = posterior
+		end
 	end
 end
 
+# ╔═╡ 9fcb9c9f-b65f-4a35-8508-7e430ab02c57
+
+
+# ╔═╡ f956e217-3dce-446a-8660-25f2c9cb05e2
+md"""
+We now have a sequence of **posterior distributions** and **log evidences** for each model. Notice that the first "posterior" in each sequence is the prior, and the last posterior is the posterior that takes all data into account. This is our updated model, using Bayesian reasoning.
+
+_Click on the vectors below to see their values._
+"""
+
+# ╔═╡ 2c90eee1-b5d9-434d-bccc-64de8b458a48
+posterior_distributions
+
+# ╔═╡ 9d82af33-8e91-48e9-8c34-fa6ea31492c2
+log_evidences
+
 # ╔═╡ 6a2af90a-d294-11ef-07bd-018326577791
 md"""
-For each model, as a function of the number of coin tosses, we plot the evolution of the parameter posteriors 
+### Results: Posteriors Visualised
 
-```math
-p(\mu|D_n,m_\bullet)
-```
-
+For each model, we plot the parameter **posteriors** ``p(\mu|D_n,m_\bullet)`` computed after ``n`` iterations.
 """
 
 # ╔═╡ d484c41d-9834-4528-bf47-93ab4e35ebaa
 md"""
-Select iteration: $(@bind toss_index_1 Slider(1:n_tosses; show_value=true))
+Select iteration: $(@bind toss_index_1 Slider(0:n_tosses; show_value=true))
 """
 
 # ╔═╡ 6a2b1106-d294-11ef-0d64-dbc26ba3eb44
 # Animate posterior distributions over time in a gif
 
 let i = toss_index_1
-    p = plot(title=string("n = ", i))
-    for j in 1:n_models
-        plot!(posterior_distributions[j][i+1], xlims = (0, 1), fill=(0, .2,), label=string("Posterior m", j), linewidth=2, ylims=(0,28), xlabel="μ")
+    p = plot(title="n = $i$(i == 0 ? " (priors)" : "")")
+    for (j,post) in enumerate(posterior_distributions)
+        plot!(post[i+1], xlims = (0, 1), fill=(0, .2,), label="Posterior model $j", linewidth=2, ylims=(0,28), xlabel="μ", legend=:topright)
     end
-	p
+	vline!([mean(secret_distribution)]; style=:dash, color="purple", label="True parameter")
 end
+
+# ╔═╡ c5c601e4-c792-4096-aa9e-f6b564137123
+keyconcept(
+	"",
+	md"""
+	Bayesian Machine Learning updates a **prior** parameter distribution to generate a **posterior** parameter distribution. The posterior distribution is generally **closer to the true value**.
+	"""
+)
+
+# ╔═╡ 7c70558d-4605-408f-9098-989345edac6e
+
 
 # ╔═╡ 6a2b2d44-d294-11ef-33ba-15db357708b1
 md"""
+
+#### What happens with model 1?
+
 Note that both posteriors move toward the "correct" value (``\mu=0.4``). However, the posterior for ``m_1`` (blue) moves much slower because we assumed far more pseudo-observations for ``m_1`` than for ``m_2``. 
 
-As we get more observations, the influence of the prior diminishes. 
 
 """
 
+# ╔═╡ e9b32823-efd2-4a27-b529-4f49752c00bb
+keyconcept(
+	"",
+	md"As we get more observations, the influence of the prior diminishes. "
+)
+
+# ╔═╡ 69eaf045-e766-4b7f-a9e8-8eac674ca2ae
+
+
 # ╔═╡ 6a2b3ba4-d294-11ef-3c28-176be260cb15
 md"""
+
+### Results: Evidence Visualised
+
 We have an intuition that ``m_2`` is superior over ``m_1``. Let's check this by plotting over time the relative Bayesian evidences for each model:
 
 ```math
@@ -1050,9 +1156,6 @@ We have an intuition that ``m_2`` is superior over ``m_1``. Let's check this by 
 
 """
 
-# ╔═╡ c69c591f-1947-4b07-badb-3882fd097785
-evidences = map(model -> exp.(model), log_evidences)
-
 # ╔═╡ ebcfcd1b-7fc8-42b7-a35e-4530f798cfdf
 md"""
 Select iteration: $(@bind toss_index_2 Slider(1:n_tosses; show_value=true))
@@ -1060,13 +1163,15 @@ Select iteration: $(@bind toss_index_2 Slider(1:n_tosses; show_value=true))
 
 # ╔═╡ 188b5bea-6765-4dcf-9369-3b1fdbe94494
 let i = toss_index_2
-	p = plot(title=string(L"\frac{p_i(\mathbf{x}_{1:n})}{\sum_i p_i(\mathbf{x}_{1:n})}","   n = ", i), ylims=(0, 1), legend=:topleft)
-    total = sum([evidences[j][i] for j in 1:n_models])
-    bar!([(evidences[j][i] / total) for j in 1:n_models], group=["Model $i" for i in 1:n_models])
+	evidences = map(model -> exp.(model), log_evidences)
+	
+	plot(title=string(L"\frac{p_i(\mathbf{x}_{1:n})}{\sum_i p_i(\mathbf{x}_{1:n})}","   n = ", i), ylims=(0, 1), legend=:topleft)
+    total = sum(e[i] for e in evidences)
+    bar!([(e[i] / total) for e in evidences], group=["Model $i" for i in eachindex(priors)])
 end
 
-# ╔═╡ 84e7ff22-e232-4ab7-a206-ccdd943043dd
-
+# ╔═╡ ee4006aa-e54b-4501-93ee-60b34bdf5c7b
+exercise_statement("Convergence to 0"; header_level=4)
 
 # ╔═╡ 6a2b9676-d294-11ef-241a-89ff7aa676f9
 md"""
@@ -1476,96 +1581,12 @@ NotebookCard("https://bmlip.github.io/course/minis/Distributions%20in%20Julia.ht
 
 # ╔═╡ 6a2ccd16-d294-11ef-22ee-a5cff62ccd9c
 md"""
-## The Kullback-Leibler Divergence
-
-The $(HTML("<span id='KLD'>Kullback-Leibler Divergence</span>")) (a.k.a. relative entropy) between two distributions ``q`` and ``p`` is defined as
-
-```math
-D_{\text{KL}}[q,p] \equiv \sum_z q(z) \log \frac{q(z)}{p(z)}
-```
-
-The following [Gibbs Inequality](https://en.wikipedia.org/wiki/Gibbs%27_inequality) holds (see [wikipedia](https://en.wikipedia.org/wiki/Gibbs%27_inequality) for proof): 
-
-```math
-D_{\text{KL}}[q,p] \geq 0 \quad \text{with equality only if } p=q 
-```
-
-The KL divergence can be interpreted as a distance between two probability distributions.
-
-As an aside, note that ``D_{\text{KL}}[q,p] \neq D_{\text{KL}}[p,q]``. Both divergences are relevant. 
+## The Kullback-Leibler Divergence$(HTML("<span id='KLD'></span>"))
 
 """
 
-# ╔═╡ 6a2cd9be-d294-11ef-33cf-4b23b92e1cbf
-md"""
-Here is an animation that shows the KL divergence between two Gaussian distributions:
-
-"""
-
-# ╔═╡ 10306ea6-6092-463c-9315-7a216c83606e
-function kullback_leibler(q::Normal, p::Normal)                                 
-    # Calculates the KL Divergence between two gaussians 
-    # (see https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence for calculations)
-    return log((p.σ / q.σ)) + ((q.σ)^2 + (p.μ - q.μ)^2) / (2*p.σ^2) - (1/2)
-end
-
-# statistics of distributions we'll keep constant (we'll vary the mean of q)
-# feel free to change these and see what happens
-
-# ╔═╡ ff20449d-1489-430a-aeee-a3a66bece706
-μ_p = 0; σ_p = 1;
-
-# ╔═╡ b47a2e71-48bb-4cc7-9a14-c0e654c5d2f8
-σ_q = 1;
-
-# ╔═╡ 9a58bf5d-f072-4572-bb90-9b860133dce8
-p = Normal(μ_p, σ_p)
-
-# ╔═╡ 635e4f4c-5274-4bd4-a940-b2f3819426ec
-@bind KL_animation_step Slider(1:100)
-
-# ╔═╡ 7bf0fde7-b201-4646-9934-ec93e661cf22
-let i = KL_animation_step
-	# sequence of means tested so far (to compute sequence of KL divergences)
-    μ_seq = [(j / 10.) - 5. + μ_p for j in 1:i]
-	# KL divergence data
-    kl = [kullback_leibler(Normal(μ, σ_q), p) for μ in μ_seq]
-
-	
-    viz = plot(; 
-			   right_margin=8mm, 
-			   title=string(L"D_{KL}(Q || P) = ", round(100 * kl[i]) / 100.), 
-			   legend=:topleft
-	)
-
-	# extract mean of current frame from mean sequence
-    μ_q = μ_seq[i]
-    q = Normal(μ_q, σ_q)
-
-    plot!(p;
-		  xlims = (μ_p - 8, μ_p + 8), 
-		  fill=(0, .2,), 
-		  label="P", 
-		  linewidth=2, 
-		  ylims=(0,0.5),
-	)
-    plot!(q;
-		  fill=(0, .2,), 
-		  label="Q",
-		  linewidth=2, 
-		  ylims=(0,0.5),
-	)
-	# plot KL divergence data with different y-axis scale and different legend 
-    plot!(twinx(), μ_seq, kl;
-		  xlims = (μ_p - 8, μ_p + 8),
-		  ylims=(0, maximum(kl) + 3), 
-		  xticks=:none, 
-		  linewidth = 3,                                                             
-		  color="green",
-		  legend=:topright,
-		  label=L"D_{KL}(Q || P)",
-	)
-end
+# ╔═╡ f5d8d021-3157-464f-93a2-b3054779e55f
+NotebookCard("https://bmlip.github.io/course/minis/KL%20Divergence.html")
 
 # ╔═╡ 1f92c406-6792-4af6-9132-35efd8223bc5
 md"""
@@ -1581,7 +1602,9 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+MarkdownLiteral = "736d6165-7244-6769-4267-6b50796e6954"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 
@@ -1589,6 +1612,7 @@ StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 BmlipTeachingTools = "~1.1.0"
 Distributions = "~0.25.119"
 LaTeXStrings = "~1.4.0"
+MarkdownLiteral = "~0.1.2"
 Plots = "~1.40.13"
 SpecialFunctions = "~2.5.1"
 StatsPlots = "~0.15.7"
@@ -1600,7 +1624,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "c32aa4de72bf9cb3845a24e6c53ef8abfcfaabe9"
+project_hash = "dcbf704cb9c8d90e5e5aca147f7d66c1c2f60dce"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -1742,6 +1766,12 @@ deps = ["ColorTypes", "FixedPointNumbers", "Reexport"]
 git-tree-sha1 = "37ea44092930b1811e666c3bc38065d7d87fcc74"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
 version = "0.13.1"
+
+[[deps.CommonMark]]
+deps = ["PrecompileTools"]
+git-tree-sha1 = "351d6f4eaf273b753001b2de4dffb8279b100769"
+uuid = "a80b9123-70ca-4bc0-993e-6e3bcb318db6"
+version = "0.9.1"
 
 [[deps.Compat]]
 deps = ["TOML", "UUIDs"]
@@ -2237,6 +2267,12 @@ version = "0.5.16"
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 version = "1.11.0"
+
+[[deps.MarkdownLiteral]]
+deps = ["CommonMark", "HypertextLiteral"]
+git-tree-sha1 = "f7d73634acd573bf3489df1ee0d270a5d6d3a7a3"
+uuid = "736d6165-7244-6769-4267-6b50796e6954"
+version = "0.1.2"
 
 [[deps.MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
@@ -3075,7 +3111,9 @@ version = "1.9.2+0"
 # ╟─6a23b828-d294-11ef-371a-05d061144a43
 # ╟─6be2e966-4048-44d0-a37e-95060e3fe30b
 # ╟─6a23df9e-d294-11ef-3ddf-a51d4cea00fc
-# ╟─6a24376c-d294-11ef-348a-e9027bd0ec29
+# ╟─4f6a2d4f-bd89-4b0c-b544-397de2e34e72
+# ╟─b791e819-f5a0-4c44-983b-07d8497516fb
+# ╟─daa1df0e-4ec5-4fb1-a355-a42c35bd35b9
 # ╟─6a24b9e4-d294-11ef-3ead-9d272fbf89be
 # ╟─6a24c3e6-d294-11ef-3581-2755a9ba15ba
 # ╟─e2de9415-7bd8-4e95-abeb-53fc068ee950
@@ -3130,7 +3168,6 @@ version = "1.9.2+0"
 # ╟─6a9ad1c4-dfb2-4987-9ddc-da6131605083
 # ╟─6a27efc6-d294-11ef-2dc2-3b2ef95e72f5
 # ╟─6a280132-d294-11ef-10ac-f3890cb3f78b
-# ╠═80edf8a4-e738-4bdb-bea3-0967926da645
 # ╟─6a2814b0-d294-11ef-3a76-9b93c1fcd4d5
 # ╟─6a282892-d294-11ef-2c12-4b1c7374617c
 # ╟─6a286b04-d294-11ef-1b34-8b7a85c0048c
@@ -3144,10 +3181,10 @@ version = "1.9.2+0"
 # ╟─6a28d81e-d294-11ef-2a9f-d32daa5556ae
 # ╟─6a28e674-d294-11ef-391b-0d33fd609fb8
 # ╟─6a28f466-d294-11ef-3af9-e34de9736c71
-# ╠═df312e6a-503f-486f-b7ec-15404070960c
-# ╟─3987d441-b9c8-4bb1-8b2d-0cc78d78819e
 # ╟─51bed1cc-c960-46fe-bc09-2b684df3b0cc
 # ╟─513414c7-0a54-4767-a583-7d779f8fbc55
+# ╟─ee3da94c-5e87-4a0b-8373-c01e339d28aa
+# ╟─261620b0-9580-4d9e-b7de-d7972ea549cd
 # ╟─6a294790-d294-11ef-270b-5b2152431426
 # ╟─b872cd69-d534-4b04-bb76-d85bb7ef0ea9
 # ╟─1ba1939d-9986-4b97-9273-4f2434f1d385
@@ -3168,24 +3205,35 @@ version = "1.9.2+0"
 # ╟─6a2a9faa-d294-11ef-1284-cfccb1da444e
 # ╟─6a2aad42-d294-11ef-3129-3be5be8c82d6
 # ╟─6a2abb16-d294-11ef-0243-d376e8a39bb0
-# ╟─6a2acb7e-d294-11ef-185c-9d49ce79c31b
-# ╟─8bfc4f37-4bf8-42a3-bd55-f046c8d2624a
-# ╟─51829800-1781-49ae-8ee7-ac15c0bfcb88
-# ╟─de7a1b82-f1c4-4eff-b372-ac76cf11c015
-# ╟─d1d2bb84-7083-435a-9c19-4c02074143e3
-# ╟─9c751f8e-f7ed-464f-b63c-41e318bbff2d
-# ╟─e99e7650-bb72-4576-8f2a-c3994533b644
+# ╟─54cb380d-8864-4158-ba68-55027ae68971
+# ╠═9da43d0f-e605-41b7-9bc6-db5be95bc87f
+# ╟─280e0819-674e-4a58-854d-5a66e0777074
+# ╠═e47b6eb6-2bb3-4c2d-bda6-f1535f2f94c4
+# ╟─e55126ef-e956-464d-8ae0-32b077649f21
+# ╟─f67136ff-f33c-436e-823b-9c530d257ab0
+# ╠═d1d2bb84-7083-435a-9c19-4c02074143e3
+# ╠═9c751f8e-f7ed-464f-b63c-41e318bbff2d
+# ╟─6922b899-499e-4f73-a6be-ca427fdc14ea
+# ╠═3a903a4d-1fb0-4566-8151-9c86dfc40ceb
+# ╠═e99e7650-bb72-4576-8f2a-c3994533b644
 # ╟─7a624d2f-812a-47a0-a609-9fe299de94f5
-# ╟─3a903a4d-1fb0-4566-8151-9c86dfc40ceb
+# ╟─51829800-1781-49ae-8ee7-ac15c0bfcb88
+# ╟─9fcb9c9f-b65f-4a35-8508-7e430ab02c57
+# ╟─f956e217-3dce-446a-8660-25f2c9cb05e2
+# ╠═2c90eee1-b5d9-434d-bccc-64de8b458a48
+# ╠═9d82af33-8e91-48e9-8c34-fa6ea31492c2
 # ╟─6a2af90a-d294-11ef-07bd-018326577791
 # ╟─6a2b1106-d294-11ef-0d64-dbc26ba3eb44
 # ╟─d484c41d-9834-4528-bf47-93ab4e35ebaa
+# ╟─c5c601e4-c792-4096-aa9e-f6b564137123
+# ╟─7c70558d-4605-408f-9098-989345edac6e
 # ╟─6a2b2d44-d294-11ef-33ba-15db357708b1
+# ╟─e9b32823-efd2-4a27-b529-4f49752c00bb
+# ╟─69eaf045-e766-4b7f-a9e8-8eac674ca2ae
 # ╟─6a2b3ba4-d294-11ef-3c28-176be260cb15
-# ╠═c69c591f-1947-4b07-badb-3882fd097785
 # ╟─188b5bea-6765-4dcf-9369-3b1fdbe94494
 # ╟─ebcfcd1b-7fc8-42b7-a35e-4530f798cfdf
-# ╟─84e7ff22-e232-4ab7-a206-ccdd943043dd
+# ╟─ee4006aa-e54b-4501-93ee-60b34bdf5c7b
 # ╟─6a2b9676-d294-11ef-241a-89ff7aa676f9
 # ╟─9c5d7c89-f65c-4f52-9e49-14692bed2452
 # ╟─6a2bb18a-d294-11ef-23bb-99082caf6e01
@@ -3213,15 +3261,13 @@ version = "1.9.2+0"
 # ╟─1edae118-dcc7-4169-95cf-f36025f2c336
 # ╟─275a9a69-3135-4cbd-8a35-b1abee4af83f
 # ╟─6a2ccd16-d294-11ef-22ee-a5cff62ccd9c
-# ╟─6a2cd9be-d294-11ef-33cf-4b23b92e1cbf
-# ╠═10306ea6-6092-463c-9315-7a216c83606e
-# ╠═ff20449d-1489-430a-aeee-a3a66bece706
-# ╠═b47a2e71-48bb-4cc7-9a14-c0e654c5d2f8
-# ╠═9a58bf5d-f072-4572-bb90-9b860133dce8
-# ╟─7bf0fde7-b201-4646-9934-ec93e661cf22
-# ╟─635e4f4c-5274-4bd4-a940-b2f3819426ec
+# ╟─f5d8d021-3157-464f-93a2-b3054779e55f
 # ╟─1f92c406-6792-4af6-9132-35efd8223bc5
+# ╠═b32d2d36-f3a5-406f-adf6-c7b8ebe6cc77
+# ╠═17182feb-2c58-4485-aadc-114003376607
+# ╠═df312e6a-503f-486f-b7ec-15404070960c
 # ╠═caba8eee-dfea-45bc-a8a7-1dd20a1fa994
+# ╠═3987d441-b9c8-4bb1-8b2d-0cc78d78819e
 # ╟─7a764a14-a5df-4f76-8836-f0a571fc3519
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
