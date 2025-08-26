@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.15
+# v0.20.16
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/ffg-example-1.png?raw=true"
@@ -12,14 +12,26 @@
 using Markdown
 using InteractiveUtils
 
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    #! format: off
+    return quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
+    #! format: on
+end
+
+# ╔═╡ 5a8dcadb-f0c2-4fb0-b8cd-db8cf49cc292
+using BmlipTeachingTools
+
 # ╔═╡ 965a08f4-d294-11ef-0604-1586ff37c0d4
 using Plots, LinearAlgebra, LaTeXStrings
 
 # ╔═╡ 2cb7d369-e7fd-4d66-8321-66a9197a26bd
 using RxInfer, Random
-
-# ╔═╡ 5a8dcadb-f0c2-4fb0-b8cd-db8cf49cc292
-using BmlipTeachingTools
 
 # ╔═╡ 96547560-d294-11ef-0fa7-6b6489f7baba
 title("Factor Graphs")
@@ -96,21 +108,24 @@ md"""
 md"""
 ## Factor Graph Construction Rules
 
-Consider a function 
-
-```math
-f(x_1,x_2,x_3,x_4,x_5) = f_a(x_1,x_2,x_3) \cdot f_b(x_3,x_4,x_5) \cdot f_c(x_4)
-```
-
 """
 
-# ╔═╡ 9655c1ae-d294-11ef-061a-991947cee620
+# ╔═╡ 403845d6-0229-4c93-bc23-3aecfd76e874
+TwoColumn( 
 md"""
-The factorization of this function can be graphically represented by a **Forney-style Factor Graph** (FFG):
-
+Consider a function 
+```math
+	\begin{align}
+f(x_1,&x_2,x_3,x_4,x_5) \\
+	&= f_a(x_1,x_2,x_3) \cdot f_b(x_3,x_4,x_5) \cdot f_c(x_4)\,.
+	\end{align}
+```
+The factorization of this function can be graphically represented by a **Forney-style Factor Graph** (FFG), see image on the right.
+""",
+	
+md"""
 ![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-example-1.png?raw=true)
-
-"""
+""")	
 
 # ╔═╡ 9655d360-d294-11ef-0f06-ab58e2ad0e5f
 md"""
@@ -275,8 +290,17 @@ An observation, say ``y=3``, can be represented by a **delta node** ``f(y)=\delt
 
 In an FFG, we visualize a delta node by a small black box,
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-observation-y-3.png?raw=true)
+"""
 
+# ╔═╡ adfc41d1-956a-43ba-94d3-3ed6c71475ca
+@htl """
+
+<img src="https://github.com/bmlip/course/blob/v2/assets/figures/ffg-observation-y-3.png?raw=true" alt=" " style="display: block; width: 70%; margin: 0 auto;">
+
+"""
+
+# ╔═╡ 3d54facb-e655-4d8d-b565-bffc4fdf0a95
+md"""
 where we identify 
 ```math
 \begin{align*}
@@ -285,7 +309,6 @@ f_b(x_3,x_4,x_5) &= p(x_3,x_5|x_4) \\
 f_c(x_4) &= p(x_4)
 \end{align*}
 ```
-
 """
 
 # ╔═╡ ea4a720f-a644-46a0-ad35-b215780e0928
@@ -541,21 +564,23 @@ md"""
 The figure above (a screen recording from the [RxInfer webpage](http://rxinfer.com)) is an animated GIF illustrating how RxInfer operates. The model is represented as a graph, where each node passes messages to its neighbors. When messages meet on an edge, the belief about the variable associated with that edge is updated.
 """
 
-# ╔═╡ 96589eb0-d294-11ef-239a-2513a805cdcf
-md"""
-## Code Example: Bayesian Linear Regression by Message Passing
+# ╔═╡ bb402d81-1938-409d-897c-1f86d0970fe5
+TODO(
+	md"The example below needs some math work, see [github issue](https://github.com/bmlip/course/pull/156#issuecomment-3223104105)."
+)
 
-"""
+# ╔═╡ a1c957c1-69b7-4178-ab59-c0b2439bb01a
+code_example("Bayesian Linear Regression by Message Passing"; big=true)
 
 # ╔═╡ 9658c106-d294-11ef-01db-cfcff611ed81
 md"""
-Assume we want to estimate some function ``f: \mathbb{R}^D \rightarrow \mathbb{R}`` from a given data set ``D = \{(x_1,y_1), \ldots, (x_N,y_N)\}``.
+Assume we want to estimate some function ``f^D: \mathbb{R} \rightarrow \mathbb{R}`` from a given data set ``D = \{(x_1,y_1), \ldots, (x_N,y_N)\}``.
 
 """
 
 # ╔═╡ 96594d44-d294-11ef-22b8-95165fb08ce4
 md"""
-#### model specification
+#### Model Specification
 
 We will assume a linear model with white Gaussian noise and a Gaussian prior on the coefficients ``w``:
 
@@ -590,95 +615,133 @@ We are interested in inferring the posterior ``p(w|D)``. We will execute inferen
 md"""
 The left figure shows the factor graph for this model for one observation ``(x,y)``. The figure on the right shows the message passing scheme. 
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-bayesian-linear-regression.png?raw=true)
-
 """
 
-# ╔═╡ 9659ab66-d294-11ef-027a-d3f7206050af
-md"""
-#### Inference Execution (by RxInfer)
+# ╔═╡ 14b87cc5-ddb0-4b8f-89e2-0c1cc50588aa
+@htl """
 
-Let's solve this problem by message passing-based inference with Julia's FFG toolbox [RxInfer](https://biaslab.github.io/rxinfer-website/).
+<img src="https://github.com/bmlip/course/blob/v2/assets/figures/ffg-bayesian-linear-regression.png?raw=true" alt=" " style="display: block; width: 70%; margin: 0 auto;">
 
 """
-
-# ╔═╡ 6d90a958-6f2b-4f18-a121-0d1bab9e4d91
-md"""
-#### Parameters
-"""
-
-# ╔═╡ 1070063a-ef85-4527-ae82-1f01c1a506ff
-Σ = 1e5 * Diagonal(I,3) # Covariance matrix of prior on w
-
-# ╔═╡ ba7a2dbd-f068-4249-bc29-77f2d0804676
-σ2 = 2.0;                # Noise variance
 
 # ╔═╡ 480165f9-33d9-4db1-bf05-8d99f0d9fb3e
 md"""
-#### Generating a data set
+#### Generate the Data Set
+"""
+
+# ╔═╡ ca290536-ecf7-4c2e-93f9-d51c27dde210
+md"""
+We first generate data by a "secret" function ``f`` that is parameterized by weights ``w^*``:
 """
 
 # ╔═╡ aec4726a-954e-4e76-aae5-2dd6c979b12d
-w = [1.0; 2.0; 0.25]
-
-# ╔═╡ 1c9c7994-672c-42a3-8ae7-8ce092ada9f0
-N = 30;
-
-# ╔═╡ 99265e22-e8dc-40fe-989f-0d2a6c72faac
-z = 10.0*rand(N)
-
-# ╔═╡ e20e9048-1271-41c7-97d3-635f320aa365
-x_train = [[1.0; z; z^2] for z in z] # Feature vector x = [1.0; z; z^2]
+secret_true_w = [1.0; 2.0; 0.25];
 
 # ╔═╡ 96ef3cfb-ca18-46d6-bcac-0122c2c85fba
-f(x) = (w'*x)[1];
+f(x::Vector)::Real = secret_true_w' * x;
 
-# ╔═╡ 34ebbbe1-2a6b-422b-aeb1-cd2953acddca
-y_train = map(f, x_train) + sqrt(σ2)*randn(N) # y[i] = w' * x[i] + ϵ
+# ╔═╡ 79a0d02b-368f-4371-854c-cf2cea9328e5
+f([3.0^0, 3.0^1, 3.0^2])
 
-# ╔═╡ 7764541a-c11e-4e12-bbac-f8906cbc5dc6
-scatter(z, y_train, label="data", xlabel=L"z", ylabel=L"f([1.0, z, z^2]) + \epsilon")
+# ╔═╡ 05b733c6-2faf-4463-a0fd-48455757a28c
+md"""
+You may use the slider to adjust the number of observations:
+"""
+
+# ╔═╡ 1c9c7994-672c-42a3-8ae7-8ce092ada9f0
+begin
+	N_bond = @bindname Nsamples Slider(1:30; default=20, show_value=true)
+end
+
+# ╔═╡ f6fc4fad-70fb-432f-b77d-8e6ad42eef6c
+md"""
+Create the feature vector ``x = [1.0; z; z^2]``:
+"""
+
+# ╔═╡ 3a045b5c-9d87-46a6-a404-85c4bd77dd61
+md"""
+Now we can generate the observed ``y`` coordinates in the data set:
+"""
+
+# ╔═╡ ba7a2dbd-f068-4249-bc29-77f2d0804676
+data_noise_σ² = 2.0;
+
+# ╔═╡ f153c139-94c8-42af-9628-24455ee70cd1
+md"""
+Let's take a look at our data (feel free to play with the slider again):
+"""
+
+# ╔═╡ aca1f927-bc3b-48f6-af5c-12ee2ea4a49b
+N_bond
 
 # ╔═╡ 965a1df0-d294-11ef-323c-3da765f1104a
 md"""
-Now build the factor graph in RxInfer, perform sum-product message passing and plot results (mean of posterior).
+#### Infer Solution with RxInfer
+
+Now build the factor graph in RxInfer, and perform sum-product message passing to generate a posterior for the weights. 
 
 """
 
+# ╔═╡ 9c333d1b-9ca7-4838-bf55-18a6b0a462a0
+md"""
+First, we need a prior distribution for the weights
+"""
+
+# ╔═╡ 1070063a-ef85-4527-ae82-1f01c1a506ff
+prior_Σ = 1e5 * Diagonal(I,3) # Covariance matrix of prior on w
+
+# ╔═╡ 485c1eab-cf20-4fd9-b3b3-b83338484160
+md"""
+Specify the model in RxInfer
+"""
+
 # ╔═╡ fd338a30-9622-405a-96fa-caca6bd4ccfb
-@model function linear_regression(y,x, N, Σ, σ2)
+@model function linear_regression(y,x, Nsamples, Σ, σ²)
 
     w ~ MvNormalMeanCovariance(zeros(3),Σ)
     
-    for i in 1:N
-        y[i] ~ NormalMeanVariance(dot(w , x[i]), σ2)
+    for i in 1:Nsamples
+        y[i] ~ NormalMeanVariance(dot(w, x[i]), σ²)
     end
 end
 
-# ╔═╡ c03b1140-adce-467a-b953-50ad1bf3bc34
-# Run message passing algorithm 
-results = infer(
-    model      = linear_regression(N=length(x_train), Σ=Σ, σ2=σ2),
-    data       = (y = y_train, x = x_train),
-    returnvars = (w = KeepLast(),),
-    iterations = 20,
+# ╔═╡ 6055d71c-ed31-4bd4-9e6c-472912ed72ac
+md"""
+... and perform inference:
+"""
+
+# ╔═╡ 9431bc9a-bd83-4e4d-b64d-0571c1d01c87
+md"""
+It worked! Now we have a **posterior distribution** for ``w``:
+"""
+
+# ╔═╡ b3262127-69e0-4efb-875b-074d1d70437c
+
+
+# ╔═╡ fb61c774-34a3-493a-b149-c870993b6d46
+md"""
+#### Plot the Results
+
+Let's sample ``10`` typical values for the weights ``w`` from this posterior distribution, and plot the corresponding curves ``f_w: x \mapsto w^Tx`` in the scatter plot again.
+
+
+"""
+
+# ╔═╡ 5bcefd5f-4cd2-4cfe-8c1f-1129e5020d9a
+N_bond
+
+# ╔═╡ 1832bffd-2729-4d3f-86f4-0e2d9ab26ba3
+md"""
+Notice how the samples of the functions ``f_w`` lie closer together as we get more observations!
+"""
+
+# ╔═╡ 4a10044c-e044-43e1-bd44-847f56019061
+keyconcept(
+	"RxInfer does Bayesian ML",
+	md"""
+	In RxInfer, you need to specify the model and provide the observations. Inference is executed automatically by the "infer( )" function. 
+	"""
 )
-
-# ╔═╡ 83a70a4b-b114-4351-8fa2-dd565ebc9916
-convert(MvNormal, results.posteriors[:w])
-
-# ╔═╡ 965a37e8-d294-11ef-340f-0930b229dd32
-let
-	plt = scatter(z, y_train, label="data", xlabel=L"z", ylabel=L"f([1.0, z, z^2]) + \epsilon")
-	z_test = collect(0:0.2:12)
-	x_test = [[1.0; z; z^2] for z in z_test]
-	for i=1:10
-	    w_sample = rand(results.posteriors[:w])
-	    f_est(x) = (w_sample'*x)[1]
-	    plot!(plt, z_test, map(f_est, x_test), alpha=0.3, label=nothing);
-	end
-	plt
-end
 
 # ╔═╡ 965a6c20-d294-11ef-1c91-4bd237afbd20
 md"""
@@ -746,6 +809,17 @@ md"""
 - (e) Now assume that our belief about parameter ``\Sigma_v`` is instead given by a distribution ``p(\Sigma_v)`` (rather than a known value). Adapt the factor graph drawing of the previous answer to reflect our belief about ``\Sigma_v``.  
 """
 
+# ╔═╡ 45251c19-6eae-41e7-b0ed-8bd70a67d4e0
+ex_d_sol = TwoColumn(
+	md"""
+	- (d) Copy the graph onto your exam paper and draw the message passing schedule for computing ``p(z_k|z_{k-1},x_k,\theta)`` by drawing arrows in the factor graph. Indicate the order of the messages by assigning numbers to the arrows.      
+	
+	Some permutations of this order are also possible. The most important thing here is that you recognize the tree with ``Z_k`` as a root of the tree and pass messages from the terminals (e.g., ``Z_{k-1}``, ``X_k``, etc.) towards the root.
+	""", 
+	@htl """
+	<img src="https://github.com/bmlip/course/blob/main/assets/figures/ffg-5SSB0-exam-Kalman-filter-wMessages-wUncertainSigmaV.png?raw=true" alt=" " style="display: block; width: 100%; margin: 0 auto;">
+	""");
+
 # ╔═╡ 206c34b3-1873-460b-911e-f2cd4f8886af
 hide_solution(
 md"""
@@ -806,29 +880,13 @@ p(x^n,z^n|\theta) &= p(z_0|\Sigma_0) \prod_{k=1}^n p(x_k|z_k,C,\Sigma_v) \,p(z_k
 
 Yes, since the generative model ``p(x^n,z^n|\theta)`` is (one big) Gaussian.
 
+ $ex_d_sol
+
+- (e) Now assume that our belief about parameter ``\Sigma_v`` is instead given by a distribution ``p(\Sigma_v)`` (rather than a known value). Adapt the factor graph drawing of the previous answer to reflects our belief about ``\Sigma_v``.      
+
+For answer, see drawing for answer (d).
 
 """)
-
-# ╔═╡ a9a9f3a2-67e7-4ff5-bc94-29229656ca40
-TODO("FONS, I like to put a two-column block into one foldable solution, so that answers for (d) and (e) are also in the details() function.")
-
-# ╔═╡ 45251c19-6eae-41e7-b0ed-8bd70a67d4e0
-TwoColumn(
-	md"""
-	- (d) Copy the graph onto your exam paper and draw the message passing schedule for computing ``p(z_k|z_{k-1},x_k,\theta)`` by drawing arrows in the factor graph. Indicate the order of the messages by assigning numbers to the arrows.      
-	
-	Some permutations of this order are also possible. The most important thing here is that you recognize the tree with ``Z_k`` as a root of the tree and pass messages from the terminals (e.g., ``Z_{k-1}``, ``X_k``, etc.) towards the root.
-	""", 
-	@htl """
-	<img src="https://github.com/bmlip/course/blob/main/assets/figures/ffg-5SSB0-exam-Kalman-filter-wMessages-wUncertainSigmaV.png?raw=true" alt=" " style="display: block; width: 100%; margin: 0 auto;">
-	""")
-
-# ╔═╡ 7f4c06cb-139e-4e15-a032-b8991183634f
-md"""
-	- (e) Now assume that our belief about parameter ``\Sigma_v`` is instead given by a distribution ``p(\Sigma_v)`` (rather than a known value). Adapt the factor graph drawing of the previous answer to reflects our belief about ``\Sigma_v``.      
-	
-	For answer, see drawing for answer (d).
-	"""
 
 # ╔═╡ a6e155eb-7376-4e57-8e63-628934e14e78
 md"""
@@ -881,12 +939,17 @@ md"""
 # ╔═╡ 965aa14c-d294-11ef-226f-65d587fefa64
 md"""
 ## $(HTML("<span id='sp-for-multiplication-node'>Sum-Product Messages for Multiplication Nodes</span>"))
-
-Next, let us consider a **multiplication** by a fixed (invertible matrix) gain ``f_A(x,y) = \delta(y-Ax)``
-
-![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-gain-node.png?raw=true)
-
 """
+
+# ╔═╡ 56e8a1bd-ef80-4265-b926-e5e9e085b72f
+TwoColumn(
+md"""
+Next, let us consider a **multiplication** by a fixed (invertible matrix) gain ``f_A(x,y) = \delta(y-Ax)``
+""",
+md"""
+![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-gain-node.png?raw=true)
+"""
+)
 
 # ╔═╡ 965ab77c-d294-11ef-2510-95b1a998589f
 md"""
@@ -943,9 +1006,17 @@ where ``\overleftarrow{\xi}_X \triangleq \overleftarrow{W}_X \overleftarrow{m}_X
 md"""
 ## $(HTML("<span id='sp-for-addition-node'>Code example: Gaussian forward and backward messages for the Addition node</span>"))
 
-Let's calculate the Gaussian forward and backward messages for the addition node in RxInfer.  ![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-addition-node.png?raw=true)
-
 """
+
+# ╔═╡ 8dd6874c-12b7-47b6-b589-009849198024
+TwoColumn(
+md"""
+Let's calculate the Gaussian forward and backward messages for the addition node in RxInfer.
+""",
+md"""
+![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-addition-node.png?raw=true)
+"""
+)
 
 # ╔═╡ bfbf3d09-23f5-4f54-96f6-bfe536cfc228
 md"Forward message on ``Z``:"
@@ -963,9 +1034,17 @@ md"Backward message on ``X``:"
 md"""
 ## Code Example: forward and backward messages for the Matrix Multiplication node
 
-In the same way we can also investigate the forward and backward messages for the matrix multiplication ("gain") node  ![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-gain-node.png?raw=true)
-
 """
+
+# ╔═╡ a3e11d46-5a22-4eb6-ba91-7258ba3c667e
+TwoColumn(
+md"""
+In the same way we can also investigate the forward and backward messages for the matrix multiplication ("gain") node
+""",
+md"""
+![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-gain-node.png?raw=true)
+"""
+)
 
 # ╔═╡ 0efe10d8-1d0e-4a8f-8005-25ee261322b8
 md"Forward message on ``Y``:"
@@ -983,6 +1062,11 @@ md"Backward message on ``X``:"
 md"""
 ## Example: Sum-Product Algorithm to infer a posterior
 
+"""
+
+# ╔═╡ e0add49a-94ac-4247-8554-5a50d4abbebb
+TwoColumn(
+md"""
 Consider a generative model 
 
 ```math
@@ -991,24 +1075,22 @@ p(x,y_1,y_2) = p(x)\,p(y_1|x)\,p(y_2|x) .
 
 This model expresses the assumption that ``Y_1`` and ``Y_2`` are independent measurements of ``X``.
 
+""",
+md"""
 ![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-observations.png?raw=true)
-
 """
+)
 
-# ╔═╡ 965c2a4e-d294-11ef-1aab-73725568c64e
+# ╔═╡ d05277c1-fb9e-4b2b-bcbc-d8be5e63cab5
+TwoColumn(
 md"""
 Assume that we are interested in the posterior for ``X`` after observing ``Y_1= \hat y_1`` and ``Y_2= \hat y_2``. The posterior for ``X`` can be inferred by applying the sum-product algorithm to the following graph:
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-observations-2.png?raw=true)
-
-"""
-
-# ╔═╡ 965c39a8-d294-11ef-1d83-bde85e3ca790
+""",
 md"""
-!!! note
-	We usually draw terminal nodes for observed variables in the graph by smaller solid-black squares. This is just to help the visualization of the graph, since the computational rules are no different than for other nodes. 
-
+![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-observations-2.png?raw=true)
 """
+)
 
 # ╔═╡ 965c5f28-d294-11ef-324e-4df3e38b5045
 md"""
@@ -1062,18 +1144,18 @@ end
 result = infer(model=my_model(), data=(y1=y1_hat, y2 = y2_hat,))
 
 # ╔═╡ defb2149-294b-47a8-99ed-1b3746b275f1
-Text("Sum-product message passing result: p(x|y1,y2) = \n\t𝒩($(mean(result.posteriors[:x])),$(var(result.posteriors[:x])))")
-
-# ╔═╡ c95bf9a4-2e7b-4b3a-a161-56f3fd16ad0f
-# TODO: could also write this as:
-var"p(x|y1,y2)" = convert(Normal, result.posteriors[:x])
+Text("Sum-product message passing result: p(x|y1,y2) = \n\t𝒩($(
+	round(mean(result.posteriors[:x]); digits=3)
+),$(
+	round(var(result.posteriors[:x]); digits=3)
+))")
 
 # ╔═╡ b3656d6c-4717-4fcd-90c6-ae4f4aa5e1be
 
 
 # ╔═╡ b15f28ce-c8c1-439b-aeca-74a58d2557e2
 md"""
-We calculate mean and variance of p(x|y1,y2) manually by multiplying 3 Gaussians (see lesson 4 for details)
+We calculate mean and variance of `p(x|y1,y2)` manually by multiplying 3 Gaussians (see lesson 4 for details)
 """
 
 # ╔═╡ 86e67c05-068d-4de4-80f3-1a20cc8a43ea
@@ -1091,7 +1173,60 @@ md"""
 """
 
 # ╔═╡ 981b08cc-7fb4-4880-8e8a-0b60a5dd72a2
+stable_rand(args...; seed=nothing) = rand(MersenneTwister(543432 + hash(seed)), args...)
 
+# ╔═╡ 99265e22-e8dc-40fe-989f-0d2a6c72faac
+z = stable_rand(Uniform(0, 10), Nsamples; seed=1234)
+
+# ╔═╡ e20e9048-1271-41c7-97d3-635f320aa365
+x_train = [[1.0; z; z^2] for z in z]
+
+# ╔═╡ 34ebbbe1-2a6b-422b-aeb1-cd2953acddca
+# y[i]  = w' * x[i]   + ϵ
+y_train = f.(x_train) + stable_rand(Normal(0, sqrt(data_noise_σ²)), Nsamples; seed=4566)
+
+# ╔═╡ 7764541a-c11e-4e12-bbac-f8906cbc5dc6
+scatter(z, y_train;
+	xlim=(-.2,10.2),
+	ylim=(-1,51),
+	label="data", 
+	xlabel=L"z", 
+	ylabel=L"f([1.0, z, z^2]) + \epsilon"
+)
+
+# ╔═╡ c03b1140-adce-467a-b953-50ad1bf3bc34
+# Run message passing algorithm 
+results = infer(
+    model      = linear_regression(Nsamples=length(x_train), Σ=prior_Σ, σ²=data_noise_σ²),
+    data       = (y = y_train, x = x_train),
+    returnvars = (w = KeepLast(),),
+    iterations = 20,
+)
+
+# ╔═╡ 83a70a4b-b114-4351-8fa2-dd565ebc9916
+convert(MvNormal, results.posteriors[:w])
+
+# ╔═╡ 92f7bcfd-00a4-4cb7-a3eb-c1e101fdbcf6
+w_samples = rand(results.posteriors[:w], 10)       |> eachcol .|> collect
+
+# ╔═╡ 965a37e8-d294-11ef-340f-0930b229dd32
+let
+	plt = scatter(
+		z, y_train;
+		xlim=(-.2,10.2),
+		ylim=(-1,51),
+		label="data", 
+		xlabel=L"z", 
+		ylabel=L"f([1.0, z, z^2]) + \epsilon"
+	)
+	z_test = collect(0:0.2:12)
+	x_test = [[1.0; z; z^2] for z in z_test]
+	for w in w_samples
+	    f_est(x) = w'*x
+	    plot!(plt, z_test, map(f_est, x_test), alpha=0.5, label=nothing);
+	end
+	plt
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1116,7 +1251,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "2c267c977cf5e1509686d4affec06b6e95203285"
+project_hash = "5ad1eecd681556b7eddbd0fd3d9f72efb0e21df1"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "60665b326b75db6517939d0e1875850bc4a54368"
@@ -3094,7 +3229,7 @@ version = "1.9.2+0"
 # ╟─9655959e-d294-11ef-0ca6-5f20aa579e91
 # ╟─05db1eab-5b63-4ab9-8b4a-ab2cde554295
 # ╟─9655b2c2-d294-11ef-057f-9b3984064411
-# ╟─9655c1ae-d294-11ef-061a-991947cee620
+# ╟─403845d6-0229-4c93-bc23-3aecfd76e874
 # ╟─9655d360-d294-11ef-0f06-ab58e2ad0e5f
 # ╟─9655e06c-d294-11ef-0393-9355d6e20afb
 # ╟─9655ed6e-d294-11ef-370f-937b590036f3
@@ -3107,6 +3242,8 @@ version = "1.9.2+0"
 # ╟─9656d850-d294-11ef-21a1-474b07ea7729
 # ╟─9658329c-d294-11ef-0d03-45e6872c4985
 # ╟─f0181b53-a604-489f-a89e-db6fc58571dd
+# ╟─adfc41d1-956a-43ba-94d3-3ed6c71475ca
+# ╟─3d54facb-e655-4d8d-b565-bffc4fdf0a95
 # ╟─ea4a720f-a644-46a0-ad35-b215780e0928
 # ╟─00c69a22-feb5-4d1e-9ab5-a136435d7d22
 # ╟─9656e606-d294-11ef-1daa-312623552a5b
@@ -3131,67 +3268,82 @@ version = "1.9.2+0"
 # ╟─96587a66-d294-11ef-2c7a-9fd7bea76582
 # ╟─89e2757e-a09f-40c6-8dd7-9b4b4d232e17
 # ╟─c4b5b124-e52a-41fc-b27e-a58181622e5c
-# ╟─96589eb0-d294-11ef-239a-2513a805cdcf
+# ╟─bb402d81-1938-409d-897c-1f86d0970fe5
+# ╟─a1c957c1-69b7-4178-ab59-c0b2439bb01a
 # ╟─9658c106-d294-11ef-01db-cfcff611ed81
 # ╟─96594d44-d294-11ef-22b8-95165fb08ce4
 # ╟─96597ce0-d294-11ef-3478-25c6bbef601e
 # ╟─965998a8-d294-11ef-1d18-85876e3656c5
-# ╟─9659ab66-d294-11ef-027a-d3f7206050af
-# ╠═965a08f4-d294-11ef-0604-1586ff37c0d4
-# ╟─6d90a958-6f2b-4f18-a121-0d1bab9e4d91
-# ╠═1070063a-ef85-4527-ae82-1f01c1a506ff
-# ╠═ba7a2dbd-f068-4249-bc29-77f2d0804676
+# ╟─14b87cc5-ddb0-4b8f-89e2-0c1cc50588aa
 # ╟─480165f9-33d9-4db1-bf05-8d99f0d9fb3e
-# ╠═aec4726a-954e-4e76-aae5-2dd6c979b12d
-# ╠═1c9c7994-672c-42a3-8ae7-8ce092ada9f0
-# ╠═99265e22-e8dc-40fe-989f-0d2a6c72faac
-# ╠═e20e9048-1271-41c7-97d3-635f320aa365
+# ╟─ca290536-ecf7-4c2e-93f9-d51c27dde210
 # ╠═96ef3cfb-ca18-46d6-bcac-0122c2c85fba
+# ╠═aec4726a-954e-4e76-aae5-2dd6c979b12d
+# ╠═79a0d02b-368f-4371-854c-cf2cea9328e5
+# ╟─05b733c6-2faf-4463-a0fd-48455757a28c
+# ╟─1c9c7994-672c-42a3-8ae7-8ce092ada9f0
+# ╠═99265e22-e8dc-40fe-989f-0d2a6c72faac
+# ╟─f6fc4fad-70fb-432f-b77d-8e6ad42eef6c
+# ╠═e20e9048-1271-41c7-97d3-635f320aa365
+# ╟─3a045b5c-9d87-46a6-a404-85c4bd77dd61
+# ╠═ba7a2dbd-f068-4249-bc29-77f2d0804676
 # ╠═34ebbbe1-2a6b-422b-aeb1-cd2953acddca
-# ╠═7764541a-c11e-4e12-bbac-f8906cbc5dc6
+# ╟─f153c139-94c8-42af-9628-24455ee70cd1
+# ╟─aca1f927-bc3b-48f6-af5c-12ee2ea4a49b
+# ╟─7764541a-c11e-4e12-bbac-f8906cbc5dc6
 # ╟─965a1df0-d294-11ef-323c-3da765f1104a
-# ╠═2cb7d369-e7fd-4d66-8321-66a9197a26bd
+# ╟─9c333d1b-9ca7-4838-bf55-18a6b0a462a0
+# ╠═1070063a-ef85-4527-ae82-1f01c1a506ff
+# ╟─485c1eab-cf20-4fd9-b3b3-b83338484160
 # ╠═fd338a30-9622-405a-96fa-caca6bd4ccfb
+# ╟─6055d71c-ed31-4bd4-9e6c-472912ed72ac
 # ╠═c03b1140-adce-467a-b953-50ad1bf3bc34
+# ╟─9431bc9a-bd83-4e4d-b64d-0571c1d01c87
 # ╠═83a70a4b-b114-4351-8fa2-dd565ebc9916
+# ╟─b3262127-69e0-4efb-875b-074d1d70437c
+# ╟─fb61c774-34a3-493a-b149-c870993b6d46
+# ╠═92f7bcfd-00a4-4cb7-a3eb-c1e101fdbcf6
+# ╟─5bcefd5f-4cd2-4cfe-8c1f-1129e5020d9a
 # ╟─965a37e8-d294-11ef-340f-0930b229dd32
+# ╟─1832bffd-2729-4d3f-86f4-0e2d9ab26ba3
+# ╟─4a10044c-e044-43e1-bd44-847f56019061
 # ╟─965a6c20-d294-11ef-1c91-4bd237afbd20
 # ╟─25492eea-e649-43f9-b71f-ac6d1a80d0ee
 # ╟─a5cd774f-57ad-4cb5-86c0-35987aa6e221
 # ╟─b6de3f00-d3b8-44d8-b72a-48cd5628b607
 # ╟─05375a01-4d1b-44cc-b1c4-a5eb4b6c5c5b
 # ╟─206c34b3-1873-460b-911e-f2cd4f8886af
-# ╟─a9a9f3a2-67e7-4ff5-bc94-29229656ca40
 # ╟─45251c19-6eae-41e7-b0ed-8bd70a67d4e0
-# ╟─7f4c06cb-139e-4e15-a032-b8991183634f
 # ╟─a6e155eb-7376-4e57-8e63-628934e14e78
 # ╟─9dc870d7-a5f3-447c-96ee-ad23199bc253
 # ╟─e8a35c28-6d6d-4066-8251-f091f28622a9
 # ╟─965a8a1a-d294-11ef-1d2f-65abf76665e8
 # ╟─965aa14c-d294-11ef-226f-65d587fefa64
+# ╟─56e8a1bd-ef80-4265-b926-e5e9e085b72f
 # ╟─965ab77c-d294-11ef-2510-95b1a998589f
 # ╟─965af708-d294-11ef-112c-f5470031dbbe
 # ╟─965b11a4-d294-11ef-1d04-dbdf39ce91a3
 # ╟─965b25ac-d294-11ef-0b9a-9d5a50a76069
+# ╟─8dd6874c-12b7-47b6-b589-009849198024
 # ╟─bfbf3d09-23f5-4f54-96f6-bfe536cfc228
 # ╠═e7e4b6d0-bdf0-4a93-9a73-7971e6e33065
 # ╟─2f5415e5-70b1-47ea-9790-7ac953bca538
 # ╠═1b76ab6c-ffa2-40eb-a6c6-55d7097a5108
 # ╟─965b886e-d294-11ef-1b10-0319896874cf
+# ╟─a3e11d46-5a22-4eb6-ba91-7258ba3c667e
 # ╟─0efe10d8-1d0e-4a8f-8005-25ee261322b8
 # ╠═1be3121d-be18-46a1-9af9-f108a2257c22
 # ╟─e5658c95-6cd0-426f-b819-31f9f2c7eaf4
 # ╠═94ca674e-1a01-424c-8657-6510be7097c3
 # ╟─965c18f8-d294-11ef-2456-b945a46241f4
-# ╟─965c2a4e-d294-11ef-1aab-73725568c64e
-# ╟─965c39a8-d294-11ef-1d83-bde85e3ca790
+# ╟─e0add49a-94ac-4247-8554-5a50d4abbebb
+# ╟─d05277c1-fb9e-4b2b-bcbc-d8be5e63cab5
 # ╟─965c5f28-d294-11ef-324e-4df3e38b5045
 # ╠═d27f7af6-e094-44fa-8ba4-4ad2fa38f8bc
 # ╟─90d62ba0-ca97-43f6-8f5a-0c1086a13f3d
 # ╠═053e9dde-c088-4f15-9ca6-98b8185a8a11
 # ╠═07b09ac1-7fa7-4b62-b130-97315adb6fa7
 # ╟─defb2149-294b-47a8-99ed-1b3746b275f1
-# ╠═c95bf9a4-2e7b-4b3a-a161-56f3fd16ad0f
 # ╟─b3656d6c-4717-4fcd-90c6-ae4f4aa5e1be
 # ╟─b15f28ce-c8c1-439b-aeca-74a58d2557e2
 # ╠═86e67c05-068d-4de4-80f3-1a20cc8a43ea
@@ -3199,6 +3351,8 @@ version = "1.9.2+0"
 # ╟─578ec319-337d-4396-bb75-eaf99d95a38d
 # ╟─89da2fc0-a7c8-4a9d-82d9-622a311d010d
 # ╠═5a8dcadb-f0c2-4fb0-b8cd-db8cf49cc292
+# ╠═965a08f4-d294-11ef-0604-1586ff37c0d4
 # ╠═981b08cc-7fb4-4880-8e8a-0b60a5dd72a2
+# ╠═2cb7d369-e7fd-4d66-8321-66a9197a26bd
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
