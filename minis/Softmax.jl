@@ -70,11 +70,11 @@ bar(result; label=nothing, size=(400,150), ylim=(0,1))
 md"""
 ### Properties of the Result
 
-Output of the softmax funcion will always **sum to 1**:
+Output of the softmax function will always **sum to 1**:
 """
 
 # ╔═╡ 4bb1040c-fa30-4cde-b308-13df21e8e539
-sum(x), sum(softmax(x))
+sum(result)
 
 # ╔═╡ 2570f665-21b0-4262-b149-4e9d60e1f36a
 md"""
@@ -82,7 +82,7 @@ And each **entry lies between 0 and 1**. Here is the lowest and highest value:
 """
 
 # ╔═╡ b9508dde-429d-414f-b7be-4e94f1ef8c2b
-extrema(softmax(x))
+extrema(result)
 
 # ╔═╡ 13fe6c00-2e27-424f-91e8-6452d76f358e
 md"""
@@ -95,7 +95,7 @@ The softmax function maintain relative order between entries. If ``x_k > x_j``, 
 sortperm(x)
 
 # ╔═╡ 94ea9b8d-335b-41ad-a360-556ed4556148
-sortperm(softmax(x))
+sortperm(result)
 
 # ╔═╡ f972cf68-f643-4d2d-b196-ebef6b7106d3
 md"""
