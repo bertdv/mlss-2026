@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.17
+# v0.20.15
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/Faragher-2012-cart-1.png?raw=true"
@@ -89,15 +89,10 @@ Task: Infer the position ``z_t`` after 10 time steps, i.e., infer ``p(z_{10}|x_{
 
 """
 
-# ╔═╡ f77d215f-d1f1-4f14-9c92-fcf1b66f99b0
-keyconcept(
-	"Dynamical Models example",
-	md"""
-	The illustration above shows the real cart position, and the measured position. 
-	
-	💡 We know the equations of motion of the cart, and we have previous measurements. With Bayesian ML we can **combine this information** (current measurement + old measurements + system knowledge) into an optimal estimate for the cart position, which is _more precise_ than the measurement alone.
-	"""
-)
+# ╔═╡ 91fb40f2-8c2d-4e0e-8a8a-8d823ed869dc
+md"""
+Move the time step slider below to show the real cart position ``z_t`` (the vertical dashed line), and a (probabilistic) prediction for the measured position ``x_t``.  
+"""
 
 # ╔═╡ 6b7f6d3b-8ad6-434a-babe-2597e86299fa
 md"""
@@ -109,14 +104,6 @@ See later in this lecture.
 
 
 """
-
-# ╔═╡ e841a707-895d-45d0-8320-b9a9deddcd3d
-TODO(md"""
-	 Explain why ``z_t`` and ``\dot{z_t}`` are "hidden" states? (Because we don't observe them directly)
-
-	 Is ``\dot{z_t}`` (velocity) part of the observations? Should we include that in the illustration above?
-	 
-	 """)
 
 # ╔═╡ fc919736-d9e3-4ca0-a53c-5fac18539ab5
 md"""
@@ -197,7 +184,12 @@ The condition ``p(z_t\,|\,z^{t-1}) = p(z_t\,|\,z_{t-1})`` (``z_t`` only depends 
 md"""
 The Forney-style factor graph for a state-space model looks as follows:
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-state-space.png?raw=true)
+"""
+
+# ╔═╡ 5d9d2972-0507-47a1-a726-26bb129f62f9
+@htl """
+
+<img src="https://github.com/bmlip/course/blob/v2/assets/figures/ffg-state-space.png?raw=true" alt=" " style="display: block; width: 80%; margin: 0 auto;">
 
 """
 
@@ -268,19 +260,46 @@ Here are some examples of message passing-based inference in dynamic models.
 
 Filtering (also known as state estimation) refers to the estimation of the latent state at time step ``t``, based on all observations up to and including time ``t``. The FFG below shows the needed messages to compute ``p(z_t|x_{1:t})``.
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-state-space-filtering.png?raw=true)
+
+"""
+
+# ╔═╡ d51bd37b-a12f-426a-87ca-6d4e6701fdb4
+@htl """
+
+<img src="https://github.com/bmlip/course/blob/v2/assets/figures/ffg-state-space-filtering.png?raw=true" alt=" " style="display: block; width: 80%; margin: 0 auto;">
+
+"""
+
+# ╔═╡ 030d6de1-1f63-47d3-bea0-abe3ddf24be4
+md"""
+
 
 ##### Smoothing
 
 In contrast to filtering, which uses only past and current observations, smoothing aims to estimate a latent state by incorporating information from both past and future observations. This is achieved by passing backward messages through the factor graph, typically from later time steps toward earlier ones.
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-state-space-smoothing.png?raw=true)
 
+"""
+
+# ╔═╡ 99ef8d0f-679a-43d1-9bbb-91bd8ad725ec
+@htl """
+
+<img src="https://github.com/bmlip/course/blob/v2/assets/figures/ffg-state-space-smoothing.png?raw=true" alt=" " style="display: block; width: 80%; margin: 0 auto;">
+
+"""
+
+# ╔═╡ 69446a18-bb7d-45e2-b480-dcaa76fa66c0
+md"""
 ##### Prediction
 
 Prediction involves the estimation of a future state or observation based only on past (and possibly current) observations, without incorporating any future information.
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/ffg-state-space-prediction.png?raw=true)
+"""
+
+# ╔═╡ 620a77a8-50c4-4005-a41b-6a6221391434
+@htl """
+
+<img src="https://github.com/bmlip/course/blob/v2/assets/figures/ffg-state-space-prediction.png?raw=true" alt=" " style="display: block; width: 80%; margin: 0 auto;">
 
 """
 
@@ -411,7 +430,7 @@ Note that the above derivation includes updating the "instant" evidence
 p(x_t|x^{t-1}) = \mathcal{N}\left(x_t \,|\, ca \mu_{t-1}, \sigma_x^2 + c^2(\sigma_z^2+a^2\sigma_{t-1}^2) \right) \,.
 ```
 
-For an observed sequence ``x^t``, the evidence ``p(x_t|x^{t-1})`` is a scalar number that scores how well the model predicts ``x^t``, based on past observations ``x^{t-1}``.
+For an observed sequence ``x^t``, the evidence ``p(x_t|x^{t-1})`` is a scalar number that scores how well the model predicts ``x_t``, based on past observations ``x^{t-1}``.
 
 
 
@@ -451,76 +470,40 @@ challenge_solution("Tracking of Cart Position", color="green", header_level=1)
 
 # ╔═╡ e8c172c6-8d0d-43fa-a68d-62a95a560668
 md"""
-## Model Parameters
+Let's use the Kalman filtering equations to solve the cart position tracking challenge.
 
+#### Model Specification
 """
 
 # ╔═╡ e3056eeb-777a-4323-9d2e-f376cae2e1ca
-n_steps = 40;
+begin
+	n_steps = 10;
+	Δt = 1.0;
+	
+	z_start = [10.0; 0.0];
+	u = 0.2 * ones(n_steps)   # constant force
+	A = [1.0 Δt;
+	     0.0 1.0]
+	b = [0.5*Δt^2; Δt]
+	Σz = collect(Diagonal([0.2*Δt; 0.1*Δt]))
+	Σx = collect(Diagonal([1.0; 2.0]))
+	
+end;
 
 # ╔═╡ 49fd6d97-8ef1-49cd-8dcb-dafddb14814c
 @bind intro_i Slider(2:n_steps; show_value=true)
 
-# ╔═╡ 54a90995-cc15-41fa-a2fc-e1f191a3853b
-md"""
-#### Initial position and force function:
-
-"""
-
-# ╔═╡ a67d22cd-e375-4382-ae3d-749893754beb
-z_start = [10.0; 0.0];
-
-# ╔═╡ b3ea45da-6976-454a-b7ed-d85d739a3021
-u = 0.2 * ones(n_steps)   # constant force
-
-# ╔═╡ 1026d399-2af4-4e2b-918f-9a607ffd37d4
-md"""
-
-#### Equations of motion:
-"""
-
-# ╔═╡ 0f845342-af59-4448-aac6-1c301a41536d
-Δt = 1.0;
-
-# ╔═╡ 9c83fad1-58b0-4285-a0b4-00dfe3ce304b
-A = [1.0 Δt;
-     0.0 1.0]
-
-# ╔═╡ 3bda634c-e2fa-4c98-925d-7ed1ba62fe15
-b = [0.5*Δt^2; Δt]
-
-# ╔═╡ da1e8bd1-c67d-4371-9de0-059c642a9714
-md"""
-#### Process noise covariance:
-"""
-
-# ╔═╡ bcb6ad76-39e3-4b3d-ba4c-2a98df0195af
-Σz = collect(Diagonal([0.2*Δt; 0.1*Δt]))
-
-# ╔═╡ bd58f70e-04b4-4e50-b82e-13ad0e3a9abe
-md"""
-### Observation noise covariance:
-"""
-
-# ╔═╡ 17ca9dc4-98bd-4135-bec2-74fd97a9bc56
-Σx = collect(Diagonal([1.0; 2.0]))
-
 # ╔═╡ 130edb3e-f5f9-40d2-970d-d0fc822fd82a
 md"""
-## Generate noisy observations
+#### Generate Noisy observations
 
-This vector contains our measurements. Each elements corresponds to a time step, and it is a 2-element vector with `[position, velocity]`.
-"""
-
-# ╔═╡ 3b4fe598-c0f2-4f38-9d4c-09f6c39c39de
-md"""
-We call an [function from the Appendix](#generateNoisyMeasurements) to generate the measurements.
+The measurements are organized per time step, with each element comprising a two-dimensional observation of `[position, velocity]`.
 """
 
 # ╔═╡ 272a0d3a-d294-11ef-2537-39a6e410e56b
 md"""
 
-## Inference by explicit Kalman filtering
+#### Inference by Explicit Kalman Filtering
 
 We can now solve the cart tracking problem of the introductory example by executing the Kalman filter equations KF-2.
 """
@@ -541,7 +524,9 @@ md"""
 
 Let's now solve the cart tracking problem by sum-product message passing in a factor graph. All we have to do is create factor nodes for the state-transition model ``p(z_t|z_{t-1})`` and the observation model ``p(x_t|z_t)``. Then we let [RxInfer](https://rxinfer.com) execute the message passing schedule. 
 
-By default, RxInfer automatically applies smoothing when it receives a static dataset. Since we want to do filtering, we will enable the option autoupdates when doing inference later on. To be able to do that, we first have to write our model for only a single time-step:
+#### Model Specification in RxInfer
+
+We only need to specify a single time step (and the initial values):
 """
 
 # ╔═╡ 6e8e7cea-7f97-418e-9453-c25a5896bc71
@@ -557,27 +542,16 @@ end
 
 # ╔═╡ d6d3b368-8be5-4201-989f-44617d0cb34e
 md"""
-We also need to specify how to update the parameters, by extracting them from the distribution of the current latent state z.
+
+#### Inference by RxInfer
+
+By default, RxInfer applies smoothing when it receives a static dataset. Since we want to do filtering, we will enable the option `autoupdates` when doing inference . 
 """
 
 # ╔═╡ 331415dc-70fd-4b58-8536-8ed47b071e25
 autoupdates = @autoupdates begin
 	z_prev_m_0, z_prev_v_0 = mean_cov(q(z))
 end
-
-# ╔═╡ 4d6c7311-d366-442f-ac2d-3176051b98b8
-md"""
-Finally, we have to specify the distribution of the first state:
-"""
-
-# ╔═╡ c7532c8c-deab-4cad-9900-9ffb1cbc4221
-z_prev_v_0 = A * (1e8*diageye(2) * A') + Σz
-
-# ╔═╡ 272a6f96-d294-11ef-13e4-1b2b12867c9b
-md"""
-Now that we've built the model, we can perform Kalman filtering by inserting measurement data into the model and performing message passing. Note that we enable the autoupdates we specified earlier, and save the history of the inference process.
-
-"""
 
 # ╔═╡ 557b0052-b1a4-489e-be53-2327033954f2
 md"""
@@ -840,23 +814,21 @@ end
 # ╔═╡ 24f6c005-173d-4831-8c93-c54a9ba0334e
 begin
 	gen_measurements_output = generateNoisyMeasurements(z_start, u, A, b, Σz, Σx);
-	
 	xs_real = first.(gen_measurements_output)
 	xs_measurement = last.(gen_measurements_output)
-
-	Text("gen_measurements_output")
 end
 
 # ╔═╡ 2618d09b-4fd6-4cdc-9d80-45f7d0b262db
-xs_measurement
+xs_measurement # see code in Appendix how measurements are generated
 
 # ╔═╡ 25b3697e-6171-402c-97a5-201ca6bbe3a7
-z_prev_m_0 = xs_measurement[1]
-
-# ╔═╡ 23596def-109a-4cba-a1fe-93628bdf6699
-init = @initialization begin
-	q(z) = MvNormalMeanCovariance(z_prev_m_0, z_prev_v_0)
-end
+begin
+	z_prev_m_0 = xs_measurement[1]
+	z_prev_v_0 = A * (1e8*diageye(2) * A') + Σz
+	init = @initialization begin
+		q(z) = MvNormalMeanCovariance(z_prev_m_0, z_prev_v_0)
+	end
+end;
 
 # ╔═╡ 32f7bc6a-cf3d-44f3-9603-8c4fe5c1a32d
 engine = infer(
@@ -929,13 +901,13 @@ let
 		V_z = (Diagonal(I,2)-gain)*V_pred_z             # posterior covariance update
 	end
 	
-	plotCartPrediction(
+plotCartPrediction(
 		predictive=Normal(m_pred_z[1], V_pred_z[1]),
 		corrected=Normal(m_z[1], V_z[1]), 
 		measurement=Normal(xs_measurement[closed_form_i][1], Σx[1,1]),
 		real=xs_real[closed_form_i][1],
 		rolling=closed_form_rolling,
-	)
+	)	
 end
 
 # ╔═╡ 272aaaf6-d294-11ef-0162-c76ba8ba7232
@@ -984,9 +956,9 @@ StatsPlots = "~0.15.7"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.10"
+julia_version = "1.11.4"
 manifest_format = "2.0"
-project_hash = "5b13aab7acb6382bb5a50ec8112678fb65697988"
+project_hash = "28ba169b34e7b8260d2aea7e379b92a9a6d72dc5"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "60665b326b75db6517939d0e1875850bc4a54368"
@@ -1039,7 +1011,7 @@ version = "1.1.3"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
-version = "1.1.1"
+version = "1.1.2"
 
 [[deps.ArnoldiMethod]]
 deps = ["LinearAlgebra", "Random", "StaticArrays"]
@@ -1103,6 +1075,7 @@ weakdeps = ["SparseArrays"]
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
+version = "1.11.0"
 
 [[deps.AxisAlgorithms]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "WoodburyMatrices"]
@@ -1118,6 +1091,7 @@ version = "0.4.7"
 
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+version = "1.11.0"
 
 [[deps.BayesBase]]
 deps = ["Distributions", "DomainSets", "LinearAlgebra", "Random", "SpecialFunctions", "StaticArrays", "Statistics", "StatsAPI", "StatsBase", "StatsFuns", "TinyHugeNumbers"]
@@ -1234,12 +1208,10 @@ deps = ["FixedPointNumbers", "Random"]
 git-tree-sha1 = "67e11ee83a43eb71ddc950302c53bf33f0690dfe"
 uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 version = "0.12.1"
+weakdeps = ["StyledStrings"]
 
     [deps.ColorTypes.extensions]
     StyledStringsExt = "StyledStrings"
-
-    [deps.ColorTypes.weakdeps]
-    StyledStrings = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
 
 [[deps.ColorVectorSpace]]
 deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "Requires", "Statistics", "TensorCore"]
@@ -1356,6 +1328,7 @@ version = "1.0.0"
 [[deps.Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+version = "1.11.0"
 
 [[deps.Dbus_jll]]
 deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl"]
@@ -1451,6 +1424,7 @@ weakdeps = ["ChainRulesCore", "SparseArrays"]
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+version = "1.11.0"
 
 [[deps.Distributions]]
 deps = ["AliasTables", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SpecialFunctions", "Statistics", "StatsAPI", "StatsBase", "StatsFuns"]
@@ -1585,6 +1559,7 @@ weakdeps = ["HTTP"]
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+version = "1.11.0"
 
 [[deps.FillArrays]]
 deps = ["LinearAlgebra"]
@@ -1664,6 +1639,7 @@ version = "1.0.17+0"
 [[deps.Future]]
 deps = ["Random"]
 uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
+version = "1.11.0"
 
 [[deps.GLFW_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libglvnd_jll", "Xorg_libXcursor_jll", "Xorg_libXi_jll", "Xorg_libXinerama_jll", "Xorg_libXrandr_jll", "libdecor_jll", "xkbcommon_jll"]
@@ -1961,6 +1937,7 @@ version = "2025.2.0+0"
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+version = "1.11.0"
 
 [[deps.Interpolations]]
 deps = ["Adapt", "AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "Requires", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
@@ -2118,6 +2095,7 @@ version = "2.6.2"
 [[deps.LazyArtifacts]]
 deps = ["Artifacts", "Pkg"]
 uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
+version = "1.11.0"
 
 [[deps.LazyModules]]
 git-tree-sha1 = "a560dd966b386ac9ae60bdd3a3d3a326062d3c3e"
@@ -2132,16 +2110,17 @@ version = "0.6.4"
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "8.4.0+0"
+version = "8.6.0+0"
 
 [[deps.LibGit2]]
 deps = ["Base64", "LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
+version = "1.11.0"
 
 [[deps.LibGit2_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll"]
 uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
-version = "1.6.4+0"
+version = "1.7.2+0"
 
 [[deps.LibSSH2_jll]]
 deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
@@ -2150,6 +2129,7 @@ version = "1.11.0+1"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+version = "1.11.0"
 
 [[deps.Libffi_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -2196,6 +2176,7 @@ version = "7.4.0"
 [[deps.LinearAlgebra]]
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+version = "1.11.0"
 
 [[deps.LittleCMS_jll]]
 deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll"]
@@ -2221,6 +2202,7 @@ version = "0.3.29"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+version = "1.11.0"
 
 [[deps.LoggingExtras]]
 deps = ["Dates", "Logging"]
@@ -2268,6 +2250,7 @@ version = "0.4.2"
 [[deps.Markdown]]
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+version = "1.11.0"
 
 [[deps.MatrixCorrectionTools]]
 deps = ["LinearAlgebra"]
@@ -2284,7 +2267,7 @@ version = "1.1.9"
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
-version = "2.28.2+1"
+version = "2.28.6+0"
 
 [[deps.Measures]]
 git-tree-sha1 = "c13304c81eec1ed3af7fc20e75fb6b26092a1102"
@@ -2311,6 +2294,7 @@ version = "1.2.0"
 
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+version = "1.11.0"
 
 [[deps.MosaicViews]]
 deps = ["MappedArrays", "OffsetArrays", "PaddedViews", "StackViews"]
@@ -2320,7 +2304,7 @@ version = "0.3.4"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
-version = "2023.1.10"
+version = "2023.12.12"
 
 [[deps.MultivariateStats]]
 deps = ["Arpack", "Distributions", "LinearAlgebra", "SparseArrays", "Statistics", "StatsAPI", "StatsBase"]
@@ -2384,7 +2368,7 @@ version = "1.3.6+0"
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
-version = "0.3.23+4"
+version = "0.3.27+1"
 
 [[deps.OpenEXR]]
 deps = ["Colors", "FileIO", "OpenEXR_jll"]
@@ -2407,7 +2391,7 @@ version = "2.5.4+0"
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.5+0"
+version = "0.8.1+4"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
@@ -2498,9 +2482,13 @@ uuid = "30392449-352a-5448-841d-b1acce4e97dc"
 version = "0.44.2+0"
 
 [[deps.Pkg]]
-deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
+deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-version = "1.10.0"
+version = "1.11.0"
+weakdeps = ["REPL"]
+
+    [deps.Pkg.extensions]
+    REPLExt = "REPL"
 
 [[deps.PkgVersion]]
 deps = ["Pkg"]
@@ -2603,6 +2591,7 @@ version = "1.5.0"
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+version = "1.11.0"
 
 [[deps.ProgressMeter]]
 deps = ["Distributed", "Printf"]
@@ -2664,12 +2653,14 @@ uuid = "94ee1d12-ae83-5a48-8b1c-48b8ff168ae0"
 version = "0.7.6"
 
 [[deps.REPL]]
-deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
+deps = ["InteractiveUtils", "Markdown", "Sockets", "StyledStrings", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+version = "1.11.0"
 
 [[deps.Random]]
 deps = ["SHA"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+version = "1.11.0"
 
 [[deps.RangeArrays]]
 git-tree-sha1 = "b9039e93773ddcfc828f12aadf7115b4b4d225f5"
@@ -2826,6 +2817,7 @@ version = "1.4.8"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+version = "1.11.0"
 
 [[deps.Setfield]]
 deps = ["ConstructionBase", "Future", "MacroTools", "StaticArraysCore"]
@@ -2836,6 +2828,7 @@ version = "1.1.2"
 [[deps.SharedArrays]]
 deps = ["Distributed", "Mmap", "Random", "Serialization"]
 uuid = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
+version = "1.11.0"
 
 [[deps.Showoff]]
 deps = ["Dates", "Grisu"]
@@ -2868,6 +2861,7 @@ version = "0.1.5"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
+version = "1.11.0"
 
 [[deps.SortingAlgorithms]]
 deps = ["DataStructures"]
@@ -2878,7 +2872,7 @@ version = "1.2.2"
 [[deps.SparseArrays]]
 deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-version = "1.10.0"
+version = "1.11.0"
 
 [[deps.SpecialFunctions]]
 deps = ["IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
@@ -2936,9 +2930,14 @@ uuid = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
 version = "1.4.3"
 
 [[deps.Statistics]]
-deps = ["LinearAlgebra", "SparseArrays"]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "ae3bb1eb3bba077cd276bc5cfc337cc65c3075c0"
 uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-version = "1.10.0"
+version = "1.11.1"
+weakdeps = ["SparseArrays"]
+
+    [deps.Statistics.extensions]
+    SparseArraysExt = ["SparseArrays"]
 
 [[deps.StatsAPI]]
 deps = ["LinearAlgebra"]
@@ -2972,6 +2971,10 @@ git-tree-sha1 = "3b1dcbf62e469a67f6733ae493401e53d92ff543"
 uuid = "f3b207a7-027a-5e70-b257-86293d7955fd"
 version = "0.15.7"
 
+[[deps.StyledStrings]]
+uuid = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
+version = "1.11.0"
+
 [[deps.SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
 uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
@@ -2979,7 +2982,7 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
-version = "7.2.1+1"
+version = "7.7.0+0"
 
 [[deps.TOML]]
 deps = ["Dates"]
@@ -3018,6 +3021,7 @@ version = "0.1.1"
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+version = "1.11.0"
 
 [[deps.ThreadingUtilities]]
 deps = ["ManualMemory"]
@@ -3083,6 +3087,7 @@ version = "1.6.1"
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+version = "1.11.0"
 
 [[deps.UnPack]]
 git-tree-sha1 = "387c1f73762231e86e0c9c5443ce3b4a0a9a0c2b"
@@ -3091,6 +3096,7 @@ version = "1.0.2"
 
 [[deps.Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+version = "1.11.0"
 
 [[deps.UnicodeFun]]
 deps = ["REPL"]
@@ -3416,7 +3422,7 @@ version = "1.1.7+0"
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
-version = "1.52.0+1"
+version = "1.59.0+0"
 
 [[deps.oneTBB_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -3454,22 +3460,27 @@ version = "1.9.2+0"
 # ╟─2728adf0-d294-11ef-2467-f176bb42fb8b
 # ╟─50c601c9-ec68-4155-932c-190bced1ac9a
 # ╟─2728b7c8-d294-11ef-06e6-5329a76c16be
+# ╟─91fb40f2-8c2d-4e0e-8a8a-8d823ed869dc
 # ╟─49fd6d97-8ef1-49cd-8dcb-dafddb14814c
 # ╟─4940b72d-182d-47bb-a446-51ce42724beb
-# ╟─f77d215f-d1f1-4f14-9c92-fcf1b66f99b0
 # ╟─6b7f6d3b-8ad6-434a-babe-2597e86299fa
-# ╟─e841a707-895d-45d0-8320-b9a9deddcd3d
 # ╟─fc919736-d9e3-4ca0-a53c-5fac18539ab5
 # ╟─2728c344-d294-11ef-1c5e-8d601b7ac3f9
 # ╟─2728d136-d294-11ef-27bc-6de51ace159c
 # ╟─2728dece-d294-11ef-2dda-af89555d838f
 # ╟─2728e5c2-d294-11ef-1788-9b3699bb4ccd
 # ╟─2729087c-d294-11ef-3f71-51112552f7b9
+# ╟─5d9d2972-0507-47a1-a726-26bb129f62f9
 # ╟─63f422ca-ba15-41ad-b36b-7a6aa4cc5e2a
 # ╟─27290f78-d294-11ef-2ac4-b179be83b812
 # ╟─27295340-d294-11ef-3a56-131df0415315
 # ╟─27296132-d294-11ef-0d39-9da05d6c20b7
 # ╟─27298004-d294-11ef-06db-490237bf9408
+# ╟─d51bd37b-a12f-426a-87ca-6d4e6701fdb4
+# ╟─030d6de1-1f63-47d3-bea0-abe3ddf24be4
+# ╟─99ef8d0f-679a-43d1-9bbb-91bd8ad725ec
+# ╟─69446a18-bb7d-45e2-b480-dcaa76fa66c0
+# ╟─620a77a8-50c4-4005-a41b-6a6221391434
 # ╟─2f439fb0-012c-4318-bb8b-90c37d2ff43c
 # ╟─a24760e2-055a-4902-a78e-65aa59b80f68
 # ╟─27298d26-d294-11ef-080e-dbe7270d9191
@@ -3482,38 +3493,21 @@ version = "1.9.2+0"
 # ╟─bbaa44b9-9bac-4fb8-8014-fbf400a93039
 # ╟─e8c172c6-8d0d-43fa-a68d-62a95a560668
 # ╠═e3056eeb-777a-4323-9d2e-f376cae2e1ca
-# ╟─54a90995-cc15-41fa-a2fc-e1f191a3853b
-# ╠═a67d22cd-e375-4382-ae3d-749893754beb
-# ╠═b3ea45da-6976-454a-b7ed-d85d739a3021
-# ╟─1026d399-2af4-4e2b-918f-9a607ffd37d4
-# ╠═0f845342-af59-4448-aac6-1c301a41536d
-# ╠═9c83fad1-58b0-4285-a0b4-00dfe3ce304b
-# ╠═3bda634c-e2fa-4c98-925d-7ed1ba62fe15
-# ╟─da1e8bd1-c67d-4371-9de0-059c642a9714
-# ╠═bcb6ad76-39e3-4b3d-ba4c-2a98df0195af
-# ╟─bd58f70e-04b4-4e50-b82e-13ad0e3a9abe
-# ╠═17ca9dc4-98bd-4135-bec2-74fd97a9bc56
 # ╟─130edb3e-f5f9-40d2-970d-d0fc822fd82a
 # ╠═2618d09b-4fd6-4cdc-9d80-45f7d0b262db
-# ╟─3b4fe598-c0f2-4f38-9d4c-09f6c39c39de
-# ╟─24f6c005-173d-4831-8c93-c54a9ba0334e
 # ╟─272a0d3a-d294-11ef-2537-39a6e410e56b
 # ╟─83587586-8a88-4bbb-b2bf-1ca9a8cf6339
 # ╟─f2e5dd92-b4bf-495a-8c11-2f34f2667041
 # ╠═ad05de22-40db-413e-85bd-24e6ef448656
 # ╟─272a4b2e-d294-11ef-2762-47a3479186ad
 # ╠═6e8e7cea-7f97-418e-9453-c25a5896bc71
+# ╠═25b3697e-6171-402c-97a5-201ca6bbe3a7
 # ╟─d6d3b368-8be5-4201-989f-44617d0cb34e
 # ╠═331415dc-70fd-4b58-8536-8ed47b071e25
-# ╟─4d6c7311-d366-442f-ac2d-3176051b98b8
-# ╟─25b3697e-6171-402c-97a5-201ca6bbe3a7
-# ╟─c7532c8c-deab-4cad-9900-9ffb1cbc4221
-# ╠═23596def-109a-4cba-a1fe-93628bdf6699
-# ╟─272a6f96-d294-11ef-13e4-1b2b12867c9b
 # ╠═32f7bc6a-cf3d-44f3-9603-8c4fe5c1a32d
 # ╟─557b0052-b1a4-489e-be53-2327033954f2
 # ╟─b7d0c2e7-418b-417d-992a-c93ae3598f9e
-# ╠═272aaaf6-d294-11ef-0162-c76ba8ba7232
+# ╟─272aaaf6-d294-11ef-0162-c76ba8ba7232
 # ╟─272ab9b2-d294-11ef-0510-c3b68d2f1099
 # ╟─272ac73e-d294-11ef-0526-55f6dfa019d1
 # ╟─272ad3fa-d294-11ef-030a-5b8e2070d654
@@ -3534,6 +3528,7 @@ version = "1.9.2+0"
 # ╠═07fe12dc-501c-407b-ab39-ba9a4845762c
 # ╠═60201d93-64e8-42ce-85ab-8eb661223427
 # ╠═84018669-bff5-4d06-a8f1-df515910c4d9
+# ╠═24f6c005-173d-4831-8c93-c54a9ba0334e
 # ╠═ae8c57ce-b74d-4543-b25b-eee57ad2e415
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
