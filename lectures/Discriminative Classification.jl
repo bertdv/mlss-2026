@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.15
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/Figure4.9.png?raw=true"
@@ -24,6 +24,9 @@ macro bind(def, element)
     #! format: on
 end
 
+# ╔═╡ e379cc2a-43f8-432f-84fc-a88fd4f3ad0a
+using BmlipTeachingTools
+
 # ╔═╡ a759653c-0da4-40b7-9e9e-1e3d2e4df4ea
 using Random, Plots, LaTeXStrings
 
@@ -32,9 +35,6 @@ using MarkdownLiteral: @mdx
 
 # ╔═╡ 616e84d7-063d-4d9d-99e4-56aecf3c7ee4
 using Distributions, ExponentialFamily, LinearAlgebra, LogExpFunctions, StatsFuns, BayesBase, Optim
-
-# ╔═╡ e379cc2a-43f8-432f-84fc-a88fd4f3ad0a
-using BmlipTeachingTools
 
 # ╔═╡ 25eefb10-d294-11ef-0734-2daf18636e8e
 title("Discriminative Classification")
@@ -68,7 +68,7 @@ challenge_statement("difficult class-conditional data distributions" , color= "r
 
 # ╔═╡ 25ef2806-d294-11ef-3cb6-0f3e76b9177e
 md"""
-Our task will be the same as in the preceding class on (generative) classification. But this time, the class-conditional data distributions look very non-Gaussian, yet the linear discriminative boundary looks easy enough:
+Our task will be the same as in the preceding class on (generative) classification. But this time, the class-conditional data distributions look very non-Gaussian, yet the linear discriminative boundary looks easy enough. 
 
 """
 
@@ -77,18 +77,10 @@ begin
 	N_bond = @bindname N Slider(9:200; default=120, show_value=true)
 end
 
-# ╔═╡ cf829697-6283-4d2f-b0dd-bbfbd689a145
+# ╔═╡ 7e7cab21-09ab-4d06-9716-ab7864b229ab
 md"""
-### Implementation
+See [data generation code](#Data-Generation).
 """
-
-# ╔═╡ b5bc379c-5a0e-4b13-99fe-92632250a35e
-md"""
-Split X based on class label:
-"""
-
-# ╔═╡ ddb2dc0d-3ef9-4add-93e9-ee575aabd81a
-X_test = [3.75; 1.0]; # Features of 'new' data point
 
 # ╔═╡ d1bbdc6a-e5ff-4cd6-9175-860b5ec04f3c
 md"""
@@ -212,7 +204,7 @@ This choice for the class posterior is called **logistic regression**, in analog
 ```math
 \begin{align}
 p(y_n|x_n,w) &= \mathcal{N}(y_n|w^T x_n,\beta^{-1}) \tag{for linear regression} \\
-p(y_n|x_n,w) &= \sigma\left( (2y_n-1) w^T x_n\right) \tag{for logistic regression}
+p(y_n|x_n,w) &= \mathrm{Bernoulli}\left(y_n \,|\, \sigma(w^T x_n) \right) \tag{for logistic regression}
 \end{align}
 ```
 
@@ -378,6 +370,24 @@ In contrast, if you eliminate uncertainty by representing the weights as fixed-p
 
 """
 
+# ╔═╡ 7932fff4-0568-49de-b34c-711e51487ae3
+challenge_solution("Bayesian Logistic Regression" , color= "green", header_level=1 )
+
+# ╔═╡ 25f3bef2-d294-11ef-1438-e9f7e469336f
+md"""
+
+Let us perform Bayesian inference to estimate the posterior distribution of ``w`` given the data set from the introduction. To allow an offset in the discrimination boundary, we add a constant 1 to the feature vector ``x``. 
+"""
+
+# ╔═╡ aaf764da-cf1b-4bc7-83ea-6d25a80ca3ab
+N_bond
+
+# ╔═╡ 69706576-0333-43bf-8523-e7838f373529
+md"""
+Note that we get a full predictive posterior distribution over the assignment of class labels for every datapoint, so instead of assigning a point to a class, we get a measure of uncertainty over our class assignment!
+
+"""
+
 # ╔═╡ 0045e569-dc3c-4998-86da-9d96f599c599
 md"""
 # Maximum Likelihood Estimation
@@ -386,8 +396,6 @@ md"""
 
 # ╔═╡ 25f365e2-d294-11ef-300e-9914333b1233
 md"""
-
-## MLE Parameter Estimation
 
 Rather than the computationally involved Laplace approximation, in practice, discriminative classification is often executed through maximum likelihood estimation. 
 
@@ -456,24 +464,6 @@ The parameter vector ``w`` for logistic regression can then be estimated through
 \hat{w}^{(i+1)} =  \hat{w}^{(i)} + \eta \cdot \left. \nabla_w   \mathrm{L}(w)  \right|_{w = \hat{w}^{(i)}}
 ```
 until convergence. 
-
-"""
-
-# ╔═╡ 7932fff4-0568-49de-b34c-711e51487ae3
-challenge_solution("Bayesian Logistic Regression for Difficult Class-conditional Data Distributions" , color= "green" )
-
-# ╔═╡ 25f3bef2-d294-11ef-1438-e9f7e469336f
-md"""
-
-Let us perform Bayesian inference to estimate the posterior distribution of ``w`` given the data set from the introduction. To allow an offset in the discrimination boundary, we add a constant 1 to the feature vector ``x``. 
-"""
-
-# ╔═╡ aaf764da-cf1b-4bc7-83ea-6d25a80ca3ab
-N_bond
-
-# ╔═╡ 69706576-0333-43bf-8523-e7838f373529
-md"""
-Note that we get a full predictive posterior distribution over the assignment of class labels for every datapoint, so instead of assigning a point to a class, we get a measure of uncertainty over our class assignment!
 
 """
 
@@ -642,27 +632,6 @@ function generate_dataset(N::Int64)
     return (X, y)
 end
 
-# ╔═╡ e3474a09-11ec-43e8-900f-f4fb31283f46
-X, y = generate_dataset(N) # Generate data set, collect in matrix X and vector y
-
-# ╔═╡ 48c200f1-9363-4ae4-ab9c-b000071aa9d6
-X_c1 = X[:,findall(.!y)]'
-
-# ╔═╡ 47ee9e9f-427c-42e1-867a-b6d2c9438d76
-X_c2 = X[:,findall(y)]'
-
-# ╔═╡ a65ca01a-0e9a-42cb-b1d7-648102a77eb5
-function plot_dataset()
-    result = scatter(X_c1[:,1], X_c1[:,2],markersize=4, label=L"y=0", xlabel=L"x_1", ylabel=L"x_2", xlims=(-1.6, 9), ylims=(-2, 7))
-    scatter!(X_c2[:,1], X_c2[:,2],markersize=4, label=L"y=1")
-    scatter!([X_test[1]], [X_test[2]], markersize=7, marker=:star, label=L"y=?") 
-	plot!(legend=:bottomright)
-    return result  
-end
-
-# ╔═╡ d29ccc9e-d4a6-46ae-b907-2bc68c8d99bc
-	plot_dataset()
-
 # ╔═╡ b8790891-1546-48e0-9f96-e09eade31c12
 logσ(x) = -softplus(x)
 
@@ -705,6 +674,31 @@ function predictive_posterior(x, weight_posterior)
 	query_point = μ / (sqrt(inv(λsq) + σ ))
 	return normcdf(0, 1, query_point)
 end
+
+# ╔═╡ cf829697-6283-4d2f-b0dd-bbfbd689a145
+md"""
+#### Data Generation
+"""
+
+# ╔═╡ e3474a09-11ec-43e8-900f-f4fb31283f46
+begin
+	X, y = generate_dataset(N) # Generate data set, collect in matrix X and vector y
+	X_c1 = X[:,findall(.!y)]' # Split X based on class label
+	X_c2 = X[:,findall(y)]'
+	X_test = [3.75; 1.0]; # Features of 'new' data point
+end
+
+# ╔═╡ a65ca01a-0e9a-42cb-b1d7-648102a77eb5
+function plot_dataset()
+    result = scatter(X_c1[:,1], X_c1[:,2],markersize=4, label=L"y=0", xlabel=L"x_1", ylabel=L"x_2", xlims=(-1.6, 9), ylims=(-2, 7))
+    scatter!(X_c2[:,1], X_c2[:,2],markersize=4, label=L"y=1")
+    scatter!([X_test[1]], [X_test[2]], markersize=7, marker=:star, label=L"y=?") 
+	plot!(legend=:bottomright)
+    return result  
+end
+
+# ╔═╡ d29ccc9e-d4a6-46ae-b907-2bc68c8d99bc
+	plot_dataset()
 
 # ╔═╡ fce5d561-ea76-4bd8-9cce-6f707f72fc60
 let
@@ -763,7 +757,7 @@ StatsFuns = "~1.5.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.6"
+julia_version = "1.11.4"
 manifest_format = "2.0"
 project_hash = "d392ac7ebb5f5a679f052447cf4176c80ccf0bd5"
 
@@ -1625,7 +1619,7 @@ version = "0.3.27+1"
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.5+0"
+version = "0.8.1+4"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
@@ -2368,12 +2362,7 @@ version = "1.9.2+0"
 # ╟─25ef2806-d294-11ef-3cb6-0f3e76b9177e
 # ╟─4ceede48-a4d5-446b-bb34-26cec4af357a
 # ╟─d29ccc9e-d4a6-46ae-b907-2bc68c8d99bc
-# ╟─cf829697-6283-4d2f-b0dd-bbfbd689a145
-# ╠═e3474a09-11ec-43e8-900f-f4fb31283f46
-# ╟─b5bc379c-5a0e-4b13-99fe-92632250a35e
-# ╟─48c200f1-9363-4ae4-ab9c-b000071aa9d6
-# ╟─47ee9e9f-427c-42e1-867a-b6d2c9438d76
-# ╠═ddb2dc0d-3ef9-4add-93e9-ee575aabd81a
+# ╟─7e7cab21-09ab-4d06-9716-ab7864b229ab
 # ╟─d1bbdc6a-e5ff-4cd6-9175-860b5ec04f3c
 # ╟─25ef6ece-d294-11ef-270a-999c8d457b24
 # ╟─25ef7f54-d294-11ef-3f05-0d85fe6e7a17
@@ -2400,15 +2389,15 @@ version = "1.9.2+0"
 # ╟─e4cc517b-d3b5-4517-a28b-efb8aba24496
 # ╟─33b859f2-9ea8-4f8b-b0f8-08a19c6a96fc
 # ╟─38b4854f-be02-4696-802f-2106481e3aea
-# ╟─0045e569-dc3c-4998-86da-9d96f599c599
-# ╟─25f365e2-d294-11ef-300e-9914333b1233
-# ╟─3b24b142-2239-4951-9177-ff87b5da4b68
-# ╟─ff31d8c1-db35-4c85-a609-67fc40e9e78d
 # ╟─7932fff4-0568-49de-b34c-711e51487ae3
 # ╟─25f3bef2-d294-11ef-1438-e9f7e469336f
 # ╟─aaf764da-cf1b-4bc7-83ea-6d25a80ca3ab
 # ╟─fce5d561-ea76-4bd8-9cce-6f707f72fc60
 # ╟─69706576-0333-43bf-8523-e7838f373529
+# ╟─0045e569-dc3c-4998-86da-9d96f599c599
+# ╟─25f365e2-d294-11ef-300e-9914333b1233
+# ╟─3b24b142-2239-4951-9177-ff87b5da4b68
+# ╟─ff31d8c1-db35-4c85-a609-67fc40e9e78d
 # ╟─1f2bfcf4-fef4-4612-8683-d5c86a326eef
 # ╟─25f3ff84-d294-11ef-0031-63b23d23324d
 # ╟─25f41118-d294-11ef-13a8-3fa6587c1bf3
@@ -2428,5 +2417,7 @@ version = "1.9.2+0"
 # ╟─b48f8800-473d-48e4-ab78-eb07653db7a5
 # ╠═1bfac9c5-e5cf-4a70-b077-11bb00cb1482
 # ╠═fd908bf5-71a1-4ae8-8416-cc1fdf084dcb
+# ╟─cf829697-6283-4d2f-b0dd-bbfbd689a145
+# ╠═e3474a09-11ec-43e8-900f-f4fb31283f46
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
