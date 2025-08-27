@@ -88,7 +88,7 @@ Split X based on class label:
 """
 
 # ╔═╡ ddb2dc0d-3ef9-4add-93e9-ee575aabd81a
-X_test = [3.75; 1.0] # Features of 'new' data point
+X_test = [3.75; 1.0]; # Features of 'new' data point
 
 # ╔═╡ d1bbdc6a-e5ff-4cd6-9175-860b5ec04f3c
 md"""
@@ -708,12 +708,8 @@ end
 
 # ╔═╡ fce5d561-ea76-4bd8-9cce-6f707f72fc60
 let
-    p = plot_dataset()
-
+	plot_dataset()
 	X_ext = vcat(X, ones(1, length(y)))
-	granularity = 0.01
-
-
 
 	# Define a prior distribution over parameters, play with this to see the result change!
 	prior = MvNormalMeanCovariance(zeros(3), 100 .* diagm(ones(3)))
@@ -725,14 +721,13 @@ let
 	plot!([-2., 10.], disc_boundary; label="Discr. boundary", linewidth=2)
 
 	# Plot heatmap
-	xrange = -1.6:granularity:9
-	yrange = -2:granularity:7
+	xrange = range(-1.6, 9; length=50)
+	yrange = range(-2, 7; length=30)
 	
-	result = zeros(length(yrange), length(xrange))
-	for (xi, x) in enumerate(xrange), (yi, y) in   enumerate(yrange)
-		result[yi, xi] = predictive_posterior([x, y, 1], posterior)
-	end
-	heatmap!(p, xrange, yrange, result, alpha=0.5)
+	heatmap!(xrange, yrange, (x,y) -> predictive_posterior([x, y, 1], posterior);
+			 alpha=0.5,
+			 color=:redblue,
+			)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -2366,21 +2361,19 @@ version = "1.9.2+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═25eefb10-d294-11ef-0734-2daf18636e8e
+# ╟─25eefb10-d294-11ef-0734-2daf18636e8e
 # ╟─e7c45ff8-9fa2-4ea3-a06f-5769d877540e
 # ╟─25ef12bc-d294-11ef-1557-d98ba829a804
 # ╟─fe66a986-2f55-4417-a71d-b3b99f6369cc
 # ╟─25ef2806-d294-11ef-3cb6-0f3e76b9177e
-# ╠═4ceede48-a4d5-446b-bb34-26cec4af357a
+# ╟─4ceede48-a4d5-446b-bb34-26cec4af357a
 # ╟─d29ccc9e-d4a6-46ae-b907-2bc68c8d99bc
 # ╟─cf829697-6283-4d2f-b0dd-bbfbd689a145
-# ╠═a65ca01a-0e9a-42cb-b1d7-648102a77eb5
-# ╟─e3474a09-11ec-43e8-900f-f4fb31283f46
+# ╠═e3474a09-11ec-43e8-900f-f4fb31283f46
 # ╟─b5bc379c-5a0e-4b13-99fe-92632250a35e
 # ╟─48c200f1-9363-4ae4-ab9c-b000071aa9d6
 # ╟─47ee9e9f-427c-42e1-867a-b6d2c9438d76
 # ╠═ddb2dc0d-3ef9-4add-93e9-ee575aabd81a
-# ╠═a759653c-0da4-40b7-9e9e-1e3d2e4df4ea
 # ╟─d1bbdc6a-e5ff-4cd6-9175-860b5ec04f3c
 # ╟─25ef6ece-d294-11ef-270a-999c8d457b24
 # ╟─25ef7f54-d294-11ef-3f05-0d85fe6e7a17
@@ -2414,7 +2407,7 @@ version = "1.9.2+0"
 # ╟─7932fff4-0568-49de-b34c-711e51487ae3
 # ╟─25f3bef2-d294-11ef-1438-e9f7e469336f
 # ╟─aaf764da-cf1b-4bc7-83ea-6d25a80ca3ab
-# ╠═fce5d561-ea76-4bd8-9cce-6f707f72fc60
+# ╟─fce5d561-ea76-4bd8-9cce-6f707f72fc60
 # ╟─69706576-0333-43bf-8523-e7838f373529
 # ╟─1f2bfcf4-fef4-4612-8683-d5c86a326eef
 # ╟─25f3ff84-d294-11ef-0031-63b23d23324d
@@ -2425,13 +2418,15 @@ version = "1.9.2+0"
 # ╟─9554ed0b-69dd-443c-9538-03a4117eeb78
 # ╟─6eee35ee-fd55-498f-9441-f18c2508de19
 # ╟─1128cb07-68c8-4b80-8fb4-ee9fcc76c050
+# ╠═e379cc2a-43f8-432f-84fc-a88fd4f3ad0a
+# ╠═a759653c-0da4-40b7-9e9e-1e3d2e4df4ea
 # ╠═ad196ae6-c65e-4aaa-b0cc-bd72daa41952
 # ╠═616e84d7-063d-4d9d-99e4-56aecf3c7ee4
 # ╠═fcec3c3a-8b0b-4dfd-b010-66abbf330069
+# ╟─a65ca01a-0e9a-42cb-b1d7-648102a77eb5
 # ╟─b8790891-1546-48e0-9f96-e09eade31c12
 # ╟─b48f8800-473d-48e4-ab78-eb07653db7a5
 # ╠═1bfac9c5-e5cf-4a70-b077-11bb00cb1482
 # ╠═fd908bf5-71a1-4ae8-8416-cc1fdf084dcb
-# ╠═e379cc2a-43f8-432f-84fc-a88fd4f3ad0a
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
