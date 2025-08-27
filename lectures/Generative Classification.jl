@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.15
 
 #> [frontmatter]
 #> description = "Can you teach a computer to tell apples from peaches? Discover generative classification!"
@@ -416,7 +416,7 @@ Because the quadratic term ``x_\bullet^T \hat{\Sigma}_k^{-1} x_\bullet`` is now 
 """	)
 
 # ╔═╡ 1a890e4b-b8a9-4a6e-b1f3-17863e1416d7
-challenge_solution("Apple or Peach", header_level=2, color="green")
+challenge_solution("Apple or Peach", header_level=1, color="green")
 
 # ╔═╡ 4481b38d-dc67-4c1f-ac0b-b348f0aea461
 md"""
@@ -427,12 +427,9 @@ We can fit a Bernouilly distribution to [`y` (see definition)](#y), this is simp
 
 # ╔═╡ 5092090d-cfac-4ced-b61e-fb7107a4c638
 md"""
-#### Estimate class-conditional multivariate Gaussian densities
+#### Estimate class-conditional distributions
 Now, for each class, we fit a Gaussian distribution to the data of that class:
 """
-
-# ╔═╡ 7b541729-0810-4832-a608-8dd0aa60c1d5
-
 
 # ╔═╡ 3228f074-7c1d-420a-bfb0-c3bd693003ad
 md"""
@@ -441,9 +438,8 @@ Our model assumes that both distributions have the same covariance matrix. We ge
 
 # ╔═╡ e91effb4-b3ac-4d7a-b93f-33a78a125110
 md"""
-### Two conditionals
 
-We now have a conditional distribution for each class:
+We now have class-conditional Gaussian distributions for each class:
 """
 
 # ╔═╡ 689ea1f9-0a72-478e-b8a9-ebf450ce95ef
@@ -470,26 +466,26 @@ The following answer was provided:
 
 If you are only interested in approximating a function, and you have lots of examples of desired behavior, then often a non-probabilistic DNN is a fine approach. However, if you are willing to formulate your models in a probabilistic framework, you can frequently improve on the deterministic approach in many ways. We list a few below:
 
-1.	Bayesian Evidence as a Performance Metric
+1.	**Bayesian Evidence as a Performance Metric**
   - Model performance is evaluated using the evidence ``p(D|m)`` for a model, which inherently balances fit and complexity. This enables the use of the entire dataset for learning: there is no need for arbitrary splits into training and test sets.
 
-2.	Parameter Uncertainty Enables Active Learning
+2.	**Parameter Uncertainty Enables Active Learning**
   - By maintaining uncertainty over model parameters, Bayesian models support active learning, i.e., the selection of data points that are expected to be most informative (See the [lesson on intelligent agents](https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html)). This allows learning from smaller datasets, unlike deterministic deep networks, which often require massive amounts of labeled data.
 
-3.	Predictions with Confidence Bounds
+3.	**Predictions with Confidence Bounds**
   - Bayesian models naturally yield predictive distributions, enabling uncertainty quantification (e.g., confidence intervals) around predictions.
 
-4.	Explicit and Modular Assumptions
+4.	**Explicit and Modular Assumptions**
   - Priors, likelihoods, and structural assumptions are explicitly specified and can be independently modified, promoting transparency and model modularity.
 
-5.	Unified Treatment of Accuracy and Complexity
+5.	**Unified Treatment of Accuracy and Complexity**
   - Both data fit and model complexity are scored in the same probabilistic units. In contrast, how would you penalize overparameterized architectures (e.g., deep networks) in a deterministic framework?
 
-6.	Data-Dependent, Optimal Learning Rates
+6.	**Data-Dependent, Optimal Learning Rates**
   - Learning rates emerge naturally from Bayesian updates. Contrast this with the trial-and-error tuning needed in standard optimization.
   - Example: The Kalman gain is an optimal learning rate based on current uncertainty.
 
-7.	Principled Knowledge Transfer
+7.	**Principled Knowledge Transfer**
   - Bayesian inference enables posterior-to-prior propagation: results from one experiment (posterior) can inform the next (as a prior). This provides a principled mechanism for sequential learning and integration of heterogeneous information sources.
 
 
@@ -680,17 +676,10 @@ y = rand(MersenneTwister(23), p_apple_secret, N)
 y .|> Int |> join |> Text
 
 # ╔═╡ cc8144d9-9ecf-4cbd-aea9-0c7a2fca2d94
-p_apple_est = sum(y) / length(y)
-# or equivalently:
-# p_apple_est = fit_mle(Bernoulli, y).p
+p_apple_est = sum(y) / length(y) # or: p_apple_est = fit_mle(Bernoulli, y).p
 
 # ╔═╡ 19360d53-93d8-46fe-82d5-357015e75e22
 π_hat = [p_apple_est; 1-p_apple_est]
-
-# ╔═╡ ff5a544d-d6e6-4895-8bc8-e395f928f2d8
-@mdx """
-And we have fitted a distribution for the class membership probability: ``p(apple) = $(round(p_apple_est; digits=3))``.
-"""
 
 # ╔═╡ eac2821e-b25c-4605-857a-cd3bd06303c1
 X = let
@@ -874,7 +863,7 @@ Plots = "~1.40.18"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.6"
+julia_version = "1.11.4"
 manifest_format = "2.0"
 project_hash = "737975aa4d2ac53dac1846baf435d33a03b3ea26"
 
@@ -1443,7 +1432,7 @@ version = "0.3.27+1"
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.5+0"
+version = "0.8.1+4"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
@@ -2165,16 +2154,14 @@ version = "1.9.2+0"
 # ╟─4481b38d-dc67-4c1f-ac0b-b348f0aea461
 # ╠═cc8144d9-9ecf-4cbd-aea9-0c7a2fca2d94
 # ╠═19360d53-93d8-46fe-82d5-357015e75e22
-# ╟─5092090d-cfac-4ced-b61e-fb7107a4c638
+# ╠═5092090d-cfac-4ced-b61e-fb7107a4c638
 # ╠═10bfb9ea-46a6-4f4d-980e-ed2afce7b39a
 # ╠═cd310392-aabd-40e0-b06f-f8297c7eed6f
-# ╟─7b541729-0810-4832-a608-8dd0aa60c1d5
 # ╟─3228f074-7c1d-420a-bfb0-c3bd693003ad
 # ╠═ba9fa93f-093c-4783-988f-27f4ba228e88
 # ╠═46d2d5e9-bb6b-409a-acdc-cdffd1a6f797
 # ╟─e91effb4-b3ac-4d7a-b93f-33a78a125110
 # ╟─36e6b874-a1b8-40d7-8762-f0c5f9121e40
-# ╟─ff5a544d-d6e6-4895-8bc8-e395f928f2d8
 # ╟─689ea1f9-0a72-478e-b8a9-ebf450ce95ef
 # ╟─90b862a5-d5bc-4122-a942-f01062daa86a
 # ╠═33d5d6e7-1208-4c5b-b651-429b3b6ad50b
