@@ -418,6 +418,11 @@ Note that we get a full predictive posterior distribution over the assignment of
 
 """
 
+# ╔═╡ 98ef7093-f8ed-4a44-a153-0a64ab483f65
+md"""
+### Implementation
+"""
+
 # ╔═╡ 0045e569-dc3c-4998-86da-9d96f599c599
 md"""
 # Maximum Likelihood Estimation
@@ -762,8 +767,7 @@ let
 end
 
 # ╔═╡ fce5d561-ea76-4bd8-9cce-6f707f72fc60
-let
-	plot_dataset()
+bayesian_plot = let
 	X_ext = vcat(X, ones(1, length(y)))
 
 	# Define a prior distribution over parameters, play with this to see the result change!
@@ -773,17 +777,20 @@ let
 	# Plot 50% boundary
 	θ = mean(posterior)
 	disc_boundary(x1) = -1 / θ[2] * (θ[1]*x1 + θ[3])
+	plot_dataset()
 	plot!([-2., 10.], disc_boundary; label="Discr. boundary", linewidth=2)
 
 	# Plot heatmap
 	xrange = range(-1.6, 9; length=50)
 	yrange = range(-2, 7; length=30)
-	
-	heatmap!(xrange, yrange, (x,y) -> predictive_posterior([x, y, 1], posterior);
-			 alpha=0.5,
-			 color=:redblue,
-			)
-end
+	heatmap!(
+		xrange, yrange, (x,y) -> predictive_posterior([x, y, 1], posterior);
+		alpha=0.5, color=:redblue,
+	)
+end;
+
+# ╔═╡ 75076ca1-7226-4229-8e70-06cc586507c3
+bayesian_plot
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -2458,8 +2465,10 @@ version = "1.9.2+0"
 # ╟─7932fff4-0568-49de-b34c-711e51487ae3
 # ╟─25f3bef2-d294-11ef-1438-e9f7e469336f
 # ╟─aaf764da-cf1b-4bc7-83ea-6d25a80ca3ab
-# ╟─fce5d561-ea76-4bd8-9cce-6f707f72fc60
+# ╟─75076ca1-7226-4229-8e70-06cc586507c3
 # ╟─69706576-0333-43bf-8523-e7838f373529
+# ╟─98ef7093-f8ed-4a44-a153-0a64ab483f65
+# ╠═fce5d561-ea76-4bd8-9cce-6f707f72fc60
 # ╟─0045e569-dc3c-4998-86da-9d96f599c599
 # ╟─25f365e2-d294-11ef-300e-9914333b1233
 # ╟─3b24b142-2239-4951-9177-ff87b5da4b68
