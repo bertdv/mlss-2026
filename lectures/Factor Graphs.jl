@@ -564,23 +564,18 @@ md"""
 The figure above (a screen recording from the [RxInfer webpage](http://rxinfer.com)) is an animated GIF illustrating how RxInfer operates. The model is represented as a graph, where each node passes messages to its neighbors. When messages meet on an edge, the belief about the variable associated with that edge is updated.
 """
 
-# ╔═╡ bb402d81-1938-409d-897c-1f86d0970fe5
-TODO(
-	md"The example below needs some math work, see [github issue](https://github.com/bmlip/course/pull/156#issuecomment-3223104105)."
-)
-
 # ╔═╡ a1c957c1-69b7-4178-ab59-c0b2439bb01a
 code_example("Bayesian Linear Regression by Message Passing"; big=true)
 
 # ╔═╡ 9658c106-d294-11ef-01db-cfcff611ed81
 md"""
-Assume we want to estimate some function ``f^D: \mathbb{R} \rightarrow \mathbb{R}`` from a given data set ``D = \{(x_1,y_1), \ldots, (x_N,y_N)\}``.
+Assume we want to estimate some function ``f: \mathbb{R}^D \rightarrow \mathbb{R}`` from a given data set ``D = \{(x_1,y_1), \ldots, (x_N,y_N)\}``, with ``x_i \in \mathbb{R}^D``, ``y_i \in \mathbb{R}``.
 
 """
 
 # ╔═╡ 96594d44-d294-11ef-22b8-95165fb08ce4
 md"""
-#### Model Specification
+### Model Specification
 
 We will assume a linear model with white Gaussian noise and a Gaussian prior on the coefficients ``w``:
 
@@ -605,7 +600,7 @@ p(w,\epsilon,D) &= \overbrace{p(w)}^{\text{weight prior}} \prod_{i=1}^N  \overbr
 
 # ╔═╡ 96597ce0-d294-11ef-3478-25c6bbef601e
 md"""
-#### Inference (parameter estimation)
+### Inference (parameter estimation)
 
 We are interested in inferring the posterior ``p(w|D)``. We will execute inference by message passing on the FFG for the model.
 
@@ -624,28 +619,30 @@ The left figure shows the factor graph for this model for one observation ``(x,y
 
 """
 
+# ╔═╡ 42dd67e6-eb0f-4368-9947-47de229f7be1
+md"""
+### Modeling a Polynomial
+The section above is about a **linear model** for a function on ``\mathbb{R}^D \rightarrow \mathbb{R}``.
+
+In the example below, we will model a function ``f: \mathbb{R} \rightarrow \mathbb{R}`` with a **polynomial** of degree ``K``.
+
+
+We can use a linear model for a polynomial! The trick is to turn each training data point ``(x,y) \in \mathbb{R} \times \mathbb{R}`` into a feature vector:
+
+```math
+(\,[1, x, x^2, x^3, \cdots, x^K], \ y\,) \quad \in \, \mathbb{R}^{K+1} \times \mathbb{R}
+```
+
+And we have now transformed our polynomial model on ``\mathbb{R}`` to a linear model on ``\mathbb{R}^{K+1}``.
+
+
+"""
+
 # ╔═╡ 480165f9-33d9-4db1-bf05-8d99f0d9fb3e
 md"""
-#### Generate the Data Set
-"""
+### Generate the Data Set
+For details, see [the Appendix](#Appendix).
 
-# ╔═╡ ca290536-ecf7-4c2e-93f9-d51c27dde210
-md"""
-We first generate data by a "secret" function ``f`` that is parameterized by weights ``w^*``:
-"""
-
-# ╔═╡ aec4726a-954e-4e76-aae5-2dd6c979b12d
-secret_true_w = [1.0; 2.0; 0.25];
-
-# ╔═╡ 96ef3cfb-ca18-46d6-bcac-0122c2c85fba
-f(x::Vector)::Real = secret_true_w' * x;
-
-# ╔═╡ 79a0d02b-368f-4371-854c-cf2cea9328e5
-f([3.0^0, 3.0^1, 3.0^2])
-
-# ╔═╡ 05b733c6-2faf-4463-a0fd-48455757a28c
-md"""
-You may use the slider to adjust the number of observations:
 """
 
 # ╔═╡ 1c9c7994-672c-42a3-8ae7-8ce092ada9f0
@@ -653,46 +650,20 @@ begin
 	N_bond = @bindname Nsamples Slider(1:30; default=20, show_value=true)
 end
 
-# ╔═╡ f6fc4fad-70fb-432f-b77d-8e6ad42eef6c
+# ╔═╡ 8a2019af-9500-42c5-8408-ff93104a2d79
 md"""
-Create the feature vector ``x = [1.0; z; z^2]``:
+Now, we want to find the parameter ``w`` for our polynomial ``f_w`` to model this data.
 """
 
-# ╔═╡ 3a045b5c-9d87-46a6-a404-85c4bd77dd61
-md"""
-Now we can generate the observed ``y`` coordinates in the data set:
-"""
+# ╔═╡ 1a40ef8d-d677-4bf0-9186-18c5aa43a849
 
-# ╔═╡ ba7a2dbd-f068-4249-bc29-77f2d0804676
-data_noise_σ² = 2.0;
-
-# ╔═╡ f153c139-94c8-42af-9628-24455ee70cd1
-md"""
-Let's take a look at our data (feel free to play with the slider again):
-"""
-
-# ╔═╡ aca1f927-bc3b-48f6-af5c-12ee2ea4a49b
-N_bond
 
 # ╔═╡ 965a1df0-d294-11ef-323c-3da765f1104a
 md"""
-#### Infer Solution with RxInfer
+### Infer Solution with RxInfer
 
 Now build the factor graph in RxInfer, and perform sum-product message passing to generate a posterior for the weights. 
 
-"""
-
-# ╔═╡ 9c333d1b-9ca7-4838-bf55-18a6b0a462a0
-md"""
-First, we need a prior distribution for the weights
-"""
-
-# ╔═╡ 1070063a-ef85-4527-ae82-1f01c1a506ff
-prior_Σ = 1e5 * Diagonal(I,3) # Covariance matrix of prior on w
-
-# ╔═╡ 485c1eab-cf20-4fd9-b3b3-b83338484160
-md"""
-Specify the model in RxInfer
 """
 
 # ╔═╡ fd338a30-9622-405a-96fa-caca6bd4ccfb
@@ -705,10 +676,8 @@ Specify the model in RxInfer
     end
 end
 
-# ╔═╡ 6055d71c-ed31-4bd4-9e6c-472912ed72ac
-md"""
-... and perform inference:
-"""
+# ╔═╡ 1070063a-ef85-4527-ae82-1f01c1a506ff
+prior_Σ = 1e5 * Diagonal(I,3); # prior for the weights
 
 # ╔═╡ 9431bc9a-bd83-4e4d-b64d-0571c1d01c87
 md"""
@@ -1175,11 +1144,50 @@ md"""
 # ╔═╡ 981b08cc-7fb4-4880-8e8a-0b60a5dd72a2
 stable_rand(args...; seed=nothing) = rand(MersenneTwister(543432 + hash(seed)), args...)
 
+# ╔═╡ 997235c1-08bd-4dbc-b1bc-cb10a3b83da4
+md"""
+## Data generation details
+
+We first generate data by a "secret" function ``f`` that is parameterized by weights ``w^*``:
+
+"""
+
+# ╔═╡ aec4726a-954e-4e76-aae5-2dd6c979b12d
+secret_true_w = [1.0; 2.0; 0.25];
+
+# ╔═╡ 96ef3cfb-ca18-46d6-bcac-0122c2c85fba
+f(x::Vector)::Real = secret_true_w' * x;
+
+# ╔═╡ 79a0d02b-368f-4371-854c-cf2cea9328e5
+f([3.0^0, 3.0^1, 3.0^2])
+
+# ╔═╡ cb4427f9-0cb1-4393-b4de-14a4d64cc29c
+
+
+# ╔═╡ aca1f927-bc3b-48f6-af5c-12ee2ea4a49b
+N_bond
+
 # ╔═╡ 99265e22-e8dc-40fe-989f-0d2a6c72faac
 z = stable_rand(Uniform(0, 10), Nsamples; seed=1234)
 
+# ╔═╡ f6fc4fad-70fb-432f-b77d-8e6ad42eef6c
+md"""
+Create the feature vector ``x = [1.0, z, z^2]``:
+"""
+
 # ╔═╡ e20e9048-1271-41c7-97d3-635f320aa365
-x_train = [[1.0; z; z^2] for z in z]
+x_train = [[1.0, z, z^2] for z in z]
+
+# ╔═╡ 2f86a4cf-2075-45b5-bf2d-2d4d6888461a
+x_train
+
+# ╔═╡ 3a045b5c-9d87-46a6-a404-85c4bd77dd61
+md"""
+Now we can generate the observed ``y`` coordinates in the data set:
+"""
+
+# ╔═╡ ba7a2dbd-f068-4249-bc29-77f2d0804676
+data_noise_σ² = 2.0;
 
 # ╔═╡ 34ebbbe1-2a6b-422b-aeb1-cd2953acddca
 # y[i]  = w' * x[i]   + ϵ
@@ -1194,13 +1202,18 @@ scatter(z, y_train;
 	ylabel=L"f([1.0, z, z^2]) + \epsilon"
 )
 
+# ╔═╡ 22f22f59-c320-4654-b472-b64cc3a001ff
+y_train
+
 # ╔═╡ c03b1140-adce-467a-b953-50ad1bf3bc34
-# Run message passing algorithm 
 results = infer(
-    model      = linear_regression(Nsamples=length(x_train), Σ=prior_Σ, σ²=data_noise_σ²),
-    data       = (y = y_train, x = x_train),
-    returnvars = (w = KeepLast(),),
-    iterations = 20,
+	model      = linear_regression(
+					Nsamples=length(x_train), 
+					Σ=prior_Σ, σ²=data_noise_σ²
+				 ),
+	data       = (y = y_train, x = x_train),
+	returnvars = (w = KeepLast(),),
+	iterations = 20,
 )
 
 # ╔═╡ 83a70a4b-b114-4351-8fa2-dd565ebc9916
@@ -3268,45 +3281,33 @@ version = "1.9.2+0"
 # ╟─96587a66-d294-11ef-2c7a-9fd7bea76582
 # ╟─89e2757e-a09f-40c6-8dd7-9b4b4d232e17
 # ╟─c4b5b124-e52a-41fc-b27e-a58181622e5c
-# ╟─bb402d81-1938-409d-897c-1f86d0970fe5
 # ╟─a1c957c1-69b7-4178-ab59-c0b2439bb01a
 # ╟─9658c106-d294-11ef-01db-cfcff611ed81
 # ╟─96594d44-d294-11ef-22b8-95165fb08ce4
 # ╟─96597ce0-d294-11ef-3478-25c6bbef601e
 # ╟─965998a8-d294-11ef-1d18-85876e3656c5
 # ╟─14b87cc5-ddb0-4b8f-89e2-0c1cc50588aa
+# ╟─42dd67e6-eb0f-4368-9947-47de229f7be1
 # ╟─480165f9-33d9-4db1-bf05-8d99f0d9fb3e
-# ╟─ca290536-ecf7-4c2e-93f9-d51c27dde210
-# ╠═96ef3cfb-ca18-46d6-bcac-0122c2c85fba
-# ╠═aec4726a-954e-4e76-aae5-2dd6c979b12d
-# ╠═79a0d02b-368f-4371-854c-cf2cea9328e5
-# ╟─05b733c6-2faf-4463-a0fd-48455757a28c
 # ╟─1c9c7994-672c-42a3-8ae7-8ce092ada9f0
-# ╠═99265e22-e8dc-40fe-989f-0d2a6c72faac
-# ╟─f6fc4fad-70fb-432f-b77d-8e6ad42eef6c
-# ╠═e20e9048-1271-41c7-97d3-635f320aa365
-# ╟─3a045b5c-9d87-46a6-a404-85c4bd77dd61
-# ╠═ba7a2dbd-f068-4249-bc29-77f2d0804676
-# ╠═34ebbbe1-2a6b-422b-aeb1-cd2953acddca
-# ╟─f153c139-94c8-42af-9628-24455ee70cd1
-# ╟─aca1f927-bc3b-48f6-af5c-12ee2ea4a49b
 # ╟─7764541a-c11e-4e12-bbac-f8906cbc5dc6
+# ╟─8a2019af-9500-42c5-8408-ff93104a2d79
+# ╠═2f86a4cf-2075-45b5-bf2d-2d4d6888461a
+# ╠═22f22f59-c320-4654-b472-b64cc3a001ff
+# ╟─1a40ef8d-d677-4bf0-9186-18c5aa43a849
 # ╟─965a1df0-d294-11ef-323c-3da765f1104a
-# ╟─9c333d1b-9ca7-4838-bf55-18a6b0a462a0
-# ╠═1070063a-ef85-4527-ae82-1f01c1a506ff
-# ╟─485c1eab-cf20-4fd9-b3b3-b83338484160
 # ╠═fd338a30-9622-405a-96fa-caca6bd4ccfb
-# ╟─6055d71c-ed31-4bd4-9e6c-472912ed72ac
+# ╠═1070063a-ef85-4527-ae82-1f01c1a506ff
 # ╠═c03b1140-adce-467a-b953-50ad1bf3bc34
 # ╟─9431bc9a-bd83-4e4d-b64d-0571c1d01c87
 # ╠═83a70a4b-b114-4351-8fa2-dd565ebc9916
 # ╟─b3262127-69e0-4efb-875b-074d1d70437c
 # ╟─fb61c774-34a3-493a-b149-c870993b6d46
-# ╠═92f7bcfd-00a4-4cb7-a3eb-c1e101fdbcf6
 # ╟─5bcefd5f-4cd2-4cfe-8c1f-1129e5020d9a
 # ╟─965a37e8-d294-11ef-340f-0930b229dd32
 # ╟─1832bffd-2729-4d3f-86f4-0e2d9ab26ba3
 # ╟─4a10044c-e044-43e1-bd44-847f56019061
+# ╠═92f7bcfd-00a4-4cb7-a3eb-c1e101fdbcf6
 # ╟─965a6c20-d294-11ef-1c91-4bd237afbd20
 # ╟─25492eea-e649-43f9-b71f-ac6d1a80d0ee
 # ╟─a5cd774f-57ad-4cb5-86c0-35987aa6e221
@@ -3354,5 +3355,17 @@ version = "1.9.2+0"
 # ╠═965a08f4-d294-11ef-0604-1586ff37c0d4
 # ╠═981b08cc-7fb4-4880-8e8a-0b60a5dd72a2
 # ╠═2cb7d369-e7fd-4d66-8321-66a9197a26bd
+# ╟─997235c1-08bd-4dbc-b1bc-cb10a3b83da4
+# ╠═96ef3cfb-ca18-46d6-bcac-0122c2c85fba
+# ╠═aec4726a-954e-4e76-aae5-2dd6c979b12d
+# ╠═79a0d02b-368f-4371-854c-cf2cea9328e5
+# ╟─cb4427f9-0cb1-4393-b4de-14a4d64cc29c
+# ╟─aca1f927-bc3b-48f6-af5c-12ee2ea4a49b
+# ╠═99265e22-e8dc-40fe-989f-0d2a6c72faac
+# ╟─f6fc4fad-70fb-432f-b77d-8e6ad42eef6c
+# ╠═e20e9048-1271-41c7-97d3-635f320aa365
+# ╟─3a045b5c-9d87-46a6-a404-85c4bd77dd61
+# ╠═34ebbbe1-2a6b-422b-aeb1-cd2953acddca
+# ╠═ba7a2dbd-f068-4249-bc29-77f2d0804676
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
