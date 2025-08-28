@@ -296,19 +296,12 @@ The softmax function can be viewed as a smooth approximation to the maximum func
 Importantly, we did not impose the softmax posterior by assumption; rather, it emerged naturally by applying Bayes rule to our chosen prior and likelihood models.
 """
 
-# ╔═╡ 23c7d700-d294-11ef-1268-c1441a3301a4
-md"""
-Note the following properties of the softmax function ``\sigma(a)_k``:
-
-  * ``\sigma(a)_k`` is monotonically ascending function and hence it preserves the order of ``a_k``. That is, if ``a_j>a_k`` then ``\sigma(a)_j > \sigma(a)_k``.
-  
-  * ``\sigma(a)`` is always a proper probability distribution, since ``\forall_k \sigma(a)_k>0`` and ``\sum_k \sigma(a)_k = 1``.
-
-"""
+# ╔═╡ 2f2cb20f-ff7c-4b7f-8aa0-f5b3addb9299
+NotebookCard("https://bmlip.github.io/course/minis/Softmax.html")
 
 # ╔═╡ 23c82154-d294-11ef-0945-c9c94fc2a44d
 md"""
-#### making a decision
+#### Making a Decision
 
 How should we classify a new input ``x_\bullet``?
 
@@ -505,9 +498,7 @@ where ``\beta _k= \Sigma^{-1} \mu_k`` and ``\gamma_k=- \frac{1}{2} \mu_k^T \Sigm
 """
 
 # ╔═╡ ca11db2d-aa15-4bf1-b949-529c7487d11d
-md"""
-# Exercises
-"""
+exercises(header_level=1)
 
 # ╔═╡ 24a08e5c-c2c1-4f1f-a2c1-998b30147e61
 md"""
@@ -2071,7 +2062,7 @@ version = "1.9.2+0"
 # ╟─23c7baa4-d294-11ef-22c1-31b0d86f5586
 # ╟─84353cd1-e4fb-4689-9e90-d8995cbe2e9b
 # ╟─23c7c920-d294-11ef-1b6d-d98dd54dcbe3
-# ╟─23c7d700-d294-11ef-1268-c1441a3301a4
+# ╟─2f2cb20f-ff7c-4b7f-8aa0-f5b3addb9299
 # ╟─23c82154-d294-11ef-0945-c9c94fc2a44d
 # ╟─23c7e4a0-d294-11ef-16e9-6f96a41baf97
 # ╟─23c7f170-d294-11ef-1340-fbdf4ce5fd44

@@ -67,11 +67,18 @@ result = softmax(x)
 bar(result; label=nothing, size=(400,150), ylim=(0,1))
 
 # ╔═╡ 605030dc-5383-4d22-b750-ec14d03abecc
-md"""
-### Properties of the Result
-
-Output of the softmax function will always **sum to 1**:
-"""
+let
+	extra = if string(sum(result)) != "1.0"
+		html"<small style='opacity: .6'>(Except for some floating-point imprecision 😅)</small>"
+	else
+		""
+	end
+	md"""
+	### Properties of the Result
+	
+	Output of the softmax function will always **sum to 1**. $(extra)
+	"""
+end
 
 # ╔═╡ 4bb1040c-fa30-4cde-b308-13df21e8e539
 sum(result)
@@ -83,6 +90,11 @@ And each **entry lies between 0 and 1**. Here is the lowest and highest value:
 
 # ╔═╡ b9508dde-429d-414f-b7be-4e94f1ef8c2b
 extrema(result)
+
+# ╔═╡ a73c25d2-8293-4313-8432-9117dd37f04a
+md"""
+💡 These two properties mean that output of the softmax function is always a (discrete) **probability distribution**, since each entry is ``> 0``, and entries sum to ``1``.
+"""
 
 # ╔═╡ 13fe6c00-2e27-424f-91e8-6452d76f358e
 md"""
@@ -1319,6 +1331,7 @@ version = "1.9.2+0"
 # ╠═4bb1040c-fa30-4cde-b308-13df21e8e539
 # ╟─2570f665-21b0-4262-b149-4e9d60e1f36a
 # ╠═b9508dde-429d-414f-b7be-4e94f1ef8c2b
+# ╟─a73c25d2-8293-4313-8432-9117dd37f04a
 # ╟─13fe6c00-2e27-424f-91e8-6452d76f358e
 # ╠═556ca393-68c8-42ea-ab44-2d2195ee1c76
 # ╠═94ea9b8d-335b-41ad-a360-556ed4556148
