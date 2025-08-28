@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.15
+# v0.20.16
 
 #> [frontmatter]
 #> description = "Can you teach a computer to tell apples from peaches? Discover generative classification!"
@@ -664,7 +664,7 @@ const p_apple_secret = Bernoulli(0.7);
 y = rand(MersenneTwister(23), p_apple_secret, N)
 
 # ╔═╡ fedb7530-6fce-496c-a55a-3e9908f9711a
-y .|> Int |> join |> Text
+y .|> Int |> join
 
 # ╔═╡ cc8144d9-9ecf-4cbd-aea9-0c7a2fca2d94
 p_apple_est = sum(y) / length(y) # or: p_apple_est = fit_mle(Bernoulli, y).p
@@ -723,6 +723,9 @@ end
 # ╔═╡ d9efe8bb-c32c-40f4-89d9-8ace7a0665ba
 x_test = [2.3; 1.5] # Features of 'new' data point
 
+# ╔═╡ bf39f423-7df3-4990-a254-c28a1bdf23bf
+x_test
+
 # ╔═╡ 723e09fc-ec63-4c47-844c-d821515ce0f4
 @mdx("``p(\\text{apple}|x=x_∙) = $(round(predict_class(1,x_test), digits=3))``")
 
@@ -779,6 +782,13 @@ unknown_marker = @htl """ <svg style="vertical-align: -.15em;" xmlns="http://www
   <circle cx="12" cy="12" r="10" fill="#ffff00" stroke="#000" stroke-width="2"/>
 </svg> """
 
+# ╔═╡ fe324e92-d753-46cd-aad9-794a76dc806b
+md"""
+
+You are also given a test fruit $unknown_marker, which has known feature values but an **unknown fruit label**.
+
+"""
+
 # ╔═╡ a985e1d3-4867-4991-a60e-e85a9730311b
 apple_marker = @htl """<svg style="vertical-align: -.15em;" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
   <line x1="2" y1="2" x2="14" y2="14" stroke="#009af9" stroke-width="3" />
@@ -811,10 +821,8 @@ You're given the numerical values for two features (let's say, _sugar content_ a
 Generate this data yourself by selecting the total number of fruits with the slider:
 """
 
-# ╔═╡ c05b1bba-2a25-4590-afad-f748e3368a73
+# ╔═╡ 77280f3b-e391-482f-936f-703d1d3c4006
 md"""
-
-You are also given a test fruit $unknown_marker, which has known feature values but an **unknown fruit label**.
 
 ##### Problem
 
@@ -854,7 +862,7 @@ Plots = "~1.40.18"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.4"
+julia_version = "1.11.6"
 manifest_format = "2.0"
 project_hash = "737975aa4d2ac53dac1846baf435d33a03b3ea26"
 
@@ -1423,7 +1431,7 @@ version = "0.3.27+1"
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.1+4"
+version = "0.8.5+0"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
@@ -2112,7 +2120,9 @@ version = "1.9.2+0"
 # ╠═fedb7530-6fce-496c-a55a-3e9908f9711a
 # ╟─70a620bc-47c7-46c4-870b-22b3e05039a1
 # ╠═cff683bf-0488-41d2-9858-cf8776a48992
-# ╟─c05b1bba-2a25-4590-afad-f748e3368a73
+# ╟─fe324e92-d753-46cd-aad9-794a76dc806b
+# ╠═bf39f423-7df3-4990-a254-c28a1bdf23bf
+# ╟─77280f3b-e391-482f-936f-703d1d3c4006
 # ╟─5730758d-80cd-4d95-b16c-399c38cf585b
 # ╟─23c73302-d294-11ef-0c12-571686b202a9
 # ╟─23c73b54-d294-11ef-0ef8-8d9159139a1b
