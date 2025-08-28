@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.15
+# v0.20.16
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/Figure4.9.png?raw=true"
@@ -80,6 +80,19 @@ end
 # ╔═╡ 7e7cab21-09ab-4d06-9716-ab7864b229ab
 md"""
 See [data generation code](#Data-Generation).
+"""
+
+# ╔═╡ aeee1072-5173-4eae-8027-3fbf2e338d95
+md"""
+### Why Not Generative Classification?
+Like in the [last lecture](https://bmlip.github.io/course/lectures/Generative%20Classification.html), let's try to fit a generative distribution to the data. This is what we get when fitting two Gaussians to the two classes:
+"""
+
+# ╔═╡ 93083660-6a49-4147-b00c-d62a4453f222
+md"""
+That's not a good fit!
+
+Now, we could continue down this road, and try to fit a more complex distribution to the ``y = 1`` class to make it fit. **But let's explore a different approach**, modeling the discrimative boundary directly.
 """
 
 # ╔═╡ d1bbdc6a-e5ff-4cd6-9175-860b5ec04f3c
@@ -168,16 +181,33 @@ Clearly, it follows from this assumption that ``p(y_n =0 \,|\, x_n, w) = 1- \sig
 
 """
 
-# ╔═╡ 7d8f376c-b43f-46f4-87bc-c4d7f94d60e1
-TODO("can we make a mini on the softmax function and its special case, the logistic function? The graph below, including its approximation should be generated in Julia, not taken as an png from Bishop.")
+# ╔═╡ 22121f20-6b90-4782-8bed-25486cc23ae7
+NotebookCard("https://bmlip.github.io/course/minis/Softmax.html")
 
-# ╔═╡ 25f0f618-d294-11ef-0d94-bf80c8e2957b
+# ╔═╡ 56cae988-2f51-4618-8676-f46fa2924ea3
+let
+	logistic_function(a) = 1 / (1 + exp(-a))
+	
+	probit(p) = cdf(Normal(0, 1), p)
+	scaled_proibit(a; λ=sqrt(π/8)) = probit(a*λ)
+
+	p = plot(
+		xlim=(-9, 9),
+		ylim=(0,1),
+		size=(600,250),
+	)
+
+	plot!(logistic_function; label="logistic", lw=2)
+	plot!(scaled_proibit; label="probit", lw=2)
+end
+
+# ╔═╡ 66351c02-1921-44dc-b461-84a536c40fd5
 md"""
-![](https://github.com/bmlip/course/blob/v2/assets/figures/Figure4.9.png?raw=true)
-
-(Bishop fig.4.9). The logistic function ``\sigma(a) = 1/(1+e^{-a})`` (red), together with the $(HTML("<span id='scaled-probit'>scaled probit function</span>")) ``\Phi(\lambda a)``, for ``\lambda^2=\pi/8`` (in blue). We will use this approximation later in the [Laplace approximation](https://bmlip.github.io/course/minis/Laplace%20Approximation.html#gaussian-cdf).
-
+The logistic function ``\sigma(a) = 1/(1+e^{-a})`` (red), together with the $(HTML("<span id='scaled-probit'>scaled probit function</span>")) ``\Phi(\lambda a)``, for ``\lambda^2=\pi/8`` (in blue). We will use this approximation later in the [Laplace approximation](https://bmlip.github.io/course/minis/Laplace%20Approximation.html#gaussian-cdf). _Based on Bishop fig.4.9._
 """
+
+# ╔═╡ e3173267-bd90-47df-9d7f-bd9fd3f688ac
+
 
 # ╔═╡ 25f12528-d294-11ef-0c65-97c61935e9c2
 md"""
@@ -643,7 +673,7 @@ end
 
 # ╔═╡ 1bfac9c5-e5cf-4a70-b077-11bb00cb1482
 """
-This  function computes the posterior distribution over regression weights using the Laplace Approximation. We use `logσ` as a numerically stable alternative to `logistic`, and avoid matrix inversions by computing the precision matrix of the posterior distribution instead of the covariance.
+This  function computes the posterior distribution over regression weights using the Laplace Approximation. We use `logσ` as a numerically stable alternative to `logistic`, and we avoid matrix inversions by computing the precision matrix of the posterior distribution instead of the covariance.
 
 The math in this function corresponds to eq. B-4.143
 """
@@ -680,13 +710,17 @@ md"""
 #### Data Generation
 """
 
-# ╔═╡ e3474a09-11ec-43e8-900f-f4fb31283f46
-begin
-	X, y = generate_dataset(N) # Generate data set, collect in matrix X and vector y
-	X_c1 = X[:,findall(.!y)]' # Split X based on class label
-	X_c2 = X[:,findall(y)]'
-	X_test = [3.75; 1.0]; # Features of 'new' data point
-end
+# ╔═╡ 5e4bb719-ea9b-4a30-8800-5d753f405fd1
+X, y = generate_dataset(N); # Generate data set, collect in matrix X and vector y
+
+# ╔═╡ 6b56ec96-4b9d-4281-bd63-061df324867f
+X_c1 = X[:,findall(.!y)]' # Split X based on class label
+
+# ╔═╡ f8bb4fcd-9b20-44e5-8e22-e792e74b69df
+X_c2 = X[:,findall(y)]'
+
+# ╔═╡ b5a19a34-b210-41ec-853d-c5df13ae17ce
+X_test = [3.75; 1.0]; # Features of 'new' data point
 
 # ╔═╡ a65ca01a-0e9a-42cb-b1d7-648102a77eb5
 function plot_dataset()
@@ -698,7 +732,34 @@ function plot_dataset()
 end
 
 # ╔═╡ d29ccc9e-d4a6-46ae-b907-2bc68c8d99bc
+plot_dataset()
+
+# ╔═╡ f37ac438-cd56-4a09-bc8e-a75469955a2f
+let
+	d1 = fit_mle(MvNormal, X_c1')
+	d2 = fit_mle(MvNormal, X_c2')
+
 	plot_dataset()
+	
+	xrange = range(-1.6, 9; length=20)
+	yrange = range(-2, 7; length=15)
+	
+	contour!(
+		xrange, yrange,
+		(x,y) -> pdf(d1, [x,y]);
+		opacity=.4,
+		color=:blues,
+	)
+
+	
+	contour!(
+		xrange, yrange,
+		(x,y) -> pdf(d2, [x,y]);
+		opacity=.4,
+		color=:red,
+		colorbar=nothing,
+	)
+end
 
 # ╔═╡ fce5d561-ea76-4bd8-9cce-6f707f72fc60
 let
@@ -757,7 +818,7 @@ StatsFuns = "~1.5.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.4"
+julia_version = "1.11.6"
 manifest_format = "2.0"
 project_hash = "d392ac7ebb5f5a679f052447cf4176c80ccf0bd5"
 
@@ -1619,7 +1680,7 @@ version = "0.3.27+1"
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.1+4"
+version = "0.8.5+0"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
@@ -2363,6 +2424,9 @@ version = "1.9.2+0"
 # ╟─4ceede48-a4d5-446b-bb34-26cec4af357a
 # ╟─d29ccc9e-d4a6-46ae-b907-2bc68c8d99bc
 # ╟─7e7cab21-09ab-4d06-9716-ab7864b229ab
+# ╟─aeee1072-5173-4eae-8027-3fbf2e338d95
+# ╟─f37ac438-cd56-4a09-bc8e-a75469955a2f
+# ╟─93083660-6a49-4147-b00c-d62a4453f222
 # ╟─d1bbdc6a-e5ff-4cd6-9175-860b5ec04f3c
 # ╟─25ef6ece-d294-11ef-270a-999c8d457b24
 # ╟─25ef7f54-d294-11ef-3f05-0d85fe6e7a17
@@ -2371,8 +2435,10 @@ version = "1.9.2+0"
 # ╟─25efd6b6-d294-11ef-3b21-6363ef531eb5
 # ╟─25f02ac6-d294-11ef-26c4-f142b8ac4b5f
 # ╟─25f0adde-d294-11ef-353e-4b4773df9ff5
-# ╟─7d8f376c-b43f-46f4-87bc-c4d7f94d60e1
-# ╟─25f0f618-d294-11ef-0d94-bf80c8e2957b
+# ╟─22121f20-6b90-4782-8bed-25486cc23ae7
+# ╟─56cae988-2f51-4618-8676-f46fa2924ea3
+# ╟─66351c02-1921-44dc-b461-84a536c40fd5
+# ╟─e3173267-bd90-47df-9d7f-bd9fd3f688ac
 # ╟─25f12528-d294-11ef-0c65-97c61935e9c2
 # ╟─25f14226-d294-11ef-369f-e545d5fe2700
 # ╟─25f14f82-d294-11ef-02fb-2dc632b8f118
@@ -2418,6 +2484,9 @@ version = "1.9.2+0"
 # ╠═1bfac9c5-e5cf-4a70-b077-11bb00cb1482
 # ╠═fd908bf5-71a1-4ae8-8416-cc1fdf084dcb
 # ╟─cf829697-6283-4d2f-b0dd-bbfbd689a145
-# ╠═e3474a09-11ec-43e8-900f-f4fb31283f46
+# ╠═5e4bb719-ea9b-4a30-8800-5d753f405fd1
+# ╠═6b56ec96-4b9d-4281-bd63-061df324867f
+# ╠═f8bb4fcd-9b20-44e5-8e22-e792e74b69df
+# ╠═b5a19a34-b210-41ec-853d-c5df13ae17ce
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
