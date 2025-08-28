@@ -76,12 +76,14 @@ challenge_statement("Finding a Secret Function" , color= "Red" )
 
 
 
-# ╔═╡ b5a2304d-6a70-42b2-9269-98370680aed8
-secret_function(x) = sin(x * 2π);
-
-# Or use one of these functions:
-# secret_function(x) = sign(0.4 - x);
-# secret_function(x) = x ^ 2;
+# ╔═╡ e248df9b-0c48-4803-8d1e-b466ab07692e
+begin
+	secret_function_bond = @bindname secret_function Select([
+		(x -> sin(x * 2π)) => "sin(x * 2π)",
+		(x -> sign(0.4 - x)) => "sign(0.4 - x)",
+		(x -> x ^ 2) => "x ^ 2",
+	])
+end
 
 # ╔═╡ f1bf64f6-09f9-45a3-acd1-7975ab9e79fc
 md"""
@@ -204,7 +206,7 @@ md"""
 """
 
 # ╔═╡ 23010dab-3e07-401a-aa09-bcba760f0894
-NotebookCard("https://bmlip.github.io/course/lectures/minis/Basis%20Functions.html")
+NotebookCard("https://bmlip.github.io/course/minis/Basis%20Functions.html")
 
 # ╔═╡ 234c8850-d294-11ef-3707-6722628bd9dc
 md"""
@@ -598,7 +600,7 @@ v(x) &= 10e^{2x^2}-9.5
 """
 
 # ╔═╡ b6443a13-9301-4559-a5c3-396bae2a27b9
-@bindname N_points Slider(1:50; default=10)
+@bindname N_points Slider(1:50; default=10, show_value=true)
 
 # ╔═╡ 234ef126-d294-11ef-17a9-3da87a7e7d0a
 let
@@ -609,10 +611,10 @@ let
 	plot(x_test, f.(x_test), ribbon=sqrt.(v.(x_test)), label=L"f(x)") # plot f(x)
 	
 	# Generate N samples (x,y), where x ~ Unif[0,1]
-	x = rand(MersenneTwister(345435), N)
-	y = f.(x) + sqrt.(v.(x)) .* rand(MersenneTwister(848483), Normal(0,1), N)
+	x = rand(MersenneTwister(345435), N_points)
+	y = f.(x) + sqrt.(v.(x)) .* rand(MersenneTwister(848483), Normal(0,1), N_points)
 	scatter!(x, y, xlabel="x", ylabel="y", label=L"y") # Plot samples
-	
+
 	# Add constant to input so we can estimate both the offset and the slope
 	_x = [x ones(N_points)]
 	_x_test = hcat(x_test, ones(2))
@@ -836,6 +838,7 @@ const Layout = PlutoUI.ExperimentalLayout
 
 # ╔═╡ 9fd4a9b4-3296-4fe3-931f-17744bc4df81
 Layout.vbox([
+	secret_function_bond,
 	N_bond,
 	σ_noise_bond, 
 ])
@@ -2220,7 +2223,7 @@ version = "1.9.2+0"
 # ╟─66998cd5-78d6-4b22-a9c9-886436cba4dd
 # ╟─234b8c8e-d294-11ef-296a-3b38564babc4
 # ╟─234ba8c2-d294-11ef-36f6-b1f61f65557a
-# ╠═b5a2304d-6a70-42b2-9269-98370680aed8
+# ╟─e248df9b-0c48-4803-8d1e-b466ab07692e
 # ╟─f1bf64f6-09f9-45a3-acd1-7975ab9e79fc
 # ╟─37f06a96-07ac-43e0-ae4d-c64db09bde76
 # ╟─2baf33ce-2ffe-4c99-ab61-a0d578da5117
