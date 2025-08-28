@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.17
 
 #> [frontmatter]
 #> description = "Review of probability theory as a foundation for rational reasoning and Bayesian inference."
@@ -107,6 +107,9 @@ Does this fragment resonate with your own experience?
 In this lesson we introduce *Probability Theory* (PT) again. As we will see in the next lessons, PT is all you need to make sense of machine learning, artificial intelligence, statistics, etc. 
 
 """
+
+# ╔═╡ 61713e1c-8e37-45d9-9f58-c3db69e15b66
+challenge_statement("Disease Diagnosis",header_level=1)
 
 # ╔═╡ 840ab4dc-0d2e-4bf8-acc7-5f1ee2b0dcaf
 md"""
@@ -223,16 +226,7 @@ In the above sum and product rules
 keyconcept(" ", 
 	md"""
 	
-	If you want to assign real numbers to **degrees of belief**, and you want those assignments to be logically consistent, then you are **forced to follow the sum and product rules of probability theory** (PT). PT is therefore the **optimal calculus for information processing under uncertainty**.  
-	
-	"""
-)
-
-# ╔═╡ 3e1b05ee-d294-11ef-33de-efed64d01c0d
-keyconcept(
-	"",
-	md"""
-	All legitimate probabilistic relations can be **derived from the sum and product rules**!
+	When assigning real numbers to **degrees of belief**, logical consistency forces adherence to the sum and product rules of probability theory. This makes probability theory the optimal framework for information processing in the face of uncertainty.
 	
 	"""
 )
@@ -717,6 +711,15 @@ where the ``s`` and ``p`` above the equality sign indicate whether the sum or pr
 In the rest of this course, we'll encounter many lengthy probabilistic derivations. For each manipulation, you should be able to associate an 's' (for sum rule), a 'p' (for product or Bayes rule) or an 'm' (for a simplifying model assumption like conditional independency) above any equality sign.
 """
 
+# ╔═╡ 3e1b05ee-d294-11ef-33de-efed64d01c0d
+keyconcept(
+	"",
+	md"""
+	All valid probabilistic relations can be derived from just two fundamental principles: the **sum rule** and the **product rule**. These two rules form the foundation of probability theory, from which more complex constructs such as conditional probabilities, Bayes’ theorem, and marginalization naturally follow.
+	
+	"""
+)
+
 # ╔═╡ b176ceae-884e-4460-9f66-020c1ac447f1
 md"""
 # Examples
@@ -736,9 +739,6 @@ L(\theta) \triangleq p(y=1|\theta) = \theta \,.
 
 """
 
-# ╔═╡ fc733d61-fd0f-4a13-9afc-4505ac0253df
-f(y,θ) = θ.^y .* (1 .- θ).^(1 .- y) # p(y|θ)
-
 # ╔═╡ 3e1d20e0-d294-11ef-2044-e1fe6590a600
 md"""
 !!! note
@@ -746,6 +746,9 @@ md"""
 	
 	However, the likelihood function ``L(\theta)`` clearly isn't, since ``\int_0^1 L(\theta) \mathrm{d}\theta = 0.5 \neq 1``. 
 """
+
+# ╔═╡ fc733d61-fd0f-4a13-9afc-4505ac0253df
+f(y,θ) = θ.^y .* (1 .- θ).^(1 .- y) # p(y|θ)
 
 # ╔═╡ ab223dea-8ba8-4d30-94f4-72c8e070aadf
 θ_bond = @bind θ Scrubbable(0.0:0.02:1; format=".2f");
@@ -880,8 +883,8 @@ In this case, knowledge about the future influences our state of knowledge about
 
 """
 
-# ╔═╡ 178721d2-624c-4ac4-8fa1-ded23da7feef
-keyconcept("", md"Probabilities describe beliefs (a ''state of knowledge''), rather than actual properties of nature.")
+# ╔═╡ ea803646-b18e-4f13-ab6a-fc5080d44e92
+challenge_solution("Disease Diagnosis",header_level=1)
 
 # ╔═╡ ef264651-854e-4374-8ea8-5476c85150c4
 md"# Moments and Transformations"
@@ -932,21 +935,20 @@ Home exercise: Prove that ``\Sigma_{xy} = \Sigma_{yx}^{T}`` (making use of ``(AB
 md"""
 ## Linear Transformations
 
-Consider an arbitrary distribution ``p(X)`` with mean ``\mu_x`` and covariance matrix ``\Sigma_x``. Define
+Consider an arbitrary distribution ``p(x)`` with mean ``\mu_x`` and covariance matrix ``\Sigma_x``. Define
 
 ```math
-Z = A X + b \,.
+z = A x + b \,.
 ```
 
-No matter the specification of ``p(X)``, the mean and covariance matrix for ``Z`` are given by
+No matter the specification of ``p(x)``, the mean and covariance matrix for ``z`` are given by
 ```math
 \begin{align*}
-\mu_z &= A\mu_x + b \tag{SRG-3a}\\
-\Sigma_z &= A\,\Sigma_x\,A^T \tag{SRG-3b}
+\mu_z &= A\mu_x + b \\
+\Sigma_z &= A\,\Sigma_x\,A^T 
 \end{align*}
 ```
 
-(The tag (SRG-3a) refers to the corresponding eqn number in Sam Roweis' [Gaussian identities](https://github.com/bmlip/course/blob/main/assets/files/Roweis-1999-gaussian-identities.pdf) notes.)
 
 """
 
@@ -969,6 +971,18 @@ For the covariance matrix,
 ```		
 """			   
 )
+
+# ╔═╡ 726e7e9f-3d68-4d02-9954-1edd98b74fdc
+keyconcept("",
+md"""
+No matter the specification of ``p(x)``, the mean and covariance matrix for ``z=Ax + b`` are given by
+```math
+\begin{align}
+\mu_z &= A\mu_x + b \\
+\Sigma_z &= A\,\Sigma_x\,A^T 
+\end{align}
+```
+""")
 
 # ╔═╡ 58f70d3e-4b64-414e-b560-327be2a0c4c2
 exercise_statement("The PDF for the Sum of Two Variables")
@@ -1252,64 +1266,16 @@ p_y(y) &= p_x(g(y)) \cdot g^\prime(y) \\
 In the statistics literature, ``y = \frac{x-\mu}{\sigma}`` is called the **standardized** variable since it transforms a general normal variable into a standard normal one.)
 """)
 
-# ╔═╡ 3e1fd38a-d294-11ef-05d3-ad467328be96
-md"""
-# Summary
-
-Probabilities should be interpretated as degrees of belief, i.e., a state-of-knowledge, rather than a property of nature.
-
-"""
-
-# ╔═╡ 3e1fe0de-d294-11ef-0d8c-35187e394292
-md"""
-We can do everything with only the **sum rule** and the **product rule**. In practice, **Bayes rule** and **marginalization** are often very useful for inference, i.e., for computing
-
-```math
-p(\,\text{what-we-want-to-know}\,|\,\text{what-we-already-know}\,)\,.
-```
-
-"""
-
-# ╔═╡ 3e1fedfc-d294-11ef-30ee-a396bb877037
-md"""
-Bayes rule 
-
-```math
- p(\theta|D) = \frac{p(D|\theta)p(\theta)} {p(D)} 
-```
-
-is the fundamental rule for learning from data!
-
-"""
-
-# ╔═╡ 3e1ffc5c-d294-11ef-27b1-4f6ccb64c5d6
-md"""
-For a variable ``X`` with distribution ``p(X)`` with mean ``\mu_x`` and variance ``\Sigma_x``, the mean and variance of the **Linear Transformation** ``Z = AX +b`` is given by 
-
-```math
-\begin{align}
-\mu_z &= A\mu_x + b \tag{SRG-3a}\\
-\Sigma_z &= A\,\Sigma_x\,A^T \tag{SRG-3b}
-\end{align}
-```
-
-"""
-
-# ╔═╡ 3e2009e2-d294-11ef-255d-8d4a44865663
-md"""
-That's really about all you need to know about probability theory, but you need to *really* know it, so let's do some more exercises.
-
-"""
+# ╔═╡ 9b92fc89-2036-4525-979b-d296ab29329c
+TODO("Key Concepts collection")
 
 # ╔═╡ 03692f4d-0daf-4dfc-a7ff-6b954326e4d0
-md"""
-## Some More Exercises
-"""
+exercises()
 
 
 # ╔═╡ 3a1d380e-df80-4727-9772-f199214cf05d
 md"""
-##### The Sum Rule
+##### The Sum Rule (**)
 
 Derive the general sum rule,
 ```math
@@ -1352,8 +1318,8 @@ md"""
 ##### Apples and Oranges
 
 Box 1 contains 8 apples and 4 oranges. Box 2 contains 10 apples and 2 oranges. Boxes are chosen with equal probability.
-- (a) (#) What is the probability of choosing an apple?  
-- (b) (##) If an apple is chosen, what is the probability that it came from box 1?
+- (a) (*) What is the probability of choosing an apple?  
+- (b) (**) If an apple is chosen, what is the probability that it came from box 1?
 """
 
 # ╔═╡ 5613e9b7-ff0d-435a-9de6-aaf293ebf592
@@ -1380,7 +1346,7 @@ p(b_1|a) = \frac{p(a,b_1)}{p(a)} = \frac{p(a|b_1)p(b_1)}{p(a)} = \frac{\frac{8}{
 
 # ╔═╡ fc3151f9-e143-4e31-b7b7-3f25b4fe9dab
 md"""
-##### What is a Random Signal?
+##### What is a Random Signal? (*)
 Is a speech signal a "probabilistic" (random) or a deterministic signal?
 """
 
@@ -1396,8 +1362,8 @@ However, before making the recording, how would you represent your knowledge abo
 
 # ╔═╡ 5b681e41-ad14-4c58-8ea0-4b6d85885c51
 md"""
-##### Who Speaks the Truth?
-(###) The inhabitants of an island tell the truth one-third of the time. They lie with probability ``2/3``. On an occasion, after one of them made a statement, you ask another person "was that statement true?" and he says "yes". What is the probability that the statement was indeed true?
+##### Who Speaks the Truth? (***)
+The inhabitants of an island tell the truth one-third of the time. They lie with probability ``2/3``. On an occasion, after one of them made a statement, you ask another person "was that statement true?" and he says "yes". What is the probability that the statement was indeed true?
 
 """
 
@@ -1425,7 +1391,7 @@ p(S_1=\text{t} | S_2=\text{y}) &= \frac{p(S_1=\text{t},S_2=\text{y})}{p(S_2=\tex
 
 # ╔═╡ a8d4a517-84a7-426e-a49e-482c5fd047ae
 md"""
-##### The Likelihood Function is a Function of What?
+##### The Likelihood Function is a Function of What? (*)
 
 When considering the distribution ``p(D|\theta)``, is it more correct to speak about the likelihood of the model parameters ``\theta`` than about the likelihood of the observed data set ``D``. And why?
 
@@ -1441,12 +1407,12 @@ Saying “likelihood of the data” is misleading because it confuses likelihood
 
 # ╔═╡ dd31ec7c-708d-4fd7-958d-f9887798a5bc
 md"""
-# Appendix
+# Code
 """
 
 # ╔═╡ 70d79732-0f55-40ba-929d-fba431318848
 md"""
-### Disease diagnosis implementation
+##### Disease diagnosis implementation
 """
 
 # ╔═╡ 4f6dd225-c64d-4b76-b075-0bf71c863b5a
@@ -1458,8 +1424,6 @@ end;
 
 # ╔═╡ 3e185ab0-d294-11ef-3f7d-9bd465518274
 md"""
-$(challenge_statement("Disease Diagnosis"))
-
 ##### Problem
   - Given is a disease with a prevalence of $(prevalence_bond) and a test procedure with sensitivity ('true positive' rate) of $(sensitivity_bond), and specificity ('true negative' rate) of $(specificity_bond). What is the chance that somebody who tests positive actually has the disease?
 
@@ -1468,10 +1432,7 @@ $(challenge_statement("Disease Diagnosis"))
 """
 
 # ╔═╡ 3e1d6d00-d294-11ef-1081-e11b8397eb91
-## Revisiting the Challenge: Disease Diagnosis
 md"""
-$(challenge_solution("Disease Diagnosis"; big=true))
-
 ##### Problem 
 
 - Given a disease ``D \in \{0, 1\}`` with prevalence (overall occurence percentage) of $(prevalence_bond) and a test procedure ``T  \in \{0, 1\}`` with sensitivity (true positive rate) of $(sensitivity_bond) and specificity (true negative' rate) of $(specificity_bond), what is the chance that somebody who tests positive actually has the disease?
@@ -2794,6 +2755,7 @@ version = "1.9.2+0"
 # ╟─9b9be452-9681-43e8-bb09-cc8728df384f
 # ╟─9f4125a2-d5d2-4acf-8bad-82f94af230e8
 # ╟─f8c8ba53-df36-48a6-afde-2952cbcfbe48
+# ╟─61713e1c-8e37-45d9-9f58-c3db69e15b66
 # ╟─3e185ab0-d294-11ef-3f7d-9bd465518274
 # ╟─840ab4dc-0d2e-4bf8-acc7-5f1ee2b0dcaf
 # ╟─41bee964-a0a9-4a7f-8505-54a9ee12ef0d
@@ -2803,7 +2765,6 @@ version = "1.9.2+0"
 # ╟─3e18d2ea-d294-11ef-35e9-2332dd31dbf0
 # ╟─dd11e93a-3dad-4e97-8642-fb70edfa6aae
 # ╟─3e18e4bc-d294-11ef-38bc-cb97cb4e0963
-# ╟─3e1b05ee-d294-11ef-33de-efed64d01c0d
 # ╟─3e18f18c-d294-11ef-33e4-b7f9495e0508
 # ╟─3e1906ea-d294-11ef-236e-c966a9474170
 # ╟─3e191b6c-d294-11ef-3174-d1b4b36e252b
@@ -2844,6 +2805,7 @@ version = "1.9.2+0"
 # ╟─3e1c806a-d294-11ef-1fad-17e5625279f7
 # ╟─3e1c9184-d294-11ef-3e35-5393d97fbc44
 # ╟─3e1d33c8-d294-11ef-0a08-bdc419949925
+# ╟─3e1b05ee-d294-11ef-33de-efed64d01c0d
 # ╟─b176ceae-884e-4460-9f66-020c1ac447f1
 # ╟─e3157dc0-5a64-4479-a37a-40fe25cccc07
 # ╟─d93f73d4-2783-4777-b0ce-cdc0444cb300
@@ -2862,7 +2824,7 @@ version = "1.9.2+0"
 # ╟─3e1e2b96-d294-11ef-3a68-fdc78232142e
 # ╟─727dc817-0284-4c0f-9a92-21dcbea50807
 # ╟─fae6f2ce-ac8f-4ea6-b2cf-38b30a7e20d4
-# ╟─178721d2-624c-4ac4-8fa1-ded23da7feef
+# ╟─ea803646-b18e-4f13-ab6a-fc5080d44e92
 # ╟─3e1d6d00-d294-11ef-1081-e11b8397eb91
 # ╟─2156f96e-eebe-4190-8ce9-c76825c6da71
 # ╟─ef264651-854e-4374-8ea8-5476c85150c4
@@ -2871,6 +2833,7 @@ version = "1.9.2+0"
 # ╟─3e1e7742-d294-11ef-1204-f9be24da07ab
 # ╟─3e1e9224-d294-11ef-38b3-137c2be22400
 # ╟─d2202628-e4f9-4289-b48e-23b5a0073f94
+# ╟─726e7e9f-3d68-4d02-9954-1edd98b74fdc
 # ╟─58f70d3e-4b64-414e-b560-327be2a0c4c2
 # ╟─3e1ea442-d294-11ef-1364-8dd9986325f7
 # ╟─6d07be25-53d0-46b9-b197-a3680d830952
@@ -2899,11 +2862,7 @@ version = "1.9.2+0"
 # ╟─db73766d-643c-41d7-a1eb-f376c657f860
 # ╟─3e1fb370-d294-11ef-1fb6-63a41a024691
 # ╟─317707a3-9ef1-4c67-b451-6adcfcff50f0
-# ╟─3e1fd38a-d294-11ef-05d3-ad467328be96
-# ╟─3e1fe0de-d294-11ef-0d8c-35187e394292
-# ╟─3e1fedfc-d294-11ef-30ee-a396bb877037
-# ╟─3e1ffc5c-d294-11ef-27b1-4f6ccb64c5d6
-# ╟─3e2009e2-d294-11ef-255d-8d4a44865663
+# ╠═9b92fc89-2036-4525-979b-d296ab29329c
 # ╟─03692f4d-0daf-4dfc-a7ff-6b954326e4d0
 # ╟─3a1d380e-df80-4727-9772-f199214cf05d
 # ╟─99d9099f-4908-4bb3-8d59-da9cb69af04c
