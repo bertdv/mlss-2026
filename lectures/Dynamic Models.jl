@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.15
+# v0.20.16
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/Faragher-2012-cart-1.png?raw=true"
@@ -468,36 +468,9 @@ V_t &= \left(I-K_t C \right) P_{t}  \tag{posterior state variance}
 # ╔═╡ bbaa44b9-9bac-4fb8-8014-fbf400a93039
 challenge_solution("Tracking of Cart Position", color="green", header_level=1)
 
-# ╔═╡ e8c172c6-8d0d-43fa-a68d-62a95a560668
+# ╔═╡ 599e21c8-1141-4192-9dd7-46b83314a1ef
 md"""
 Let's use the Kalman filtering equations to solve the cart position tracking challenge.
-
-#### Model Specification
-"""
-
-# ╔═╡ e3056eeb-777a-4323-9d2e-f376cae2e1ca
-begin
-	n_steps = 10;
-	Δt = 1.0;
-	
-	z_start = [10.0; 0.0];
-	u = 0.2 * ones(n_steps)   # constant force
-	A = [1.0 Δt;
-	     0.0 1.0]
-	b = [0.5*Δt^2; Δt]
-	Σz = collect(Diagonal([0.2*Δt; 0.1*Δt]))
-	Σx = collect(Diagonal([1.0; 2.0]))
-	
-end;
-
-# ╔═╡ 49fd6d97-8ef1-49cd-8dcb-dafddb14814c
-@bind intro_i Slider(2:n_steps; show_value=true)
-
-# ╔═╡ 130edb3e-f5f9-40d2-970d-d0fc822fd82a
-md"""
-#### Generate Noisy observations
-
-The measurements are organized per time step, with each element comprising a two-dimensional observation of `[position, velocity]`.
 """
 
 # ╔═╡ 272a0d3a-d294-11ef-2537-39a6e410e56b
@@ -508,14 +481,43 @@ md"""
 We can now solve the cart tracking problem of the introductory example by executing the Kalman filter equations KF-2.
 """
 
+# ╔═╡ f2e5dd92-b4bf-495a-8c11-2f34f2667041
+md"""
+Center the graph around cart position? $(@bind closed_form_rolling CheckBox(default=false))
+"""
+
+# ╔═╡ ec3b781d-8b44-4bf4-9562-c5362eeb8913
+md"""
+#### Model Specification
+"""
+
+# ╔═╡ e3056eeb-777a-4323-9d2e-f376cae2e1ca
+begin
+	n_steps = 20;
+	Δt = 1.0;
+	
+	z_start = [10.0; 0.0];
+	u = 0.2 * ones(n_steps)   # constant force
+	A = [1.0 Δt;
+	     0.0 1.0]
+	b = [0.5*Δt^2; Δt]
+	Σz = collect(Diagonal([0.2*Δt; 0.1*Δt]))
+	Σx = collect(Diagonal([1.0; 2.0]))
+end;
+
+# ╔═╡ 49fd6d97-8ef1-49cd-8dcb-dafddb14814c
+@bind intro_i Slider(2:n_steps; show_value=true)
+
 # ╔═╡ 83587586-8a88-4bbb-b2bf-1ca9a8cf6339
 md"""
 Select a time step: $(@bind closed_form_i Slider(3:n_steps; show_value=true))
 """
 
-# ╔═╡ f2e5dd92-b4bf-495a-8c11-2f34f2667041
+# ╔═╡ 130edb3e-f5f9-40d2-970d-d0fc822fd82a
 md"""
-Center the graph around cart position? $(@bind closed_form_rolling CheckBox(default=false))
+#### Noisy observations
+
+The measurements are organized per time step, with each element comprising a two-dimensional observation of `[position, velocity]`.
 """
 
 # ╔═╡ 272a4b2e-d294-11ef-2762-47a3479186ad
@@ -540,19 +542,6 @@ We only need to specify a single time step (and the initial values):
 	return z
 end
 
-# ╔═╡ d6d3b368-8be5-4201-989f-44617d0cb34e
-md"""
-
-#### Inference by RxInfer
-
-By default, RxInfer applies smoothing when it receives a static dataset. Since we want to do filtering, we will enable the option `autoupdates` when doing inference . 
-"""
-
-# ╔═╡ 331415dc-70fd-4b58-8536-8ed47b071e25
-autoupdates = @autoupdates begin
-	z_prev_m_0, z_prev_v_0 = mean_cov(q(z))
-end
-
 # ╔═╡ 557b0052-b1a4-489e-be53-2327033954f2
 md"""
 Select a time step: $(@bind rxinfer_i Slider(1:n_steps; show_value=true))
@@ -568,6 +557,19 @@ md"""
 Note that both the analytical Kalman filtering solution and the message passing solution lead to the same results. The advantage of message passing-based inference with RxInfer is that we did not need to derive any inference equations. RxInfer took care of all that. 
 
 """
+
+# ╔═╡ d6d3b368-8be5-4201-989f-44617d0cb34e
+md"""
+
+#### Inference by RxInfer
+
+"""
+
+# ╔═╡ 331415dc-70fd-4b58-8536-8ed47b071e25
+# By default, RxInfer applies smoothing when it receives a static dataset. Since we want to do filtering, we will enable the option `autoupdates` when doing inference . 
+autoupdates = @autoupdates begin
+	z_prev_m_0, z_prev_v_0 = mean_cov(q(z))
+end
 
 # ╔═╡ 272ac73e-d294-11ef-0526-55f6dfa019d1
 md"""
@@ -767,6 +769,42 @@ import RxInfer.ReactiveMP: messageout, getinterface, materialize!
 # ╔═╡ 07fe12dc-501c-407b-ab39-ba9a4845762c
 import RxInfer.Rocket: getrecent
 
+# ╔═╡ ae8c57ce-b74d-4543-b25b-eee57ad2e415
+function plotCartPrediction(
+	;
+	predictive::Union{Nothing,Normal}=nothing,
+	measurement::Union{Nothing,Normal}=nothing,
+	corrected::Union{Nothing,Normal}=nothing,
+	real::Union{Nothing,Float64}=nothing,
+	rolling::Bool=false,
+	kwargs...
+)
+	result = plot(
+		; 
+		xlim=rolling ? (real - 4, real + 4) : (10,50), 
+		ylim=(-.5, 1), 
+		xlabel="Position", legend=:bottomright, 
+		kwargs...
+	)
+	
+	isnothing(predictive) || plot!(predictive; 
+		label="Prediction "*L"p(z[n]|z[n-1],u[n])", fill=(0, .1),
+	)
+	
+	isnothing(measurement) || plot!(measurement; 
+		label="Noisy measurement "*L"p(z[n]|x[n])", fill=(0, .1),
+	)
+	
+	isnothing(corrected) || plot!(corrected; 
+		label="Corrected prediction "*L"p(z[n]|z[n-1],u[n],x[n])", fill=(0, .1),
+	)
+	
+	isnothing(real) || vline!([real]; 
+		label="Real cart position", color=:purple, style=:dash,
+	)
+	return result
+end
+
 # ╔═╡ 84018669-bff5-4d06-a8f1-df515910c4d9
 function generateNoisyMeasurements( z_start::Vector{Float64},
 									u::Vector{Float64},
@@ -816,6 +854,41 @@ begin
 	gen_measurements_output = generateNoisyMeasurements(z_start, u, A, b, Σz, Σx);
 	xs_real = first.(gen_measurements_output)
 	xs_measurement = last.(gen_measurements_output)
+end;
+
+# ╔═╡ 4940b72d-182d-47bb-a446-51ce42724beb
+plotCartPrediction(
+	measurement=Normal(xs_measurement[intro_i][1], Σx[1,1]),
+	real=xs_real[intro_i][1],
+)
+
+# ╔═╡ ad05de22-40db-413e-85bd-24e6ef448656
+let
+	local m_pred_z, V_pred_z # (these will be defined later)
+
+	## Kalman filter code
+	m_z = xs_measurement[1]                         # initial predictive mean
+	V_z = A * (1e8*Diagonal(I,2) * A') + Σz         # initial predictive covariance
+	
+	for t = 2:closed_form_i
+		## predict
+		m_pred_z = A * m_z + b * u[t]                   # predictive mean
+		V_pred_z = A * V_z * A' + Σz                    # predictive covariance
+		
+		## update
+		gain = V_pred_z * inv(V_pred_z + Σx)            # Kalman gain
+		m_z = m_pred_z + gain * (xs_measurement[t]-m_pred_z) # posterior mean update
+		V_z = (Diagonal(I,2)-gain)*V_pred_z             # posterior covariance update
+	end
+
+	## Make the plot
+	plotCartPrediction(
+		predictive=Normal(m_pred_z[1], V_pred_z[1]),
+		corrected=Normal(m_z[1], V_z[1]), 
+		measurement=Normal(xs_measurement[closed_form_i][1], Σx[1,1]),
+		real=xs_real[closed_form_i][1],
+		rolling=closed_form_rolling,
+	)	
 end
 
 # ╔═╡ 2618d09b-4fd6-4cdc-9d80-45f7d0b262db
@@ -840,75 +913,6 @@ engine = infer(
 	free_energy = true,
 	autostart = true,
 )
-
-# ╔═╡ ae8c57ce-b74d-4543-b25b-eee57ad2e415
-function plotCartPrediction(
-	;
-	predictive::Union{Nothing,Normal}=nothing,
-	measurement::Union{Nothing,Normal}=nothing,
-	corrected::Union{Nothing,Normal}=nothing,
-	real::Union{Nothing,Float64}=nothing,
-	rolling::Bool=false,
-	kwargs...
-)
-	result = plot(
-		; 
-		xlim=rolling ? (real - 4, real + 4) : (10,50), 
-		ylim=(-.5, 1), 
-		xlabel="Position", legend=:bottomright, 
-		kwargs...
-	)
-	
-	isnothing(predictive) || plot!(predictive; 
-		label="Prediction "*L"p(z[n]|z[n-1],u[n])", fill=(0, .1),
-	)
-	
-	isnothing(measurement) || plot!(measurement; 
-		label="Noisy measurement "*L"p(z[n]|x[n])", fill=(0, .1),
-	)
-	
-	isnothing(corrected) || plot!(corrected; 
-		label="Corrected prediction "*L"p(z[n]|z[n-1],u[n],x[n])", fill=(0, .1),
-	)
-	
-	isnothing(real) || vline!([real]; 
-		label="Real cart position", color=:purple, style=:dash,
-	)
-	return result
-end
-
-# ╔═╡ 4940b72d-182d-47bb-a446-51ce42724beb
-plotCartPrediction(
-	measurement=Normal(xs_measurement[intro_i][1], Σx[1,1]),
-	real=xs_real[intro_i][1],
-)
-
-# ╔═╡ ad05de22-40db-413e-85bd-24e6ef448656
-let
-	local m_pred_z, V_pred_z # (these will be defined later)
-	
-	m_z = xs_measurement[1]                         # initial predictive mean
-	V_z = A * (1e8*Diagonal(I,2) * A') + Σz         # initial predictive covariance
-	
-	for t = 2:closed_form_i
-		## predict
-		m_pred_z = A * m_z + b * u[t]                   # predictive mean
-		V_pred_z = A * V_z * A' + Σz                    # predictive covariance
-		
-		## update
-		gain = V_pred_z * inv(V_pred_z + Σx)            # Kalman gain
-		m_z = m_pred_z + gain * (xs_measurement[t]-m_pred_z) # posterior mean update
-		V_z = (Diagonal(I,2)-gain)*V_pred_z             # posterior covariance update
-	end
-	
-plotCartPrediction(
-		predictive=Normal(m_pred_z[1], V_pred_z[1]),
-		corrected=Normal(m_z[1], V_z[1]), 
-		measurement=Normal(xs_measurement[closed_form_i][1], Σx[1,1]),
-		real=xs_real[closed_form_i][1],
-		rolling=closed_form_rolling,
-	)	
-end
 
 # ╔═╡ 272aaaf6-d294-11ef-0162-c76ba8ba7232
 let
@@ -956,7 +960,7 @@ StatsPlots = "~0.15.7"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.4"
+julia_version = "1.11.6"
 manifest_format = "2.0"
 project_hash = "28ba169b34e7b8260d2aea7e379b92a9a6d72dc5"
 
@@ -2391,7 +2395,7 @@ version = "2.5.4+0"
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.1+4"
+version = "0.8.5+0"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
@@ -3491,24 +3495,25 @@ version = "1.9.2+0"
 # ╟─e804a2a0-3f67-4eea-a9c8-f603a8df9a03
 # ╟─272a00a6-d294-11ef-18ba-a3700f78b13f
 # ╟─bbaa44b9-9bac-4fb8-8014-fbf400a93039
-# ╟─e8c172c6-8d0d-43fa-a68d-62a95a560668
-# ╠═e3056eeb-777a-4323-9d2e-f376cae2e1ca
-# ╟─130edb3e-f5f9-40d2-970d-d0fc822fd82a
-# ╠═2618d09b-4fd6-4cdc-9d80-45f7d0b262db
+# ╟─599e21c8-1141-4192-9dd7-46b83314a1ef
 # ╟─272a0d3a-d294-11ef-2537-39a6e410e56b
 # ╟─83587586-8a88-4bbb-b2bf-1ca9a8cf6339
 # ╟─f2e5dd92-b4bf-495a-8c11-2f34f2667041
 # ╠═ad05de22-40db-413e-85bd-24e6ef448656
+# ╟─ec3b781d-8b44-4bf4-9562-c5362eeb8913
+# ╠═e3056eeb-777a-4323-9d2e-f376cae2e1ca
+# ╟─130edb3e-f5f9-40d2-970d-d0fc822fd82a
+# ╠═2618d09b-4fd6-4cdc-9d80-45f7d0b262db
 # ╟─272a4b2e-d294-11ef-2762-47a3479186ad
 # ╠═6e8e7cea-7f97-418e-9453-c25a5896bc71
-# ╠═25b3697e-6171-402c-97a5-201ca6bbe3a7
-# ╟─d6d3b368-8be5-4201-989f-44617d0cb34e
-# ╠═331415dc-70fd-4b58-8536-8ed47b071e25
-# ╠═32f7bc6a-cf3d-44f3-9603-8c4fe5c1a32d
 # ╟─557b0052-b1a4-489e-be53-2327033954f2
 # ╟─b7d0c2e7-418b-417d-992a-c93ae3598f9e
 # ╟─272aaaf6-d294-11ef-0162-c76ba8ba7232
 # ╟─272ab9b2-d294-11ef-0510-c3b68d2f1099
+# ╟─d6d3b368-8be5-4201-989f-44617d0cb34e
+# ╠═32f7bc6a-cf3d-44f3-9603-8c4fe5c1a32d
+# ╠═25b3697e-6171-402c-97a5-201ca6bbe3a7
+# ╠═331415dc-70fd-4b58-8536-8ed47b071e25
 # ╟─272ac73e-d294-11ef-0526-55f6dfa019d1
 # ╟─272ad3fa-d294-11ef-030a-5b8e2070d654
 # ╟─272ae098-d294-11ef-3214-95b92faefeb5
@@ -3527,8 +3532,8 @@ version = "1.9.2+0"
 # ╠═dab295ff-5a02-4e4f-8f46-b0842b6bf1ff
 # ╠═07fe12dc-501c-407b-ab39-ba9a4845762c
 # ╠═60201d93-64e8-42ce-85ab-8eb661223427
-# ╠═84018669-bff5-4d06-a8f1-df515910c4d9
+# ╟─ae8c57ce-b74d-4543-b25b-eee57ad2e415
 # ╠═24f6c005-173d-4831-8c93-c54a9ba0334e
-# ╠═ae8c57ce-b74d-4543-b25b-eee57ad2e415
+# ╠═84018669-bff5-4d06-a8f1-df515910c4d9
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
