@@ -411,9 +411,13 @@ Because the quadratic term ``x_\bullet^T \hat{\Sigma}_k^{-1} x_\bullet`` is now 
 # ╔═╡ 1a890e4b-b8a9-4a6e-b1f3-17863e1416d7
 challenge_solution("Apple or Peach", header_level=1, color="green")
 
+# ╔═╡ 689ea1f9-0a72-478e-b8a9-ebf450ce95ef
+N_bond
+
 # ╔═╡ 4481b38d-dc67-4c1f-ac0b-b348f0aea461
 md"""
-#### Multinomial (in this case binomial) density estimation
+
+### Implementation
 
 We can fit a Bernouilly distribution to [`y` (see definition)](#y), this is simple:
 """
@@ -434,9 +438,6 @@ md"""
 
 We now have class-conditional Gaussian distributions for each class:
 """
-
-# ╔═╡ 689ea1f9-0a72-478e-b8a9-ebf450ce95ef
-N_bond
 
 # ╔═╡ 845f19c4-c3c5-4368-a48a-a7b57687ddf9
 N_bond
@@ -797,7 +798,7 @@ apple_marker = @htl """<svg style="vertical-align: -.15em;" xmlns="http://www.w3
 
 # ╔═╡ 90b862a5-d5bc-4122-a942-f01062daa86a
 md"""
-#### Posterior class probability of ``x_∙`` (prediction)
+## Posterior class probability of ``x_∙`` (prediction)
 
 Now we can answer the question from the challenge, and calculate the probability that ``x_∙`` is an apple $apple_marker.
 """
@@ -2152,18 +2153,18 @@ version = "1.9.2+0"
 # ╟─b01a4a56-bed2-4a06-991a-831adc84aa3e
 # ╟─1a890e4b-b8a9-4a6e-b1f3-17863e1416d7
 # ╟─23c82e10-d294-11ef-286a-ff6fee0f2805
+# ╟─36e6b874-a1b8-40d7-8762-f0c5f9121e40
+# ╟─689ea1f9-0a72-478e-b8a9-ebf450ce95ef
 # ╟─4481b38d-dc67-4c1f-ac0b-b348f0aea461
 # ╠═cc8144d9-9ecf-4cbd-aea9-0c7a2fca2d94
 # ╠═19360d53-93d8-46fe-82d5-357015e75e22
-# ╠═5092090d-cfac-4ced-b61e-fb7107a4c638
+# ╟─5092090d-cfac-4ced-b61e-fb7107a4c638
 # ╠═10bfb9ea-46a6-4f4d-980e-ed2afce7b39a
 # ╠═cd310392-aabd-40e0-b06f-f8297c7eed6f
 # ╟─3228f074-7c1d-420a-bfb0-c3bd693003ad
 # ╠═ba9fa93f-093c-4783-988f-27f4ba228e88
 # ╠═46d2d5e9-bb6b-409a-acdc-cdffd1a6f797
 # ╟─e91effb4-b3ac-4d7a-b93f-33a78a125110
-# ╟─36e6b874-a1b8-40d7-8762-f0c5f9121e40
-# ╟─689ea1f9-0a72-478e-b8a9-ebf450ce95ef
 # ╟─90b862a5-d5bc-4122-a942-f01062daa86a
 # ╠═33d5d6e7-1208-4c5b-b651-429b3b6ad50b
 # ╟─723e09fc-ec63-4c47-844c-d821515ce0f4
