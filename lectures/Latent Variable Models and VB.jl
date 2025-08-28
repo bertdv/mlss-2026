@@ -623,8 +623,13 @@ Below we exemplify training of a Gaussian Mixture Model on the Old Faithful data
 
 # ╔═╡ 26c796c8-d294-11ef-25be-17dcd4a9d315
 md"""
-The generated figure resembles Figure 10.6 in Bishop. The plots show VFEM results for a GMM of ``K = 6`` Gaussians applied to the Old Faithful data set. The ellipses denote the one standard-deviation density contours for each of the components, and the color coding of the data points reflects the "soft" class label assignments. Components whose expected mixing coefficients are numerically indistinguishable from zero are not plotted.
+The generated figure resembles Figure 10.6 in Bishop. The plots show VFEM results for a GMM of ``K = 6`` Gaussians applied to the Old Faithful data set. The ellipses denote the two standard-deviation density contours for each of the components, and the color coding of the data points reflects the "soft" class label assignments.
 
+"""
+
+# ╔═╡ 16d90f11-5933-4145-b219-19774eba25d6
+md"""
+Show synthetic label colors: $(@bind show_vfem_synthetic_labels CheckBox(default=false))
 """
 
 # ╔═╡ 8b887c4a-273c-40fe-83e9-5c79ac6946f8
@@ -986,6 +991,11 @@ We'll perform clustering on the data set from the [challenge](#challenge_hello) 
 
 """
 
+# ╔═╡ 64819124-865e-48b8-a916-2ce08dba0acc
+md"""
+Show class colors: $(@bind show_em_synthetic_labels CheckBox(default=false))
+"""
+
 # ╔═╡ 87d94630-c90b-4379-91bd-88641ee7b508
 md"""
 ### Implementation
@@ -1232,6 +1242,18 @@ const plot_lims = (
 	ylim=(41, 99),
 )
 
+# ╔═╡ d208f60e-56ea-4767-bd18-f29a853b7536
+const cluster_colors = color_list(:seaborn_bright6)
+
+# ╔═╡ 0e9e62ea-1b2f-4e80-b78b-2001ae46093f
+function get_color(xs; colors=cluster_colors)
+	if any(isnan, xs)
+		mean(cluster_colors)
+	else
+		sum(x*c for (x,c) in zip(xs, colors))
+	end
+end
+
 # ╔═╡ dd1242db-fb20-4732-ac55-a3e021bbd2b7
 const data_plot_kwargs = (
 	markersize=4, 
@@ -1260,12 +1282,18 @@ function plotGMM(X::Matrix, clusters::Vector, γ::Matrix; kwargs...)
 		X1 = LinRange(lims[1,1], lims[1,2], 50)
 		X2 = LinRange(lims[2,1], lims[2,2], 50)
 		alpha = sum(γ[k,:])/sum(γ)
-		covellipse!(clusters[k].μ, clusters[k].Σ; label="", alpha=max(0.1, alpha), color=:cyan)
+		covellipse!(clusters[k].μ, clusters[k].Σ; label="", n_std=2, alpha=max(0.0, alpha), color=cluster_colors[k])
 	end
 
 
 	# Plot data points
-	scatter!(X[1,:], X[2,:]; label="observations", data_plot_kwargs..., kwargs...)
+	scatter!(
+		X[1,:], X[2,:]; 
+		label="observations", 
+		data_plot_kwargs..., 
+		color=get_color.(eachcol(γ)),
+		kwargs...
+	)
 	return result
 end
 
@@ -1662,11 +1690,12 @@ let
     
     # Sample from the mixture model
     Random.seed!(42)  # For reproducibility
+	components = rand(Categorical(π), N_synthetic)
+	
     for n in 1:N_synthetic
         # Sample which component to use
-        component = rand(Categorical(π))
         # Sample from that component
-        X_synthetic[:, n] = rand(current_clusters[component])
+        X_synthetic[:, n] = rand(current_clusters[components[n]])
     end
     
     # Create the plot
@@ -1677,7 +1706,7 @@ let
         legend=nothing,
 		plot_lims...,
 		data_plot_kwargs...,
-		color=:purple,
+		color=show_vfem_synthetic_labels ? cluster_colors[components] : :purple,
     )
 end
 
@@ -1770,11 +1799,11 @@ let
     
     # Sample from the mixture model
     Random.seed!(42)  # For reproducibility
+	components = rand(Categorical(π), N_synthetic)
     for n in 1:N_synthetic
         # Sample which component to use
-        component = rand(Categorical(π))
         # Sample from that component
-        X_synthetic[:, n] = rand(current_clusters[component])
+        X_synthetic[:, n] = rand(current_clusters[components[n]])
     end
     
     # Create the plot
@@ -1785,7 +1814,7 @@ let
         legend=nothing,
 		plot_lims...,
 		data_plot_kwargs...,
-		color=:purple,
+		color=show_em_synthetic_labels ? cluster_colors[components] : :purple,
     )
 end
 
@@ -3338,8 +3367,9 @@ version = "1.9.2+0"
 # ╟─26c7696e-d294-11ef-25f2-dbc0946c0858
 # ╟─de0c41a3-6319-4ae3-8a1a-ae6935910fa3
 # ╟─663ac0ef-0577-43af-8df5-15e046ef875c
-# ╟─cd7cf2d0-aff7-49dc-bb12-dc73c6433768
 # ╟─26c796c8-d294-11ef-25be-17dcd4a9d315
+# ╟─cd7cf2d0-aff7-49dc-bb12-dc73c6433768
+# ╟─16d90f11-5933-4145-b219-19774eba25d6
 # ╟─8b887c4a-273c-40fe-83e9-5c79ac6946f8
 # ╠═666680b2-315a-4d95-8f7f-3ae50018e112
 # ╠═4e0c025d-fa39-462d-8e7d-e66d220e9595
@@ -3368,6 +3398,7 @@ version = "1.9.2+0"
 # ╟─5af3ff1b-1655-4dd9-a089-91544fc85a0e
 # ╟─fd233604-120a-4838-a660-d5021bccecd0
 # ╟─a7fb83cb-1f40-4c8a-9fda-2165f91e413e
+# ╟─64819124-865e-48b8-a916-2ce08dba0acc
 # ╟─87d94630-c90b-4379-91bd-88641ee7b508
 # ╟─7a3c0ff7-0b32-4954-ae28-b644f4d966ef
 # ╟─de049d59-9863-4bac-91c3-32851cad15d9
@@ -3381,6 +3412,8 @@ version = "1.9.2+0"
 # ╠═58bd0d43-743c-4745-b353-4a89b35e85ba
 # ╠═489cbd24-1a69-4a00-a2e9-53c2c57cef65
 # ╠═c18b7c1b-8011-469b-ad92-7d50c23c46e3
+# ╠═d208f60e-56ea-4767-bd18-f29a853b7536
+# ╠═0e9e62ea-1b2f-4e80-b78b-2001ae46093f
 # ╠═dd1242db-fb20-4732-ac55-a3e021bbd2b7
 # ╟─cc547bfa-a130-4382-af47-73de56e4741b
 # ╟─00000000-0000-0000-0000-000000000001
