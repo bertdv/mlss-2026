@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.17
+# v0.20.16
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/fig-Bishop-A5-Old-Faithfull.png?raw=true"
@@ -12,11 +12,23 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ c90176ea-918b-4643-a10f-cef277c5ea75
-using LinearAlgebra, PDMats, SpecialFunctions, Random
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    #! format: off
+    return quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
+    #! format: on
+end
 
 # ╔═╡ df171940-eb54-48e2-a2b8-1a8162cabf3e
 using BmlipTeachingTools
+
+# ╔═╡ c90176ea-918b-4643-a10f-cef277c5ea75
+using LinearAlgebra, PDMats, SpecialFunctions, Random
 
 # ╔═╡ 58bd0d43-743c-4745-b353-4a89b35e85ba
 using Distributions, Plots, StatsPlots
@@ -56,19 +68,19 @@ md"""
 
 """
 
-# ╔═╡ 26c591fc-d294-11ef-0423-b7a854d09bad
+# ╔═╡ 2497529b-7703-4e3e-b9db-83f8dbf43fa8
+begin
+	challenge_hello = nothing
+	challenge_statement("Density Modeling for the Old Faithful Data Set", big=true)
+end
+
+# ╔═╡ a663d6d1-2d73-40c6-8a4c-9e41df74bc84
 md"""
 
-$(challenge_statement("Density Modeling for the Old Faithful Data Set"))
 
-You're now asked to build a density model for a data set ([Old Faithful](https://en.wikipedia.org/wiki/Old_Faithful), Bishop pg. 681) that clearly is not distributed as a single Gaussian:
-
-![](https://github.com/bmlip/course/blob/v2/assets/figures/fig-Bishop-A5-Old-Faithfull.png?raw=true)
+You are asked to build a density model for a data set ([Old Faithful](https://en.wikipedia.org/wiki/Old_Faithful), Bishop pg. 681) that clearly is not distributed as a single Gaussian:
 
 """
-
-# ╔═╡ e0d0f3a1-5e00-44f0-9c2b-4308cbd673ce
-TODO("the figure above is very large; can we scale the size down a bit?")
 
 # ╔═╡ f8c8013a-3e87-4d01-a3ae-86b39cf1f002
 md"""
@@ -119,7 +131,7 @@ z_{nk} = \begin{cases} 1 & \text{if } x_n \in \mathcal{C}_k \text{ (the $k$-th c
 
 # ╔═╡ 26c5c1ae-d294-11ef-15c6-13cae5bc0dc8
 md"""
-We consider the same model as we did in the [generative classification lesson](https://bmlip.github.io/course/lectures/Generative%20Classification.html#GDA): the data for each class is distributed as a Gaussian:
+We consider the same model as we did in the [generative classification lesson](https://bmlip.github.io/course/lectures/Generative%20Classification.html#Model-Specification): the data for each class is distributed as a Gaussian:
 
 ```math
 \begin{align*}
@@ -329,9 +341,17 @@ md"""
 ```
 """)
 
-# ╔═╡ de16b831-7afa-408f-83fa-99c6e24840f5
+# ╔═╡ b4d965d1-91d8-43f8-84a5-b37ad5c6cafa
 md"""
-Note that the inference bound is a [Kullback-Leibler (KL) divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) between an (approximate) posterior ``q(z)`` and the (perfect) Bayesian posterior ``p(z|x)``. See this [slide in the BML Class](https://bmlip.github.io/course/lectures/Bayesian%20Machine%20Learning.html#KLD) for more info on the KL divergence. 
+Note that the inference bound is a [Kullback-Leibler (KL) divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) between an (approximate) posterior ``q(z)`` and the (perfect) Bayesian posterior ``p(z|x)``. To learn more:
+
+"""
+
+# ╔═╡ 18f5d694-8869-4265-98ac-9ef7ff451eaf
+NotebookCard("https://bmlip.github.io/course/minis/KL%20Divergence.html")
+
+# ╔═╡ c4b23b39-e6e4-44ec-b204-0c7d7d5a4026
+md"""
 
 Since the second term (log-evidence) does not involve ``q(z)``, VFEM over ``q`` will bring ``q(z)`` closer to the Bayesian posterior ``p(z|x)``.
 
@@ -455,9 +475,6 @@ Aside from form and factorization constraints on ``q(z)``, several ad hoc algori
 In particular, the [Expectation-Maximization (EM) algorithm](https://en.wikipedia.org/wiki/Expectation%E2%80%93maximization_algorithm) is a famous special case of constrained VFE minimization. The EM algorithm places some constraints on both the posterior ``q(z)`` and the prior ``p(z)`` (see the [OPTIONAL SLIDE](#EM-Algorithm) for more info) that essentially reduce VFE minimization to maximum likelihood estimation.
 """
 
-# ╔═╡ 757465a4-6a7f-4c8e-98de-6df5ca995b03
-TODO("internal links do not seem to work")
-
 # ╔═╡ 26c704f6-d294-11ef-1b3d-d52f0fb1c81d
 md"""
 ## Visualization of Constrained VFEM
@@ -476,22 +493,20 @@ The Bayesian posterior ``p(z|x)`` (upper-right) is the posterior that would be o
 """
 
 # ╔═╡ 06512595-bdb7-4adf-88ae-62af20210891
-md"""
-# Challenge Revisited: Modeling of the Old Faithful Data Set
-"""
+challenge_solution("Modeling of the Old Faithful Data Set"; header_level=1, big=true)
 
 # ╔═╡ 26c73cf0-d294-11ef-297b-354eb9c71f57
 md"""
 
 ## Derivation of VFEM Update Equations
 
-Let's get back to the illustrative challenge at the beginning of this lesson: we want to do [density modeling for the Old Faithful data set](#illustrative-example).
+Let's get back to the illustrative challenge at the beginning of this lesson: we want to do [density modeling for the Old Faithful data set](#challenge_hello).
 
 """
 
 # ╔═╡ 3e897a59-e7b5-492c-8a8a-724248513a72
 md"""
-##### model specification
+##### Model Specification
 
 We consider a Gaussian Mixture Model, specified by 
 
@@ -533,7 +548,7 @@ with hyperparameters ``\{ \alpha_0, m_0, \beta_0, W_0, \nu_0\}``.
 
 # ╔═╡ 93e7c7d5-a940-4764-8784-07af2f056e49
 md"""
-##### inference by constrained VFEM
+##### Inference by Constrained VFEM
 
 Assume that we have observed ``D = \left\{x_1, x_2, \ldots, x_N\right\}`` and are interested to infer a posterior distribution for the parameters ``\pi``, ``\mu`` and ``\Lambda``.  
 
@@ -558,7 +573,7 @@ q(z,\pi,\mu,\Lambda) = q(z) \cdot q(\pi,\mu,\Lambda) \,. \tag{B-10.42}
 # ╔═╡ 26c74c9a-d294-11ef-2d31-67bd57d56d7c
 md"""
 
-##### update equations
+##### Update Equations
 
 For this specific case (GMM model with factorization constraints), Bishop shows that the equations for the [optimal solutions (Eq. B-10.9)](#optimal-solutions) are analytically solvable, leading to the following variational update equations (for ``k=1,\ldots, K`` ): 
 
@@ -605,6 +620,654 @@ md"""
 Below we exemplify training of a Gaussian Mixture Model on the Old Faithful data set by VFE minimization, with the constraints as specified above. 
 
 """
+
+# ╔═╡ 26c796c8-d294-11ef-25be-17dcd4a9d315
+md"""
+The generated figure resembles Figure 10.6 in Bishop. The plots show VFEM results for a GMM of ``K = 6`` Gaussians applied to the Old Faithful data set. The ellipses denote the one standard-deviation density contours for each of the components, and the color coding of the data points reflects the "soft" class label assignments. Components whose expected mixing coefficients are numerically indistinguishable from zero are not plotted.
+
+"""
+
+# ╔═╡ 8b887c4a-273c-40fe-83e9-5c79ac6946f8
+md"""
+### Implementation
+
+_Reading this lecture online? Click **"View code"** in the top right to read the implementation of this visualisation._
+ 
+"""
+
+# ╔═╡ 666680b2-315a-4d95-8f7f-3ae50018e112
+K = 6;
+
+# ╔═╡ 4e0c025d-fa39-462d-8e7d-e66d220e9595
+max_iterations = 120;
+
+# ╔═╡ de0c41a3-6319-4ae3-8a1a-ae6935910fa3
+@bindname iteration_vfem Slider([0:10..., 10:10:max_iterations-1...]; default=2, show_value=true)
+
+# ╔═╡ f42a1a65-20ce-452f-9974-bc8146943574
+md"""
+# Theoretical Underpinning of VFE Minimization
+"""
+
+# ╔═╡ 26c7b428-d294-11ef-150a-bb37e37f4b5d
+md"""
+## Observations as Variational Constraints
+
+We derived variational inference by substituting a variational posterior ``q(z)`` for the Bayesian posterior ``p(z|x)`` in the CA decomposition of (negative log) Bayesian evidence for a model. This led to a straightforward derivation of the VFE functional, but revealed nothing about the foundations of variational inference. Is variational inference any good?
+
+To approach this question, let us first recognize that, in the context of a given model ``p(x,z)``, new observations ``x`` can generally be formulated as a constraint on a posterior distribution ``q``. For instance, observing a new data point ``x_1 = 5`` can be formalized as a constraint ``q(x_1) = \delta(x_1 - 5)``, where ``\delta(\cdot)`` is the Dirac delta function. 
+
+Viewing observations as delta-function constraints enables us to interpret them as a specific instance of variational constraints, on par with form and factorization (and other) constraints, all of which shape the variational posterior in constrained VFE minimization.
+
+
+"""
+
+# ╔═╡ b3bb7349-1965-4734-83ed-ba6fef0ccc41
+md"""
+
+## Variational Inference and The Maximum Entropy Principle
+
+In [Caticha (2010)](https://arxiv.org/abs/1011.0723) (based on earlier work by [Shore and Johnson (1980)](https://github.com/bmlip/course/blob/main/assets/files/ShoreJohnson-1980-Axiomatic-Derivation-of-the-Principle-of-Maximum-Entropy.pdf)), the [Principle of Maximum (Relative) Entropy](https://en.wikipedia.org/wiki/Principle_of_maximum_entropy) is developed as a method for rational updating of priors to posteriors when faced with new information in the form of constraints.
+
+
+Caticha's argumentation is as follows:
+
+  * Consider prior beliefs (i.e., a generative model) ``p(x,z)`` about observed and latent variables ``x`` and ``z``. Assume that new information in the form of constraints is obtained, and we are interested in the "best update" to posterior beliefs ``q(x,z)``.
+
+  * In order to define what "best update" means, Caticha assumed a ranking function ``S[q]`` that generates a preference score for each candidate posterior ``q`` for a given prior ``p``. The best update from ``p`` to ``q`` is then identified as
+
+```math
+q^* = \arg\max_q S[q]\,, \quad \text{subject to all constraints.} 
+```
+
+Similarly to [Cox' method](https://en.wikipedia.org/wiki/Cox%27s_theorem) for deriving Probability Theory from a set of sensical axioms, Caticha then introduced the following axioms, based on a rational principle (the **principle of minimal updating**, see [Caticha 2010](https://arxiv.org/abs/1011.0723)), that the ranking function needs to adhere to: 
+
+  1. *Locality*: local information has local effects.
+  2. *Coordinate invariance*: the system of coordinates carries no information.
+  3. *Independence*: When systems are known to be independent, it should not matter whether they are treated separately or jointly.
+
+It turns out that these three criteria **uniquely identify the Relative Entropy** as the proper ranking function: 
+
+```math
+\begin{align*}
+S[q] = - \sum_z q(x,z) \log \frac{q(x,z)}{p(x,z)}
+\end{align*}
+```
+
+This procedure for finding the variational posterior ``q`` is called the **Principle of  Maximum (Relative) Entropy** (PME). Note that, since ``S[q]=-F[q]``, constrained Relative Entropy maximization is equivalent to constrained VFE minimization! 
+
+Therefore, when information is supplied in the form of constraints on the posterior (such as form/factorization constraints and new observations as data constraints), we *should* select the posterior that minimizes the constrained Variational Free Energy. **Constrained FE minimization is the proper method for inference!**
+
+Bayes rule is the global solution of constrained VFEM when all constraints are data constraints, ie, delta distributions on ``q(x)``. Hence, Bayes rule is a special case of constrained VFEM. Bayes rule only applies to updating beliefs on the basis of new observations. 
+ 
+"""
+
+# ╔═╡ 06170e31-e865-4178-8af0-41d82df95d71
+keyconcept("","Constrained VFE minimization is consistent with the Maximum Entropy Principle, which prescribes how to rationally update beliefs when new information becomes available. In this framework, the updated posterior is the distribution that minimizes VFE (or equivalently, KL divergence to the prior) subject to the imposed constraints. ")
+
+# ╔═╡ bbdca8c2-022f-42be-bcf7-80d86f7f269c
+md"""
+
+## Model Performance Evaluation, Revisited
+
+Let us reconsider the Bound-Evidence decomposition of the VFE for a model ``p(x,z)`` with variational posterior ``q(z)``,
+
+```math
+\begin{align}
+\mathrm{F}[q] = \underbrace{\sum_z q(z) \log \frac{q(z)}{p(z|x)}}_{\text{inference bound}\geq 0} \underbrace{- \log p(x)}_{\text{surprise}} \tag{BE} 
+\end{align}
+```
+
+The VFE comprises two cost terms:
+
+  - The **surprise** (or negative log-evidence), ``-\log p(x)``, reflects the cost of predicting the data ``x`` using a model ``p(x, z)``, assuming that (ideal) Bayesian inference can be performed. Specifically, the evidence ``p(x)`` is obtained from the joint model ``p(x, z)`` by marginalizing over the latent variables:
+```math
+p(x) = \sum_z p(x,z)  \,.
+```
+
+  - The **inference bound**, given by the Kullback–Leibler divergence
+```math
+\sum_z q(z) \log \frac{q(z)}{p(z |x)} \geq 0 \,,
+``` 
+quantifies the cost of imperfect inference, i.e., the discrepancy between the variational posterior ``q(z)`` and the true Bayesian posterior ``p(z | x)``.
+
+In any practical setting, using a model *implies* performing inference within that model. Therefore, the effective cost of applying a model is not merely the surprise but also must include the cost of inference. 
+
+Put more bluntly: a model with very high Bayesian evidence ``p(x)`` may still be practically unusable due to exorbitant inference costs.
+
+In the literature, the VFE is typically interpreted as an approximation (more precisely, an upper-bound) to the surprise, ``-\log p(x)``, which is often regarded as the “true” measure of model performance. However, we argue that this perspective should be reversed: the VFE should be considered the true performance metric in practice, as it accounts for both model fit and the tractability of inference. The surprise can be viewed as a special case of the VFE, corresponding to a zero inference bound, that only applies when ideal Bayesian inference is computationally feasible. 
+
+"""
+
+# ╔═╡ 26c8068a-d294-11ef-3983-a1be55128b3f
+md"""
+## Variational Inference in Practice
+
+For most realistic models of complex real-world problems, Bayes rule is not tractable in closed form. As a result, the use of approximate variational Bayesian inference has seen rapid growth in practical applications.
+
+Toolboxes such as [RxInfer](http://rxinfer.com) enable users to define sophisticated probabilistic models and automate the inference process via constrained VFE minimization. Remarkably, specifying even complex models typically requires no more than a single page of code. 
+
+In contrast to traditional algorithm design, where solving a problem might require implementing a custom solution in, say, ``40`` pages of code, automated inference in a probabilistic model offers a radically more efficient and modular approach. This shift has the potential to fundamentally change how we design and deploy information processing systems in the future.
+
+"""
+
+# ╔═╡ 56bea391-b812-4fc4-8f27-fcb4cb984cf4
+exercises(;header_level=1, big=true)
+
+# ╔═╡ 5a94e2a4-7134-462e-9dc5-56083769049f
+md"""
+#### Entropy and The Free Energy Functional (*)
+
+The Free energy functional ``\mathrm{F}[q] = -\sum_z q(z) \log p(x,z) - \sum_z q(z) \log \frac{1}{q(z)}`` decomposes into "Energy minus Entropy". So apparently the entropy of the posterior ``q(z)`` is maximized. This entropy maximization may seem puzzling at first because inference should intuitively lead to *more* informed posteriors, i.e., posterior distributions whose entropy is smaller than the entropy of the prior. Explain why entropy maximization is still a reasonable objective. 
+
+ 
+"""
+
+# ╔═╡ 747a7e1e-b921-4882-b00a-1b00bef8433d
+hide_solution(
+md"""
+
+Note that Free Energy minimization is a balancing act: FE minimization implies entropy maximization *and at the same time* energy minimization. Minimizing the energy term leads to aligning ``q(z)`` with ``\log p(x,z)``, ie, it tries to move the bulk of the function ``q(z)`` to areas in ``z``-space where ``p(x,z)`` is large (``p(x,z)`` is here just a function of ``z``, since x is observed). 
+	   
+However, aside from aligning with ``p(x,z)``, we want ``q(z)`` to be as uninformative as possible. Everything that can be inferred should be represented in ``p(x,z)`` (which is prior times likelihood). We don't want to learn anything that is not in either the prior or the likelihood. The entropy term balances the energy term by favoring distributions that are as uninformative as possible.
+ 
+""")
+
+# ╔═╡ 2d4adbf6-6de8-4e3a-ad6f-fa8bbfa5999e
+md"""
+
+#### Mean Updating (*)
+
+Explain the following update rule for the [mean of the Gaussian cluster-conditional data distribution](##Update-Equations):
+
+```math
+m_k = \frac{1}{\beta_k} \left( \beta_0 m_0 + N_k \bar{x}_k \right) \tag{B-10.61} 
+```
+
+"""
+
+# ╔═╡ 208ba1bb-a4bf-4b8c-93d2-0d6c6c8d16d4
+hide_solution(
+md"""
+We see here an example of "precision-weighted means add" when two sources of information are fused, just like precision-weighted means add when two Gaussians are multiplied, eg a prior and likelihood. In this case, the prior is ``m_0`` and the likelihood estimate is ``\bar{x}``. ``\beta_0`` can be interpreted as the number of pseudo-observations in the prior.
+
+""")
+
+# ╔═╡ 2f490e1f-e495-4f55-a3f8-60d6fd716d4e
+md"""
+#### The Expectation-Maximization (EM) algorithm (**)
+
+Consider a model ``p(x,z|\theta)``, where ``D=\{x_1,x_2,\ldots,x_N\}`` is observed, ``z`` are unobserved variables, and ``\theta`` are parameters. The **Expectation-Maximization** (EM) algorithm estimates the parameters by iterating over the following two equations (``i`` is the iteration index):
+
+```math
+\begin{align*}
+q^{(i)}(z) &= p(z|D,\theta^{(i-1)}) \\
+\theta^{(i)} &= \arg\max_\theta \sum_z q^{(i)}(z) \cdot \log p(D,z|\theta)
+\end{align*}
+```
+
+Prove that this algorithm minimizes the Free Energy functional 
+
+```math
+\begin{align*}
+F[q](\theta) =  \sum_z q(z) \log \frac{q(z)}{p(D,z|\theta)} 
+\end{align*}
+```
+
+
+"""
+
+# ╔═╡ b91bc3b6-b815-4942-b297-c0e2b4b99654
+hide_solution(
+md"""
+		
+Let's start with a prior estimate ``\theta^{(i-1)}`` and we want to minimize the free energy functional wrt ``q``. This leads to
+
+
+```math
+\begin{align*}
+q^{(i)}(z) &= \arg\min_q F[q](\theta^{(i-1)}) \\
+  &= \arg\min_q \sum_z q(z) \log \frac{q(z)}{p(D,z|\theta^{(i-1)})} \\
+  &= \arg\min_q \sum_z q(z) \log \frac{q(z)}{p(z|D,\theta^{(i-1)}) \cdot p(D|\theta^{(i-1)})} \\
+  &= p(z|D,\theta^{(i-1)})
+\end{align*}
+```
+
+Next, we use ``q^{(i)}(z)=p(z|D,\theta^{(i-1)})`` and minimize the free energy w.r.t. ``\theta``, leading to
+
+```math
+\begin{align*}
+  \theta^{(i)} &= \arg\min_\theta F[q^{(i)}](\theta) \\
+  &= \arg\min_\theta \sum_z p(z|D,\theta^{(i-1)}) \log \frac{p(z|D,\theta^{(i-1)})}{p(D,z|\theta)} \\
+  &= \arg\max_\theta \sum_z \underbrace{p(z|D,\theta^{(i-1)})}_{q^{(i)}(z)} \log p(D,z|\theta)
+\end{align*}
+```
+		""")
+
+# ╔═╡ 26c8160c-d294-11ef-2a74-6f7009a7c51e
+md"""
+# $(HTML("<span id='optional-slides'>OPTIONAL SLIDES</span>"))
+
+"""
+
+# ╔═╡ 26c82f16-d294-11ef-0fe1-07326b56282f
+md"""
+## VFE Minimization with Mean-field Factorization Constraints: $(HTML("<span id='CAVI'>the CAVI Approach</span>"))
+
+Let's work out VFE minimization with additional mean-field constraints (=full factorization) constraints:  
+
+```math
+q(z) = \prod_{j=1}^m q_j(z_j)\,.
+```
+
+In other words, the posteriors for ``z_j`` are all considered independent. This is a strong constraint but often leads to good solutions.
+
+Given the mean-field constraints, it is possible to derive the following expression for the $(HTML("<span id='optimal-solutions'>optimal solutions</span>")) ``q_j^*(z_j)``, for ``j=1,\ldots,m``: 
+
+```math
+\begin{align} 
+\log q_j^*(z_j) &\propto \mathrm{E}_{q_{-j}^*}\left[ \log p(x,z) \right]  \\
+  &= \underbrace{\sum_{z_{-j}} q_{-j}^*(z_{-j}) \underbrace{\log p(x,z)}_{\text{"field"}}}_{\text{"mean field"}} 
+\end{align} 
+```
+
+where we defined ``q_{-j}^*(z_{-j}) \triangleq q_1^*(z_1)q_2^*(z_2)\cdots q_{j-1}^*(z_{j-1})q_{j+1}^*(z_{j+1})\cdots q_m^*(z_m)``.
+
+**Proof** (from [Blei, 2017](https://doi.org/10.1080/01621459.2017.1285773)): We first rewrite the FE as a function of ``q_j(z_j)`` only: 
+
+```math
+ F[q_j] = \mathbb{E}_{q_{j}}\left[ \mathbb{E}_{q_{-j}}\left[ \log p(x,z_j,z_{-j})\right]\right] - \mathbb{E}_{q_j}\left[ \log q_j(z_j)\right] + \mathtt{const.}\,,
+```
+
+where the constant holds all terms that do not depend on ``z_j``. This expression can be written as 
+
+```math
+ F[q_j] = \sum_{z_j} q_j(z_j) \log \frac{q_j(z_j)}{\exp\left( \mathbb{E}_{q_{-j}}\left[ \log p(x,z_j,z_{-j})\right]\right)}
+```
+
+which is a KL-divergence that is minimized by Eq. B-10.9.  (end proof)
+
+This is not yet a full solution to the FE minimization task since the solution ``q_j^*(z_j)`` depends on expectations that involve other solutions ``q_{i\neq j}^*(z_{i \neq j})``, and each of these other solutions ``q_{i\neq j}^*(z_{i \neq j})`` depends on an expection that involves ``q_j^*(z_j)``. 
+
+In practice, we solve this chicken-and-egg problem by an iterative approach: we first initialize all ``q_j(z_j)`` (for ``j=1,\ldots,m``) to an appropriate initial distribution and then cycle through the factors in turn by solving eq.B-10.9 and update ``q_{-j}^*(z_{-j})`` with the latest estimates. (See [Blei, 2017](https://doi.org/10.1080/01621459.2017.1285773), Algorithm 1, p864).  
+
+This algorithm for approximating Bayesian inference is known **Coordinate Ascent Variational Inference** (CAVI).   
+
+"""
+
+# ╔═╡ 26c85a22-d294-11ef-3c8e-7b72a4313ced
+md"""
+## $(HTML("<span id='EM-Algorithm'>FE Minimization by the Expectation-Maximization (EM) Algorithm</span>"))
+
+The EM algorithm is a special case of VFE minimization that focuses on Maximum-Likelihood estimation for models with latent variables. 
+
+Consider a model 
+
+```math
+p(x,z,\theta)
+```
+
+with observations ``x = \{x_n\}``, latent variables ``z=\{z_n\}`` and parameters ``\theta``.
+
+We can write the following VFE functional for this model:
+
+```math
+\begin{align*}
+F[q] =  \sum_z \sum_\theta q(z,\theta) \log \frac{q(z,\theta)}{p(x,z,\theta)} 
+\end{align*}
+```
+
+The EM algorithm makes the following simplifying assumptions:
+
+1. The prior for the parameters is uninformative (uniform). This implies that
+
+```math
+p(x,z,\theta) = p(x,z|\theta) p(\theta) \propto p(x,z|\theta)
+```
+
+2. A factorization constraint 
+
+```math
+q(z,\theta) = q(z) q(\theta)
+```
+
+3. The posterior for the parameters is a delta function:
+
+```math
+q(\theta) = \delta(\theta - \hat{\theta})
+```
+
+Basically, these three assumptions turn VFE minimization into maximum likelihood estimation for the parameters ``\theta`` and the VFE simplifies to 
+
+```math
+\begin{align*}
+F[q,\theta] =  \sum_z q(z) \log \frac{q(z)}{p(x,z|\theta)} 
+\end{align*}
+```
+
+The EM algorithm minimizes this FE by iterating (iteration counter: ``i``) over 
+
+```math
+\begin{align} \mathcal{L}^{(i)}(\theta) &= \sum_z \overbrace{p(z|x,\theta^{(i-1)})}^{q^{(i)}(z)}  \log p(x,z|\theta) \tag{the E-step} \\
+\theta^{(i)} &= \arg\max_\theta \mathcal{L}^{(i)}(\theta) \tag{the M-step} \end{align}
+
+```
+
+These choices are optimal for the given FE functional. In order to see this, consider the two decompositions
+
+```math
+\begin{align*}
+F[q,\theta] &= \underbrace{-\sum_z q(z) \log p(x,z|\theta)}_{\text{energy}} - \underbrace{\sum_z q(z) \log \frac{1}{q(z)}}_{\text{entropy}} \qquad &&\text{(EE)}\\
+  &= \underbrace{\sum_z q(z) \log \frac{q(z)}{p(z|x,\theta)}}_{\text{divergence}} - \underbrace{\log p(x|\theta)}_{\text{log-likelihood}}  \qquad &&\text{(DE)}
+\end{align*}
+```
+
+The DE decomposition shows that the FE is minimized for the choice ``q(z) := p(z|x,\theta)``. Also, for this choice, the FE equals the (negative) log-evidence (, which is this case simplifies to the log-likelihood). 
+
+The EE decomposition shows that the FE is minimized wrt ``\theta`` by minimizing the energy term. The energy term is computed in the E-step and optimized in the M-step.
+
+  * Note that in the EM literature, the energy term is often called the *expected complete-data log-likelihood*.)
+
+In order to execute the EM algorithm, it is assumed that we can analytically execute the E- and M-steps. For a large set of models (including models whose distributions belong to the exponential family of distributions), this is indeed the case and hence the large popularity of the EM algorithm. 
+
+The EM algorihm imposes rather severe assumptions on the FE (basically approximating Bayesian inference by maximum likelihood estimation). Over the past few years, the rise of Probabilistic Programming languages has dramatically increased the range of models for which the parameters can by estimated autmatically by (approximate) Bayesian inference, so the popularity of EM is slowly waning. (More on this in the Probabilistic Programming lessons). 
+
+Bishop (2006) works out EM for the GMM in section 9.2.
+
+"""
+
+# ╔═╡ 62868f61-95c7-4e07-854f-a171aadc667b
+code_example("EM-algorithm for the GMM on the Old-Faithful data set")
+
+# ╔═╡ 26c867d8-d294-11ef-2372-d75ed0bcc02d
+md"""
+
+We'll perform clustering on the data set from the [challenge](#challenge_hello) by fitting a GMM consisting of two Gaussians using the EM algorithm. 
+
+"""
+
+# ╔═╡ 87d94630-c90b-4379-91bd-88641ee7b508
+md"""
+### Implementation
+
+_Reading this lecture online? Click **"View code"** in the top right to read the implementation of this visualisation._
+ 
+"""
+
+# ╔═╡ de049d59-9863-4bac-91c3-32851cad15d9
+TODO("verify the `π_hat` situation in the code above, see comments in code")
+
+
+# ╔═╡ 26c8b682-d294-11ef-1331-2bcf8baec73f
+md"""
+## Message Passing for Free Energy Minimization
+
+The Sum-Product (SP) update rule implements perfect Bayesian inference. 
+
+Sometimes, the SP update rule is not analytically solvable. 
+
+Fortunately, for many well-known Bayesian approximation methods, a message passing update rule can be created, e.g. [Variational Message Passing](https://en.wikipedia.org/wiki/Variational_message_passing) (VMP) for variational inference. 
+
+In general, all of these message passing algorithms can be interpreted as minimization of a constrained free energy (e.g., see [Senoz et al. (2021)](https://research.tue.nl/nl/publications/variational-message-passing-and-local-constraint-manipulation-in-), and hence these message passing schemes comply with [Caticha's Method of Maximum Relative Entropy](https://arxiv.org/abs/1011.0723), which, as discussed in the [variational Bayes lesson](https://bmlip.github.io/course/lectures/Latent%20Variable%20Models%20and%20VB.html) is the proper way for updating beliefs. 
+
+Different message passing updates rules can be combined to get a hybrid inference method in one model. 
+
+"""
+
+# ╔═╡ 26c8c7fa-d294-11ef-0444-6555ecf5c721
+md"""
+## The Local Free Energy in a Factor Graph
+
+Consider an edge ``x_j`` in a Forney-style factor graph for a generative model ``p(x) = p(x_1,x_2,\ldots,x_N)``.
+
+Assume that the graph structure (factorization) is specified by
+
+```math
+p(x) = \prod_{a=1}^M p_a(x_a)
+```
+
+where ``a`` is a set of indices.
+
+Also, we assume a mean-field approximation for the posterior:
+
+```math
+q(x) = \prod_{i=1}^N q_i(x_i)
+```
+
+and consequently a corresponding free energy functional  
+
+```math
+\begin{align*}
+F[q] &= \sum_x q(x) \log \frac{q(x)}{p(x)} \\
+  &= \sum_i \sum_{x_i} \left(\prod_{i=1}^N q_i(x_i)\right) \log \frac{\prod_{i=1}^N q_i(x_i)}{\prod_{a=1}^M p_a(x_a)}
+\end{align*}
+```
+
+With these assumptions, it can be shown that the FE evaluates to (exercise)
+
+```math
+F[q] = \sum_{a=1}^M \underbrace{\sum_{x_a} \left( \prod_{j\in N(a)} q_j(x_j)\cdot \left(-\log p_a(x_a)\right) \right) }_{\text{node energy }U[p_a]} - \sum_{i=1}^N \underbrace{\sum_{x_i} q_i(x_i) \log \frac{1}{q_i(x_i)}}_{\text{edge entropy }H[q_i]}
+```
+
+In words, the FE decomposes into a sum of (expected) energies for the nodes minus the entropies on the edges. 
+
+"""
+
+# ╔═╡ 26c8e172-d294-11ef-2a9e-89e0f4cbf475
+md"""
+## Variational Message Passing
+
+Let us now consider the local free energy that is associated with edge corresponding to ``x_j``. 
+
+![](https://github.com/bmlip/course/blob/v2/assets/figures/VMP-two-nodes.png?raw=true)
+
+Apparently (see previous slide), there are three contributions to the free energy for ``x_j``:
+
+  * one entropy term for the edge ``x_j``
+  * two energy terms: one for each node that attaches to ``x_j`` (in the figure: nodes ``p_a`` and ``p_b``)
+
+The local free energy for ``x_j`` can be written as (exercise)
+
+```math
+  F[q_j] \propto \sum_{x_j} q(x_j) \log \frac{q_j(x_j)}{\nu_a(x_j)\cdot \nu_b(x_j)}
+  
+```
+
+where
+
+```math
+\begin{align*} 
+  \nu_a(x_j) &\propto \exp\left( \mathbb{E}_{q_{k}}\left[ \log p_a(x_a)\right]\right) \\
+  \nu_b(x_j) &\propto \exp\left( \mathbb{E}_{q_{l}}\left[ \log p_b(x_b)\right]\right) 
+  \end{align*}
+```
+
+and ``\mathbb{E}_{q_{k}}\left[\cdot\right]`` is an expectation w.r.t. all ``q(x_k)`` with ``k \in N(a)\setminus {j}``.
+
+``\nu_a(x_j)`` and ``\nu_b(x_j)``  can be locally computed in nodes ``a`` and ``b`` respectively and can be interpreted as colliding messages over edge ``x_j``. 
+
+Local free energy minimization is achieved by setting
+
+```math
+  q_j(x_j) \propto \nu_a(x_j) \cdot \nu_b(x_j)
+  
+```
+
+Note that message ``\nu_a(x_j)`` depends on posterior beliefs over incoming edges (``k``) for node ``a``, and in turn, the message from node ``a`` towards edge ``x_k`` depends on the belief ``q_j(x_j)``. I.o.w., direct mutual dependencies exist between posterior beliefs over edges that attach to the same node. 
+
+These considerations lead to the [Variational Message Passing](https://en.wikipedia.org/wiki/Variational_message_passing) procedure, which is an iterative free energy minimization procedure that can be executed completely through locally computable messages.  
+
+Procedure VMP, see [Dauwels (2007), section 3](https://github.com/bmlip/course/blob/main/assets/files/Dauwels-2007-on-variational-message-passing-on-factor-graphs.pdf)
+
+> 1. Initialize all messages ``q`` and ``ν``, e.g., ``q(\cdot) \propto 1`` and ``\nu(\cdot) \propto 1``. <br/>
+> 2. Select an edge ``z_k`` in the factor graph of ``f(z_1,\ldots,z_m)``.<br/>
+> 3. Compute the two messages ``\overrightarrow{\nu}(z_k)`` and ``\overleftarrow{\nu}(z_k)`` by applying the following generic rule:
+> ```math
+>   \overrightarrow{\nu}(y) \propto \exp\left( \mathbb{E}_{q}\left[ \log > g(x_1,\dots,x_n,y)\right] \right)   
+> ```
+> 4. Compute the marginal ``q(z_k)``
+> ```math
+>  q(z_k) \propto \overrightarrow{\nu}(z_k) \overleftarrow{\nu}(z_k)  
+> ```
+>  and send it to the two nodes connected to the edge ``x_k``.
+>
+> 5. Iterate 2–4 until convergence.
+
+
+"""
+
+# ╔═╡ 26c9121e-d294-11ef-18e6-ed8105503adc
+md"""
+## The Bethe Free Energy and Belief Propagation
+
+We showed that, under mean field assumptions, the FE can be decomposed into a sum of local FE contributions for the nodes (``a``) and edges (``i``):
+
+```math
+\begin{align*}
+F[q] = \sum_{a=1}^M \underbrace{\sum_{x_a} \left( \prod_{j\in N(a)} q_j(x_j)\cdot \left(-\log p_a(x_a)\right) \right) }_{\text{node energy }U[p_a]} - \sum_{i=1}^N \underbrace{\sum_{x_i} q_i(x_i) \log \frac{1}{q_i(x_i)}}_{\text{edge entropy }H[q_i]}
+\end{align*}
+```
+
+The mean field assumption is very strong and may lead to large inference costs (``\mathrm{KL}(q(x),p(x|\text{data}))``). A more relaxed assumption is to allow joint posterior beliefs over the variables that attach to a node. This idea is expressed by the Bethe Free Energy:
+
+```math
+\begin{align*}
+F_B[q] = \sum_{a=1}^M \left( \sum_{x_a} q_a(x_a) \log \frac{q_a(x_a)}{p_a(x_a)} \right)  - \sum_{i=1}^N (d_i - 1) \sum_{x_i} q_i(x_i) \log {q_i(x_i)}
+\end{align*}
+```
+
+where ``q_a(x_a)`` is the posterior joint belief over the variables ``x_a`` (i.e., the set of variables that attach to node ``a``), ``q_i(x_i)`` is the posterior marginal belief over the variable ``x_i`` and ``d_i`` is the number of factor nodes that link to edge ``i``. Moreover, ``q_a(x_a)`` and ``q_i(x_i)`` are constrained to obey the following equalities:
+
+```math
+\begin{align*}
+  \sum_{x_a \backslash x_i} q_a(x_a) &= q_i(x_i), ~~~ \forall i, \forall a \\
+  \sum_{x_i} q_i(x_i) &= 1, ~~~ \forall i \\
+  \sum_{x_a} q_a(x_a) &= 1, ~~~ \forall a \\
+\end{align*}
+```
+
+We form the Lagrangian by augmenting the Bethe Free Energy functional with the constraints:
+
+```math
+\begin{align*}
+L[q] = F_B[q] + \sum_i\sum_{a \in N(i)} \lambda_{ai}(x_i) \left(q_i(x_i) - \sum_{x_a\backslash x_i} q(x_a) \right) + \sum_{i} \gamma_i \left(  \sum_{x_i}q_i(x_i) - 1\right) + \sum_{a}\gamma_a \left(  \sum_{x_a}q_a(x_a) -1\right)
+\end{align*}
+```
+
+The stationary solutions for this Lagrangian are given by
+
+```math
+\begin{align*}
+q_a(x_a) &= f_a(x_a) \exp\left(\gamma_a -1 + \sum_{i \in N(a)} \lambda_{ai}(x_i)\right) \\ 
+q_i(x_i) &= \exp\left(1- \gamma_i + \sum_{a \in N(i)} \lambda_{ai}(x_i)\right) ^{\frac{1}{d_i - 1}}
+\end{align*}
+```
+
+where ``N(i)`` denotes the factor nodes that have ``x_i`` in their arguments and ``N(a)`` denotes the set of variables in the argument of ``f_a``.
+
+Stationary solutions are functions of Lagrange multipliers. This means that Lagrange multipliers need to be determined. Lagrange multipliers can be determined by plugging the stationary solutions back into the constraint specification and solving for the multipliers which ensure that the constraint is satisfied. The first constraint we consider is normalization, which yields the following identification:
+
+```math
+\begin{align*}
+\gamma_a &= 1 - \log \Bigg(\sum_{x_a}f_a(x_a)\exp\left(\sum_{i \in N(a)}\lambda_{ai}(x_i)\right)\Bigg)\\
+\gamma_i &= 1 + (d_i-1) \log\Bigg(\sum_{x_i}\exp\left( \frac{1}{d_i-1}\sum_{a \in N(i)} \lambda_{ai}(x_i)\right)\Bigg).
+\end{align*}
+```
+
+The functional form of the Lagrange multipliers that corresponds to the normalization constraint enforces us to obtain the Lagrange multipliers that correspond to the marginalization constraint. To do so we solve for 
+
+```math
+\begin{align*} \sum_{x_a \backslash x_i} f_a(x_a) \exp\left(\sum_{i \in N(a)} \lambda_{ai}(x_i)\right) &= \exp\left(\sum_{a \in N(i)} \lambda_{ai}(x_i)\right) ^{\frac{1}{d_i - 1}} \exp\left(\lambda_{ai}(x_i)\right)\sum_{x_a \backslash x_i} f_a(x_a) \exp\Bigg(\sum_{\substack{{j \in N(a)}  j \neq i}}\lambda_{aj}(x_j)\Bigg) \\
+&= \exp\left(\sum_{a \in N(i)} \lambda_{ai}(x_i)\right) ^{\frac{1}{d_i - 1}} \exp\left(\lambda_{ai}(x_i) + \lambda_{ia}(x_i)\right) \\
+&= \exp\left(\sum_{a \in N(i)} \lambda_{ai}(x_i)\right) ^{\frac{1}{d_i - 1}}\, , 
+\end{align*}
+```
+
+where we defined an auxilary function
+
+```math
+\begin{align*}
+\exp(\lambda_{ia}(x_i)) \triangleq \sum_{x_a \backslash x_i} f_a(x_a) \exp\Bigg(\sum_{\substack{{j \in N(a)} j \neq i}}\lambda_{aj}(x_j)\Bigg) \,.
+\end{align*}
+```
+
+This definition is valid since it can be inverted by the relation
+
+```math
+\begin{align*}
+\lambda_{ia}(x_i) = \frac{2-d_i}{d_i - 1}\lambda_{ai}(x_i) + \frac{1}{d_i -1}\sum_{\substack{c \in N(i)\\c \neq a}}\lambda_{ci}(x_i)
+\end{align*}
+```
+
+In general it is not possible to solve for the Lagrange multipliers analytically and we resort to iteratively obtaining the solutions. This leads to the **Belief Propagation algorithm** where the exponentiated Lagrange multipliers (messages) are updated iteratively via 
+
+```math
+\begin{align*} 
+\mu_{ia}^{(k+1)}(x_i) &= \sum_{x_a \backslash x_i} f_a(x_a) \prod_{\substack{{j \in N(a)}  j \neq i}}\mu^{(k)}_{aj}(x_j)  \mu_{ai}^{(k)}(x_i) \\
+&= \prod_{\substack{c \in N(i) c \neq a}}\mu^{(k)}_{ic}(x_i)\,, 
+\end{align*}
+```
+
+where ``k`` denotes iteration number and the messages are defined as
+
+```math
+\begin{align*}
+\mu_{ia}(x_i) &\triangleq \exp(\lambda_{ia}(x_i))\\
+\mu_{ai}(x_i) &\triangleq \exp(\lambda_{ai}(x_i))\,.
+\end{align*}
+```
+
+For a more complete overview of message passing as Bethe Free Energy minimization, see [Senoz et al. (2021)](https://research.tue.nl/nl/publications/variational-message-passing-and-local-constraint-manipulation-in-).
+
+"""
+
+# ╔═╡ 55570464-89c8-4d9b-b667-dfa64ac62294
+md"""
+# Appendix
+"""
+
+# ╔═╡ c18b7c1b-8011-469b-ad92-7d50c23c46e3
+const plot_lims = (
+	xlim=(1.3, 5.5),
+	ylim=(41, 99),
+)
+
+# ╔═╡ dd1242db-fb20-4732-ac55-a3e021bbd2b7
+const data_plot_kwargs = (
+	markersize=4, 
+	markerstrokewidth=0, 
+	color=:red4,
+	opacity=.8,
+)
+
+# ╔═╡ 489cbd24-1a69-4a00-a2e9-53c2c57cef65
+function plotGMM(X::Matrix, clusters::Vector, γ::Matrix; kwargs...)
+	# Plot data set and (fitted) mixture model consisting of two Gaussian distributions
+	# X contains a 2-d data set (every column holds a data point)
+	# clusters holds the 2 Gaussian elements of the mixture model
+	# γ contains p(cluster|X), and should contain NaN elements if not yet known
+
+	# Plot contours of the element distributions
+	K = length(clusters)
+	result = plot(; plot_lims...)
+	for k=1:K
+		X1 = Matrix{Float64}(undef,50,50)
+		X2 = Matrix{Float64}(undef,50,50)
+		d = Matrix{Float64}(undef,50,50)
+		# Create bounding box for thse contour plot
+		lims = [-2*sqrt(cov(clusters[k])[1,1]) 2*sqrt(cov(clusters[k])[1,1]);
+				-2*sqrt(cov(clusters[k])[2,2]) 2*sqrt(cov(clusters[k])[2,2])] + repeat(mean(clusters[k]), 1, 2)
+		X1 = LinRange(lims[1,1], lims[1,2], 50)
+		X2 = LinRange(lims[2,1], lims[2,2], 50)
+		alpha = sum(γ[k,:])/sum(γ)
+		covellipse!(clusters[k].μ, clusters[k].Σ; label="", alpha=max(0.1, alpha), color=:cyan)
+	end
+
+
+	# Plot data points
+	scatter!(X[1,:], X[2,:]; label="observations", data_plot_kwargs..., kwargs...)
+	return result
+end
 
 # ╔═╡ cc547bfa-a130-4382-af47-73de56e4741b
 old_faithful = 
@@ -889,11 +1552,11 @@ old_faithful =
 # ╔═╡ 0349720e-5de4-4b39-babd-c0881588f1de
 X = Array(Matrix{Float64}(old_faithful)')
 
+# ╔═╡ 3948225e-90d8-4b78-ba9b-5f98e228285a
+scatter(X[1,:], X[2,:]; label="observations", data_plot_kwargs...)
+
 # ╔═╡ 8555aec9-4e80-49e7-8514-ef4a2236801b
 N = size(X, 2)
-
-# ╔═╡ 666680b2-315a-4d95-8f7f-3ae50018e112
-K = 6
 
 # ╔═╡ 86c33a7c-135a-461f-a17e-b50bca418e13
 function sufficientStatistics(X,r,k::Int) #function to compute sufficient statistics
@@ -937,635 +1600,16 @@ function updateR(Λ,m,α,ν,β) #variational expectation function
     return r
 end
 
-# ╔═╡ 26c796c8-d294-11ef-25be-17dcd4a9d315
-md"""
-The generated figure resembles Figure 10.6 in Bishop. The plots show VFEM results for a GMM of ``K = 6`` Gaussians applied to the Old Faithful data set. The ellipses denote the one standard-deviation density contours for each of the components, and the color coding of the data points reflects the "soft" class label assignments. Components whose expected mixing coefficients are numerically indistinguishable from zero are not plotted.
-
-"""
-
-# ╔═╡ 0090be18-2453-4ad3-8e2c-6953649b171e
-TODO("Fons: can you make this into a cool code example where user gets to run through the iterations?")
-
-# ╔═╡ f42a1a65-20ce-452f-9974-bc8146943574
-md"""
-# Theoretical Underpinning of VFE Minimization
-"""
-
-# ╔═╡ 26c7b428-d294-11ef-150a-bb37e37f4b5d
-md"""
-## Observations as Variational Constraints
-
-We derived variational inference by substituting a variational posterior ``q(z)`` for the Bayesian posterior ``p(z|x)`` in the CA decomposition of (negative log) Bayesian evidence for a model. This led to a straightforward derivation of the VFE functional, but revealed nothing about the foundations of variational inference. Is variational inference any good?
-
-To approach this question, let us first recognize that, in the context of a given model ``p(x,z)``, new observations ``x`` can generally be formulated as a constraint on a posterior distribution ``q``. For instance, observing a new data point ``x_1 = 5`` can be formalized as a constraint ``q(x_1) = \delta(x_1 - 5)``, where ``\delta(\cdot)`` is the Dirac delta function. 
-
-Viewing observations as delta-function constraints enables us to interpret them as a specific instance of variational constraints, on par with form and factorization (and other) constraints, all of which shape the variational posterior in constrained VFE minimization.
-
-
-"""
-
-# ╔═╡ b3bb7349-1965-4734-83ed-ba6fef0ccc41
-md"""
-
-## Variational Inference and The Maximum Entropy Principle
-
-In [Caticha (2010)](https://arxiv.org/abs/1011.0723) (based on earlier work by [Shore and Johnson (1980)](https://github.com/bmlip/course/blob/main/assets/files/ShoreJohnson-1980-Axiomatic-Derivation-of-the-Principle-of-Maximum-Entropy.pdf)), the [Principle of Maximum (Relative) Entropy](https://en.wikipedia.org/wiki/Principle_of_maximum_entropy) is developed as a method for rational updating of priors to posteriors when faced with new information in the form of constraints.
-
-
-Caticha's argumentation is as follows:
-
-  * Consider prior beliefs (i.e., a generative model) ``p(x,z)`` about observed and latent variables ``x`` and ``z``. Assume that new information in the form of constraints is obtained, and we are interested in the "best update" to posterior beliefs ``q(x,z)``.
-
-  * In order to define what "best update" means, Caticha assumed a ranking function ``S[q]`` that generates a preference score for each candidate posterior ``q`` for a given prior ``p``. The best update from ``p`` to ``q`` is then identified as
-
-```math
-q^* = \arg\max_q S[q]\,, \quad \text{subject to all constraints.} 
-```
-
-Similarly to [Cox' method](https://en.wikipedia.org/wiki/Cox%27s_theorem) for deriving Probability Theory from a set of sensical axioms, Caticha then introduced the following axioms, based on a rational principle (the **principle of minimal updating**, see [Caticha 2010](https://arxiv.org/abs/1011.0723)), that the ranking function needs to adhere to: 
-
-  1. *Locality*: local information has local effects.
-  2. *Coordinate invariance*: the system of coordinates carries no information.
-  3. *Independence*: When systems are known to be independent, it should not matter whether they are treated separately or jointly.
-
-It turns out that these three criteria **uniquely identify the Relative Entropy** as the proper ranking function: 
-
-```math
-\begin{align*}
-S[q] = - \sum_z q(x,z) \log \frac{q(x,z)}{p(x,z)}
-\end{align*}
-```
-
-This procedure for finding the variational posterior ``q`` is called the **Principle of  Maximum (Relative) Entropy** (PME). Note that, since ``S[q]=-F[q]``, constrained Relative Entropy maximization is equivalent to constrained VFE minimization! 
-
-Therefore, when information is supplied in the form of constraints on the posterior (such as form/factorization constraints and new observations as data constraints), we *should* select the posterior that minimizes the constrained Variational Free Energy. **Constrained FE minimization is the proper method for inference!**
-
-Bayes rule is the global solution of constrained VFEM when all constraints are data constraints, ie, delta distributions on ``q(x)``. Hence, Bayes rule is a special case of constrained VFEM. Bayes rule only applies to updating beliefs on the basis of new observations. 
- 
-"""
-
-# ╔═╡ 06170e31-e865-4178-8af0-41d82df95d71
-keyconcept("","Constrained VFE minimization is consistent with the Maximum Entropy Principle, which prescribes how to rationally update beliefs when new information becomes available. In this framework, the updated posterior is the distribution that minimizes VFE (or equivalently, KL divergence to the prior) subject to the imposed constraints. ")
-
-# ╔═╡ bbdca8c2-022f-42be-bcf7-80d86f7f269c
-md"""
-
-## Model Performance Evaluation, Revisited
-
-Let us reconsider the Bound-Evidence decomposition of the VFE for a model ``p(x,z)`` with variational posterior ``q(z)``,
-
-```math
-\begin{align}
-\mathrm{F}[q] = \underbrace{\sum_z q(z) \log \frac{q(z)}{p(z|x)}}_{\text{inference bound}\geq 0} \underbrace{- \log p(x)}_{\text{surprise}} \tag{BE} 
-\end{align}
-```
-
-The VFE comprises two cost terms:
-
-  - The **surprise** (or negative log-evidence), ``-\log p(x)``, reflects the cost of predicting the data ``x`` using a model ``p(x, z)``, assuming that (ideal) Bayesian inference can be performed. Specifically, the evidence ``p(x)`` is obtained from the joint model ``p(x, z)`` by marginalizing over the latent variables:
-```math
-p(x) = \sum_z p(x,z)  \,.
-```
-
-  - The **inference bound**, given by the Kullback–Leibler divergence
-```math
-\sum_z q(z) \log \frac{q(z)}{p(z |x)} \geq 0 \,,
-``` 
-quantifies the cost of imperfect inference, i.e., the discrepancy between the variational posterior ``q(z)`` and the true Bayesian posterior ``p(z | x)``.
-
-In any practical setting, using a model *implies* performing inference within that model. Therefore, the effective cost of applying a model is not merely the surprise but also must include the cost of inference. 
-
-Put more bluntly: a model with very high Bayesian evidence ``p(x)`` may still be practically unusable due to exorbitant inference costs.
-
-In the literature, the VFE is typically interpreted as an approximation (more precisely, an upper-bound) to the surprise, ``-\log p(x)``, which is often regarded as the “true” measure of model performance. However, we argue that this perspective should be reversed: the VFE should be considered the true performance metric in practice, as it accounts for both model fit and the tractability of inference. The surprise can be viewed as a special case of the VFE, corresponding to a zero inference bound, that only applies when ideal Bayesian inference is computationally feasible. 
-
-"""
-
-# ╔═╡ 26c8068a-d294-11ef-3983-a1be55128b3f
-md"""
-## Variational Inference in Practice
-
-For most realistic models of complex real-world problems, Bayes rule is not tractable in closed form. As a result, the use of approximate variational Bayesian inference has seen rapid growth in practical applications.
-
-Toolboxes such as [RxInfer](http://rxinfer.com) enable users to define sophisticated probabilistic models and automate the inference process via constrained VFE minimization. Remarkably, specifying even complex models typically requires no more than a single page of code. 
-
-In contrast to traditional algorithm design, where solving a problem might require implementing a custom solution in, say, ``40`` pages of code, automated inference in a probabilistic model offers a radically more efficient and modular approach. This shift has the potential to fundamentally change how we design and deploy information processing systems in the future.
-
-"""
-
-# ╔═╡ 56bea391-b812-4fc4-8f27-fcb4cb984cf4
-md"""
-# Exercises
-"""
-
-# ╔═╡ 5a94e2a4-7134-462e-9dc5-56083769049f
-md"""
-#### Entropy and The Free Energy Functional (*)
-
-The Free energy functional ``\mathrm{F}[q] = -\sum_z q(z) \log p(x,z) - \sum_z q(z) \log \frac{1}{q(z)}`` decomposes into "Energy minus Entropy". So apparently the entropy of the posterior ``q(z)`` is maximized. This entropy maximization may seem puzzling at first because inference should intuitively lead to *more* informed posteriors, i.e., posterior distributions whose entropy is smaller than the entropy of the prior. Explain why entropy maximization is still a reasonable objective. 
-
- 
-"""
-
-# ╔═╡ 747a7e1e-b921-4882-b00a-1b00bef8433d
-hide_solution(
-md"""
-
-Note that Free Energy minimization is a balancing act: FE minimization implies entropy maximization *and at the same time* energy minimization. Minimizing the energy term leads to aligning ``q(z)`` with ``\log p(x,z)``, ie, it tries to move the bulk of the function ``q(z)`` to areas in ``z``-space where ``p(x,z)`` is large (``p(x,z)`` is here just a function of ``z``, since x is observed). 
-	   
-However, aside from aligning with ``p(x,z)``, we want ``q(z)`` to be as uninformative as possible. Everything that can be inferred should be represented in ``p(x,z)`` (which is prior times likelihood). We don't want to learn anything that is not in either the prior or the likelihood. The entropy term balances the energy term by favoring distributions that are as uninformative as possible.
- 
-""")
-
-# ╔═╡ 2d4adbf6-6de8-4e3a-ad6f-fa8bbfa5999e
-md"""
-
-#### Mean Updating (*)
-
-Explain the following update rule for the [mean of the Gaussian cluster-conditional data distribution](#update-equations):
-
-```math
-m_k = \frac{1}{\beta_k} \left( \beta_0 m_0 + N_k \bar{x}_k \right) \tag{B-10.61} 
-```
-
-"""
-
-# ╔═╡ 208ba1bb-a4bf-4b8c-93d2-0d6c6c8d16d4
-hide_solution(
-md"""
-We see here an example of "precision-weighted means add" when two sources of information are fused, just like precision-weighted means add when two Gaussians are multiplied, eg a prior and likelihood. In this case, the prior is ``m_0`` and the likelihood estimate is ``\bar{x}``. ``\beta_0`` can be interpreted as the number of pseudo-observations in the prior.
-
-""")
-
-# ╔═╡ 2f490e1f-e495-4f55-a3f8-60d6fd716d4e
-md"""
-#### The Expectation-Maximization (EM) algorithm (**)
-
-Consider a model ``p(x,z|\theta)``, where ``D=\{x_1,x_2,\ldots,x_N\}`` is observed, ``z`` are unobserved variables, and ``\theta`` are parameters. The **Expectation-Maximization** (EM) algorithm estimates the parameters by iterating over the following two equations (``i`` is the iteration index):
-
-```math
-\begin{align*}
-q^{(i)}(z) &= p(z|D,\theta^{(i-1)}) \\
-\theta^{(i)} &= \arg\max_\theta \sum_z q^{(i)}(z) \cdot \log p(D,z|\theta)
-\end{align*}
-```
-
-Prove that this algorithm minimizes the Free Energy functional 
-
-```math
-\begin{align*}
-F[q](\theta) =  \sum_z q(z) \log \frac{q(z)}{p(D,z|\theta)} 
-\end{align*}
-```
-
-
-"""
-
-# ╔═╡ b91bc3b6-b815-4942-b297-c0e2b4b99654
-hide_solution(
-md"""
-		
-Let's start with a prior estimate ``\theta^{(i-1)}`` and we want to minimize the free energy functional wrt ``q``. This leads to
-
-
-```math
-\begin{align*}
-q^{(i)}(z) &= \arg\min_q F[q](\theta^{(i-1)}) \\
-  &= \arg\min_q \sum_z q(z) \log \frac{q(z)}{p(D,z|\theta^{(i-1)})} \\
-  &= \arg\min_q \sum_z q(z) \log \frac{q(z)}{p(z|D,\theta^{(i-1)}) \cdot p(D|\theta^{(i-1)})} \\
-  &= p(z|D,\theta^{(i-1)})
-\end{align*}
-```
-
-Next, we use ``q^{(i)}(z)=p(z|D,\theta^{(i-1)})`` and minimize the free energy w.r.t. ``\theta``, leading to
-
-```math
-\begin{align*}
-  \theta^{(i)} &= \arg\min_\theta F[q^{(i)}](\theta) \\
-  &= \arg\min_\theta \sum_z p(z|D,\theta^{(i-1)}) \log \frac{p(z|D,\theta^{(i-1)})}{p(D,z|\theta)} \\
-  &= \arg\max_\theta \sum_z \underbrace{p(z|D,\theta^{(i-1)})}_{q^{(i)}(z)} \log p(D,z|\theta)
-\end{align*}
-```
-		""")
-
-# ╔═╡ 26c8160c-d294-11ef-2a74-6f7009a7c51e
-md"""
-# $(HTML("<span id='optional-slides'>OPTIONAL SLIDES</span>"))
-
-"""
-
-# ╔═╡ 26c82f16-d294-11ef-0fe1-07326b56282f
-md"""
-## VFE Minimization with Mean-field Factorization Constraints: $(HTML("<span id='CAVI'>the CAVI Approach</span>"))
-
-Let's work out VFE minimization with additional mean-field constraints (=full factorization) constraints:  
-
-```math
-q(z) = \prod_{j=1}^m q_j(z_j)\,.
-```
-
-In other words, the posteriors for ``z_j`` are all considered independent. This is a strong constraint but often leads to good solutions.
-
-Given the mean-field constraints, it is possible to derive the following expression for the $(HTML("<span id='optimal-solutions'>optimal solutions</span>")) ``q_j^*(z_j)``, for ``j=1,\ldots,m``: 
-
-```math
-\begin{align} 
-\log q_j^*(z_j) &\propto \mathrm{E}_{q_{-j}^*}\left[ \log p(x,z) \right]  \\
-  &= \underbrace{\sum_{z_{-j}} q_{-j}^*(z_{-j}) \underbrace{\log p(x,z)}_{\text{"field"}}}_{\text{"mean field"}} 
-\end{align} 
-```
-
-where we defined ``q_{-j}^*(z_{-j}) \triangleq q_1^*(z_1)q_2^*(z_2)\cdots q_{j-1}^*(z_{j-1})q_{j+1}^*(z_{j+1})\cdots q_m^*(z_m)``.
-
-**Proof** (from [Blei, 2017](https://doi.org/10.1080/01621459.2017.1285773)): We first rewrite the FE as a function of ``q_j(z_j)`` only: 
-
-```math
- F[q_j] = \mathbb{E}_{q_{j}}\left[ \mathbb{E}_{q_{-j}}\left[ \log p(x,z_j,z_{-j})\right]\right] - \mathbb{E}_{q_j}\left[ \log q_j(z_j)\right] + \mathtt{const.}\,,
-```
-
-where the constant holds all terms that do not depend on ``z_j``. This expression can be written as 
-
-```math
- F[q_j] = \sum_{z_j} q_j(z_j) \log \frac{q_j(z_j)}{\exp\left( \mathbb{E}_{q_{-j}}\left[ \log p(x,z_j,z_{-j})\right]\right)}
-```
-
-which is a KL-divergence that is minimized by Eq. B-10.9.  (end proof)
-
-This is not yet a full solution to the FE minimization task since the solution ``q_j^*(z_j)`` depends on expectations that involve other solutions ``q_{i\neq j}^*(z_{i \neq j})``, and each of these other solutions ``q_{i\neq j}^*(z_{i \neq j})`` depends on an expection that involves ``q_j^*(z_j)``. 
-
-In practice, we solve this chicken-and-egg problem by an iterative approach: we first initialize all ``q_j(z_j)`` (for ``j=1,\ldots,m``) to an appropriate initial distribution and then cycle through the factors in turn by solving eq.B-10.9 and update ``q_{-j}^*(z_{-j})`` with the latest estimates. (See [Blei, 2017](https://doi.org/10.1080/01621459.2017.1285773), Algorithm 1, p864).  
-
-This algorithm for approximating Bayesian inference is known **Coordinate Ascent Variational Inference** (CAVI).   
-
-"""
-
-# ╔═╡ 26c85a22-d294-11ef-3c8e-7b72a4313ced
-md"""
-## $(HTML("<span id='EM-Algorithm'>FE Minimization by the Expectation-Maximization (EM) Algorithm</span>"))
-
-The EM algorithm is a special case of VFE minimization that focuses on Maximum-Likelihood estimation for models with latent variables. 
-
-Consider a model 
-
-```math
-p(x,z,\theta)
-```
-
-with observations ``x = \{x_n\}``, latent variables ``z=\{z_n\}`` and parameters ``\theta``.
-
-We can write the following VFE functional for this model:
-
-```math
-\begin{align*}
-F[q] =  \sum_z \sum_\theta q(z,\theta) \log \frac{q(z,\theta)}{p(x,z,\theta)} 
-\end{align*}
-```
-
-The EM algorithm makes the following simplifying assumptions:
-
-1. The prior for the parameters is uninformative (uniform). This implies that
-
-```math
-p(x,z,\theta) = p(x,z|\theta) p(\theta) \propto p(x,z|\theta)
-```
-
-2. A factorization constraint 
-
-```math
-q(z,\theta) = q(z) q(\theta)
-```
-
-3. The posterior for the parameters is a delta function:
-
-```math
-q(\theta) = \delta(\theta - \hat{\theta})
-```
-
-Basically, these three assumptions turn VFE minimization into maximum likelihood estimation for the parameters ``\theta`` and the VFE simplifies to 
-
-```math
-\begin{align*}
-F[q,\theta] =  \sum_z q(z) \log \frac{q(z)}{p(x,z|\theta)} 
-\end{align*}
-```
-
-The EM algorithm minimizes this FE by iterating (iteration counter: ``i``) over 
-
-```math
-\begin{align} \mathcal{L}^{(i)}(\theta) &= \sum_z \overbrace{p(z|x,\theta^{(i-1)})}^{q^{(i)}(z)}  \log p(x,z|\theta) \tag{the E-step} \\
-\theta^{(i)} &= \arg\max_\theta \mathcal{L}^{(i)}(\theta) \tag{the M-step} \end{align}
-
-```
-
-These choices are optimal for the given FE functional. In order to see this, consider the two decompositions
-
-```math
-\begin{align*}
-F[q,\theta] &= \underbrace{-\sum_z q(z) \log p(x,z|\theta)}_{\text{energy}} - \underbrace{\sum_z q(z) \log \frac{1}{q(z)}}_{\text{entropy}} \qquad &&\text{(EE)}\\
-  &= \underbrace{\sum_z q(z) \log \frac{q(z)}{p(z|x,\theta)}}_{\text{divergence}} - \underbrace{\log p(x|\theta)}_{\text{log-likelihood}}  \qquad &&\text{(DE)}
-\end{align*}
-```
-
-The DE decomposition shows that the FE is minimized for the choice ``q(z) := p(z|x,\theta)``. Also, for this choice, the FE equals the (negative) log-evidence (, which is this case simplifies to the log-likelihood). 
-
-The EE decomposition shows that the FE is minimized wrt ``\theta`` by minimizing the energy term. The energy term is computed in the E-step and optimized in the M-step.
-
-  * Note that in the EM literature, the energy term is often called the *expected complete-data log-likelihood*.)
-
-In order to execute the EM algorithm, it is assumed that we can analytically execute the E- and M-steps. For a large set of models (including models whose distributions belong to the exponential family of distributions), this is indeed the case and hence the large popularity of the EM algorithm. 
-
-The EM algorihm imposes rather severe assumptions on the FE (basically approximating Bayesian inference by maximum likelihood estimation). Over the past few years, the rise of Probabilistic Programming languages has dramatically increased the range of models for which the parameters can by estimated autmatically by (approximate) Bayesian inference, so the popularity of EM is slowly waning. (More on this in the Probabilistic Programming lessons). 
-
-Bishop (2006) works out EM for the GMM in section 9.2.
-
-"""
-
-# ╔═╡ 26c867d8-d294-11ef-2372-d75ed0bcc02d
-md"""
-## Code Example: EM-algorithm for the GMM on the Old-Faithful data set
-
-We'll perform clustering on the data set from the [illustrative example](#illustrative-example) by fitting a GMM consisting of two Gaussians using the EM algorithm. 
-
-"""
-
-# ╔═╡ de049d59-9863-4bac-91c3-32851cad15d9
-TODO("verify the `π_hat` situation in the code above")
-
-
-# ╔═╡ 26c8a2a4-d294-11ef-1cd3-850e877d7a25
-md"""
-<!–- Note that you can step through the interactive demo yourself by running [this script](https://github.com/bertdv/AIP-5SSB0/blob/master/lessons/notebooks/scripts/interactive_em_demo.jl) in julia. You can run a script in julia by     `julia> include("path/to/script-name.jl")` –>
-
-"""
-
-# ╔═╡ 26c8b682-d294-11ef-1331-2bcf8baec73f
-md"""
-## Message Passing for Free Energy Minimization
-
-The Sum-Product (SP) update rule implements perfect Bayesian inference. 
-
-Sometimes, the SP update rule is not analytically solvable. 
-
-Fortunately, for many well-known Bayesian approximation methods, a message passing update rule can be created, e.g. [Variational Message Passing](https://en.wikipedia.org/wiki/Variational_message_passing) (VMP) for variational inference. 
-
-In general, all of these message passing algorithms can be interpreted as minimization of a constrained free energy (e.g., see [Senoz et al. (2021)](https://research.tue.nl/nl/publications/variational-message-passing-and-local-constraint-manipulation-in-), and hence these message passing schemes comply with [Caticha's Method of Maximum Relative Entropy](https://arxiv.org/abs/1011.0723), which, as discussed in the [variational Bayes lesson](https://bmlip.github.io/course/lectures/Latent%20Variable%20Models%20and%20VB.html) is the proper way for updating beliefs. 
-
-Different message passing updates rules can be combined to get a hybrid inference method in one model. 
-
-"""
-
-# ╔═╡ 26c8c7fa-d294-11ef-0444-6555ecf5c721
-md"""
-## The Local Free Energy in a Factor Graph
-
-Consider an edge ``x_j`` in a Forney-style factor graph for a generative model ``p(x) = p(x_1,x_2,\ldots,x_N)``.
-
-Assume that the graph structure (factorization) is specified by
-
-```math
-p(x) = \prod_{a=1}^M p_a(x_a)
-```
-
-where ``a`` is a set of indices.
-
-Also, we assume a mean-field approximation for the posterior:
-
-```math
-q(x) = \prod_{i=1}^N q_i(x_i)
-```
-
-and consequently a corresponding free energy functional  
-
-```math
-\begin{align*}
-F[q] &= \sum_x q(x) \log \frac{q(x)}{p(x)} \\
-  &= \sum_i \sum_{x_i} \left(\prod_{i=1}^N q_i(x_i)\right) \log \frac{\prod_{i=1}^N q_i(x_i)}{\prod_{a=1}^M p_a(x_a)}
-\end{align*}
-```
-
-With these assumptions, it can be shown that the FE evaluates to (exercise)
-
-```math
-F[q] = \sum_{a=1}^M \underbrace{\sum_{x_a} \left( \prod_{j\in N(a)} q_j(x_j)\cdot \left(-\log p_a(x_a)\right) \right) }_{\text{node energy }U[p_a]} - \sum_{i=1}^N \underbrace{\sum_{x_i} q_i(x_i) \log \frac{1}{q_i(x_i)}}_{\text{edge entropy }H[q_i]}
-```
-
-In words, the FE decomposes into a sum of (expected) energies for the nodes minus the entropies on the edges. 
-
-"""
-
-# ╔═╡ 26c8e172-d294-11ef-2a9e-89e0f4cbf475
-md"""
-## Variational Message Passing
-
-Let us now consider the local free energy that is associated with edge corresponding to ``x_j``. 
-
-![](https://github.com/bmlip/course/blob/v2/assets/figures/VMP-two-nodes.png?raw=true)
-
-Apparently (see previous slide), there are three contributions to the free energy for ``x_j``:
-
-  * one entropy term for the edge ``x_j``
-  * two energy terms: one for each node that attaches to ``x_j`` (in the figure: nodes ``p_a`` and ``p_b``)
-
-The local free energy for ``x_j`` can be written as (exercise)
-
-```math
-  F[q_j] \propto \sum_{x_j} q(x_j) \log \frac{q_j(x_j)}{\nu_a(x_j)\cdot \nu_b(x_j)}
-  
-```
-
-where
-
-```math
-\begin{align*} 
-  \nu_a(x_j) &\propto \exp\left( \mathbb{E}_{q_{k}}\left[ \log p_a(x_a)\right]\right) \\
-  \nu_b(x_j) &\propto \exp\left( \mathbb{E}_{q_{l}}\left[ \log p_b(x_b)\right]\right) 
-  \end{align*}
-```
-
-and ``\mathbb{E}_{q_{k}}\left[\cdot\right]`` is an expectation w.r.t. all ``q(x_k)`` with ``k \in N(a)\setminus {j}``.
-
-``\nu_a(x_j)`` and ``\nu_b(x_j)``  can be locally computed in nodes ``a`` and ``b`` respectively and can be interpreted as colliding messages over edge ``x_j``. 
-
-Local free energy minimization is achieved by setting
-
-```math
-  q_j(x_j) \propto \nu_a(x_j) \cdot \nu_b(x_j)
-  
-```
-
-Note that message ``\nu_a(x_j)`` depends on posterior beliefs over incoming edges (``k``) for node ``a``, and in turn, the message from node ``a`` towards edge ``x_k`` depends on the belief ``q_j(x_j)``. I.o.w., direct mutual dependencies exist between posterior beliefs over edges that attach to the same node. 
-
-These considerations lead to the [Variational Message Passing](https://en.wikipedia.org/wiki/Variational_message_passing) procedure, which is an iterative free energy minimization procedure that can be executed completely through locally computable messages.  
-
-Procedure VMP, see [Dauwels (2007), section 3](https://github.com/bmlip/course/blob/main/assets/files/Dauwels-2007-on-variational-message-passing-on-factor-graphs.pdf)
-
-> 1. Initialize all messages ``q`` and ``ν``, e.g., ``q(\cdot) \propto 1`` and ``\nu(\cdot) \propto 1``. <br/>
-> 2. Select an edge ``z_k`` in the factor graph of ``f(z_1,\ldots,z_m)``.<br/>
-> 3. Compute the two messages ``\overrightarrow{\nu}(z_k)`` and ``\overleftarrow{\nu}(z_k)`` by applying the following generic rule:
-> ```math
->   \overrightarrow{\nu}(y) \propto \exp\left( \mathbb{E}_{q}\left[ \log > g(x_1,\dots,x_n,y)\right] \right)   
-> ```
-> 4. Compute the marginal ``q(z_k)``
-> ```math
->  q(z_k) \propto \overrightarrow{\nu}(z_k) \overleftarrow{\nu}(z_k)  
-> ```
->  and send it to the two nodes connected to the edge ``x_k``.
->
-> 5. Iterate 2–4 until convergence.
-
-
-"""
-
-# ╔═╡ 26c9121e-d294-11ef-18e6-ed8105503adc
-md"""
-## The Bethe Free Energy and Belief Propagation
-
-We showed that, under mean field assumptions, the FE can be decomposed into a sum of local FE contributions for the nodes (``a``) and edges (``i``):
-
-```math
-\begin{align*}
-F[q] = \sum_{a=1}^M \underbrace{\sum_{x_a} \left( \prod_{j\in N(a)} q_j(x_j)\cdot \left(-\log p_a(x_a)\right) \right) }_{\text{node energy }U[p_a]} - \sum_{i=1}^N \underbrace{\sum_{x_i} q_i(x_i) \log \frac{1}{q_i(x_i)}}_{\text{edge entropy }H[q_i]}
-\end{align*}
-```
-
-The mean field assumption is very strong and may lead to large inference costs (``\mathrm{KL}(q(x),p(x|\text{data}))``). A more relaxed assumption is to allow joint posterior beliefs over the variables that attach to a node. This idea is expressed by the Bethe Free Energy:
-
-```math
-\begin{align*}
-F_B[q] = \sum_{a=1}^M \left( \sum_{x_a} q_a(x_a) \log \frac{q_a(x_a)}{p_a(x_a)} \right)  - \sum_{i=1}^N (d_i - 1) \sum_{x_i} q_i(x_i) \log {q_i(x_i)}
-\end{align*}
-```
-
-where ``q_a(x_a)`` is the posterior joint belief over the variables ``x_a`` (i.e., the set of variables that attach to node ``a``), ``q_i(x_i)`` is the posterior marginal belief over the variable ``x_i`` and ``d_i`` is the number of factor nodes that link to edge ``i``. Moreover, ``q_a(x_a)`` and ``q_i(x_i)`` are constrained to obey the following equalities:
-
-```math
-\begin{align*}
-  \sum_{x_a \backslash x_i} q_a(x_a) &= q_i(x_i), ~~~ \forall i, \forall a \\
-  \sum_{x_i} q_i(x_i) &= 1, ~~~ \forall i \\
-  \sum_{x_a} q_a(x_a) &= 1, ~~~ \forall a \\
-\end{align*}
-```
-
-We form the Lagrangian by augmenting the Bethe Free Energy functional with the constraints:
-
-```math
-\begin{align*}
-L[q] = F_B[q] + \sum_i\sum_{a \in N(i)} \lambda_{ai}(x_i) \left(q_i(x_i) - \sum_{x_a\backslash x_i} q(x_a) \right) + \sum_{i} \gamma_i \left(  \sum_{x_i}q_i(x_i) - 1\right) + \sum_{a}\gamma_a \left(  \sum_{x_a}q_a(x_a) -1\right)
-\end{align*}
-```
-
-The stationary solutions for this Lagrangian are given by
-
-```math
-\begin{align*}
-q_a(x_a) &= f_a(x_a) \exp\left(\gamma_a -1 + \sum_{i \in N(a)} \lambda_{ai}(x_i)\right) \\ 
-q_i(x_i) &= \exp\left(1- \gamma_i + \sum_{a \in N(i)} \lambda_{ai}(x_i)\right) ^{\frac{1}{d_i - 1}}
-\end{align*}
-```
-
-where ``N(i)`` denotes the factor nodes that have ``x_i`` in their arguments and ``N(a)`` denotes the set of variables in the argument of ``f_a``.
-
-Stationary solutions are functions of Lagrange multipliers. This means that Lagrange multipliers need to be determined. Lagrange multipliers can be determined by plugging the stationary solutions back into the constraint specification and solving for the multipliers which ensure that the constraint is satisfied. The first constraint we consider is normalization, which yields the following identification:
-
-```math
-\begin{align*}
-\gamma_a &= 1 - \log \Bigg(\sum_{x_a}f_a(x_a)\exp\left(\sum_{i \in N(a)}\lambda_{ai}(x_i)\right)\Bigg)\\
-\gamma_i &= 1 + (d_i-1) \log\Bigg(\sum_{x_i}\exp\left( \frac{1}{d_i-1}\sum_{a \in N(i)} \lambda_{ai}(x_i)\right)\Bigg).
-\end{align*}
-```
-
-The functional form of the Lagrange multipliers that corresponds to the normalization constraint enforces us to obtain the Lagrange multipliers that correspond to the marginalization constraint. To do so we solve for 
-
-```math
-\begin{align*} \sum_{x_a \backslash x_i} f_a(x_a) \exp\left(\sum_{i \in N(a)} \lambda_{ai}(x_i)\right) &= \exp\left(\sum_{a \in N(i)} \lambda_{ai}(x_i)\right) ^{\frac{1}{d_i - 1}} \exp\left(\lambda_{ai}(x_i)\right)\sum_{x_a \backslash x_i} f_a(x_a) \exp\Bigg(\sum_{\substack{{j \in N(a)}  j \neq i}}\lambda_{aj}(x_j)\Bigg) \\
-&= \exp\left(\sum_{a \in N(i)} \lambda_{ai}(x_i)\right) ^{\frac{1}{d_i - 1}} \exp\left(\lambda_{ai}(x_i) + \lambda_{ia}(x_i)\right) \\
-&= \exp\left(\sum_{a \in N(i)} \lambda_{ai}(x_i)\right) ^{\frac{1}{d_i - 1}}\, , 
-\end{align*}
-```
-
-where we defined an auxilary function
-
-```math
-\begin{align*}
-\exp(\lambda_{ia}(x_i)) \triangleq \sum_{x_a \backslash x_i} f_a(x_a) \exp\Bigg(\sum_{\substack{{j \in N(a)} j \neq i}}\lambda_{aj}(x_j)\Bigg) \,.
-\end{align*}
-```
-
-This definition is valid since it can be inverted by the relation
-
-```math
-\begin{align*}
-\lambda_{ia}(x_i) = \frac{2-d_i}{d_i - 1}\lambda_{ai}(x_i) + \frac{1}{d_i -1}\sum_{\substack{c \in N(i)\\c \neq a}}\lambda_{ci}(x_i)
-\end{align*}
-```
-
-In general it is not possible to solve for the Lagrange multipliers analytically and we resort to iteratively obtaining the solutions. This leads to the **Belief Propagation algorithm** where the exponentiated Lagrange multipliers (messages) are updated iteratively via 
-
-```math
-\begin{align*} 
-\mu_{ia}^{(k+1)}(x_i) &= \sum_{x_a \backslash x_i} f_a(x_a) \prod_{\substack{{j \in N(a)}  j \neq i}}\mu^{(k)}_{aj}(x_j)  \mu_{ai}^{(k)}(x_i) \\
-&= \prod_{\substack{c \in N(i) c \neq a}}\mu^{(k)}_{ic}(x_i)\,, 
-\end{align*}
-```
-
-where ``k`` denotes iteration number and the messages are defined as
-
-```math
-\begin{align*}
-\mu_{ia}(x_i) &\triangleq \exp(\lambda_{ia}(x_i))\\
-\mu_{ai}(x_i) &\triangleq \exp(\lambda_{ai}(x_i))\,.
-\end{align*}
-```
-
-For a more complete overview of message passing as Bethe Free Energy minimization, see [Senoz et al. (2021)](https://research.tue.nl/nl/publications/variational-message-passing-and-local-constraint-manipulation-in-).
-
-"""
-
-# ╔═╡ 55570464-89c8-4d9b-b667-dfa64ac62294
-md"""
-# Appendix
-"""
-
-# ╔═╡ 489cbd24-1a69-4a00-a2e9-53c2c57cef65
-function plotGMM(X::Matrix, clusters::Vector, γ::Matrix, title)
-	# Plot data set and (fitted) mixture model consisting of two Gaussian distributions
-	# X contains a 2-d data set (every column holds a data point)
-	# clusters holds the 2 Gaussian elements of the mixture model
-	# γ contains p(cluster|X), and should contain NaN elements if not yet known
-
-	# Plot contours of the element distributions
-	K = length(clusters)
-	result = plot(title=title)
-	for k=1:K
-		X1 = Matrix{Float64}(undef,50,50)
-		X2 = Matrix{Float64}(undef,50,50)
-		d = Matrix{Float64}(undef,50,50)
-		# Create bounding box for thse contour plot
-		lims = [-2*sqrt(cov(clusters[k])[1,1]) 2*sqrt(cov(clusters[k])[1,1]);
-				-2*sqrt(cov(clusters[k])[2,2]) 2*sqrt(cov(clusters[k])[2,2])] + repeat(mean(clusters[k]), 1, 2)
-		X1 = LinRange(lims[1,1], lims[1,2], 50)
-		X2 = LinRange(lims[2,1], lims[2,2], 50)
-		alpha = sum(γ[k,:])/sum(γ)
-		covellipse!(clusters[k].μ, clusters[k].Σ; label="", alpha=max(0.1, alpha), color=:cyan)
-	end
-
-
-	# Plot data points
-	scatter!(X[1,:], X[2,:]; label="observations", markersize=2, linewidth=0)
-	return result
-end
-
 # ╔═╡ 4ee377c2-a126-4c40-8053-517d40c5ef9d
-let
-	max_iter = 120
+vfem_result = let
 	#store the inference results in these vectors
-	ν = fill(3.0, K, max_iter)
-	β = fill(1.0, K, max_iter)
-	α = fill(0.01, K, max_iter)
-	R = Array{Float64}(undef,K,N,max_iter)
-	M = Array{Float64}(undef,2,K,max_iter)
-	Λ = Array{Float64}(undef,2,2,K,max_iter)
-	clusters_vb = Array{Distribution}(undef,K,max_iter) #clusters to be plotted
+	ν = fill(3.0, K, max_iterations)
+	β = fill(1.0, K, max_iterations)
+	α = fill(0.01, K, max_iterations)
+	R = Array{Float64}(undef,K,N,max_iterations)
+	M = Array{Float64}(undef,2,K,max_iterations)
+	Λ = Array{Float64}(undef,2,2,K,max_iterations)
+	clusters_vb = Array{Distribution}(undef,K,max_iterations) #clusters to be plotted
 	#initialize prior distribution parameters
 	M[:,:,1] = rand(MersenneTwister(43), 2, K) .* [4, 50] .+ [1, 50]
 	for k in 1:K
@@ -1574,7 +1618,7 @@ let
 	    clusters_vb[k,1] = MvNormal(M[:,k,1],PDMats.PDMat(convert(Matrix,Hermitian(inv(ν[1,1].*Λ[:,:,k,1])))))
 	end
 	#variational inference
-	for i in 1:max_iter-1
+	for i in 1:max_iterations-1
 	    #variational expectation 
 	    R[:,:,i+1] = updateR(Λ[:,:,:,i],M[:,:,i],α[:,i],ν[:,i],β[:,i]) 
 	    #variational minimisation
@@ -1583,13 +1627,58 @@ let
 	        clusters_vb[k,i+1] = MvNormal(M[:,k,i+1],PDMats.PDMat(convert(Matrix,Hermitian(inv(ν[k,i+1].*Λ[:,:,k,i+1])))))
 	    end
 	end
+
+
+	(; clusters_vb, R)
 	
-	plots = [plotGMM(X, clusters_vb[:,1], R[:,:,1], "Initial situation")]
-	for i in LinRange(2, 120, 5)
-	    i = round(Int,i)
-	    push!(plots, plotGMM(X, clusters_vb[:,i], R[:,:,i], "After $(i) iterations"))
-	end
-	plot(plots..., layout=(2,3), size=(1100, 600))
+end
+
+# ╔═╡ 663ac0ef-0577-43af-8df5-15e046ef875c
+let
+	i = iteration_vfem + 1
+	plotGMM(
+		X, vfem_result.clusters_vb[:,i], vfem_result.R[:,:,i];
+		title=i == 1 ? "Initial situation" : "After $(iteration_vfem) iteration$(iteration_vfem > 1 ? "s" : "")",
+		legend=nothing,
+		size=(600,300),
+	)
+end
+
+# ╔═╡ cd7cf2d0-aff7-49dc-bb12-dc73c6433768
+let
+    i = iteration_vfem + 1
+    
+    # Get the current iteration's parameters
+    current_clusters = vfem_result.clusters_vb[:, i]
+    current_responsibilities = vfem_result.R[:, :, i]
+    
+    # Compute mixture weights (π) from responsibilities
+    π = vec(mean(current_responsibilities, dims=2))
+    π = π ./ sum(π)  # Normalize to ensure they sum to 1
+    
+    # Generate synthetic data of the same size as original
+    N_synthetic = size(X, 2)  # Same number of points as original data
+    X_synthetic = Matrix{Float64}(undef, 2, N_synthetic)
+    
+    # Sample from the mixture model
+    Random.seed!(42)  # For reproducibility
+    for n in 1:N_synthetic
+        # Sample which component to use
+        component = rand(Categorical(π))
+        # Sample from that component
+        X_synthetic[:, n] = rand(current_clusters[component])
+    end
+    
+    # Create the plot
+    scatter(
+		X_synthetic[1,:], X_synthetic[2,:];
+        title="Synthetic data from this model",
+		size=(600,300),
+        legend=nothing,
+		plot_lims...,
+		data_plot_kwargs...,
+		color=:purple,
+    )
 end
 
 # ╔═╡ 7a3c0ff7-0b32-4954-ae28-b644f4d966ef
@@ -1622,34 +1711,83 @@ begin
 	        clusters[k] = MvNormal(μ_hat[:,k], convert(Matrix, Σ_k))
 	    end
 	end
-		
-	
+
+
+	rec() = deepcopy((; clusters, γ))
+	em_result = [
+		(0, :initial) => rec(),
+	]
+
 	# Execute the algorithm: iteratively update parameters and responsibilities
-	plots = [plotGMM(X, clusters, γ, "Initial situation")]
-	
-	updateResponsibilities!(X, clusters, π_hat, γ)
-	push!(plots, plotGMM(X, clusters, γ, "After first E-step"))
-	updateParameters!(X, clusters, π_hat, γ)
-	push!(plots, plotGMM(X, clusters, γ, "After first M-step"))
-	
-	local iter_counter = 1
-	for i=1:3
-	    for j=1:i+1
-	        updateResponsibilities!(X, clusters, π_hat, γ)
-	        updateParameters!(X, clusters, π_hat, γ)
-	        iter_counter += 1
-	    end
-	    push!(plots, plotGMM(X, clusters, γ, "After $(iter_counter) iterations"))
+	for i in 1:10
+		updateResponsibilities!(X, clusters, π_hat, γ)
+		push!(em_result, (i, :E) => rec())
+
+		updateParameters!(X, clusters, π_hat, γ)
+		push!(em_result, (i, :M) => rec())
 	end
-	
-	plot(plots..., layout=(2,3), size=(1100, 600))
+
+	Text("em_result")
 end
 
-# ╔═╡ 9d2068d7-db54-460e-930c-b7c3273162ee
+# ╔═╡ 5af3ff1b-1655-4dd9-a089-91544fc85a0e
+@bindname iteration_em Slider(eachindex(em_result); default=2, show_value=i->join(em_result[i][1], "-"))
 
+# ╔═╡ fd233604-120a-4838-a660-d5021bccecd0
+let
+	(i, step), res = em_result[iteration_em]
+	
+	plotGMM(
+		X, res.clusters, res.γ;
+		title=i == 0 ? 
+			"Initial situation" : 
+			"Iteration $(i), $(step)-step",
+		legend=nothing,
+		size=(600,300),
+	)
+end
 
-# ╔═╡ deba376e-59bd-4b07-814c-8f7937db52a5
+# ╔═╡ a7fb83cb-1f40-4c8a-9fda-2165f91e413e
+let
+	(i, step), res = em_result[iteration_em]
+    
+    # Get the current iteration's parameters
+    current_clusters = res.clusters
+    current_responsibilities = res.γ
 
+    
+    # Compute mixture weights (π) from responsibilities
+    π = vec(mean(current_responsibilities, dims=2))
+	if any(isnan, π)
+		π = ones(size(π))
+	end
+    π = π ./ sum(π)  # Normalize to ensure they sum to 1
+
+    
+    # Generate synthetic data of the same size as original
+    N_synthetic = size(X, 2)  # Same number of points as original data
+    X_synthetic = Matrix{Float64}(undef, 2, N_synthetic)
+    
+    # Sample from the mixture model
+    Random.seed!(42)  # For reproducibility
+    for n in 1:N_synthetic
+        # Sample which component to use
+        component = rand(Categorical(π))
+        # Sample from that component
+        X_synthetic[:, n] = rand(current_clusters[component])
+    end
+    
+    # Create the plot
+    scatter(
+		X_synthetic[1,:], X_synthetic[2,:];
+        title="Synthetic data from this model",
+		size=(600,300),
+        legend=nothing,
+		plot_lims...,
+		data_plot_kwargs...,
+		color=:purple,
+    )
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1676,9 +1814,9 @@ StatsPlots = "~0.15.7"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.10"
+julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "85e2999d1f469dcabed5dff0012719a162a1ed07"
+project_hash = "4c0ce3036329e6241b14b587412fef79c57a1869"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -1716,7 +1854,7 @@ version = "1.1.3"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
-version = "1.1.1"
+version = "1.1.2"
 
 [[deps.Arpack]]
 deps = ["Arpack_jll", "Libdl", "LinearAlgebra", "Logging"]
@@ -1732,6 +1870,7 @@ version = "3.5.1+1"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
+version = "1.11.0"
 
 [[deps.AxisAlgorithms]]
 deps = ["LinearAlgebra", "Random", "SparseArrays", "WoodburyMatrices"]
@@ -1741,6 +1880,7 @@ version = "1.1.0"
 
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+version = "1.11.0"
 
 [[deps.BitFlags]]
 git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
@@ -1798,12 +1938,10 @@ deps = ["FixedPointNumbers", "Random"]
 git-tree-sha1 = "67e11ee83a43eb71ddc950302c53bf33f0690dfe"
 uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 version = "0.12.1"
+weakdeps = ["StyledStrings"]
 
     [deps.ColorTypes.extensions]
     StyledStringsExt = "StyledStrings"
-
-    [deps.ColorTypes.weakdeps]
-    StyledStrings = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
 
 [[deps.ColorVectorSpace]]
 deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "Requires", "Statistics", "TensorCore"]
@@ -1866,6 +2004,7 @@ version = "1.0.0"
 [[deps.Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+version = "1.11.0"
 
 [[deps.Dbus_jll]]
 deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl"]
@@ -1893,6 +2032,7 @@ weakdeps = ["ChainRulesCore", "SparseArrays"]
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+version = "1.11.0"
 
 [[deps.Distributions]]
 deps = ["AliasTables", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SpecialFunctions", "Statistics", "StatsAPI", "StatsBase", "StatsFuns"]
@@ -1964,6 +2104,7 @@ version = "3.3.11+0"
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+version = "1.11.0"
 
 [[deps.FillArrays]]
 deps = ["LinearAlgebra"]
@@ -2092,6 +2233,7 @@ version = "2025.2.0+0"
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+version = "1.11.0"
 
 [[deps.Interpolations]]
 deps = ["Adapt", "AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "Requires", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
@@ -2193,6 +2335,7 @@ version = "0.16.9"
 [[deps.LazyArtifacts]]
 deps = ["Artifacts", "Pkg"]
 uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
+version = "1.11.0"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -2202,16 +2345,17 @@ version = "0.6.4"
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "8.4.0+0"
+version = "8.6.0+0"
 
 [[deps.LibGit2]]
 deps = ["Base64", "LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
+version = "1.11.0"
 
 [[deps.LibGit2_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll"]
 uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
-version = "1.6.4+0"
+version = "1.7.2+0"
 
 [[deps.LibSSH2_jll]]
 deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
@@ -2220,6 +2364,7 @@ version = "1.11.0+1"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+version = "1.11.0"
 
 [[deps.Libffi_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -2260,6 +2405,7 @@ version = "2.41.0+0"
 [[deps.LinearAlgebra]]
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+version = "1.11.0"
 
 [[deps.LogExpFunctions]]
 deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
@@ -2279,6 +2425,7 @@ version = "0.3.29"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+version = "1.11.0"
 
 [[deps.LoggingExtras]]
 deps = ["Dates", "Logging"]
@@ -2305,6 +2452,7 @@ version = "0.5.16"
 [[deps.Markdown]]
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+version = "1.11.0"
 
 [[deps.MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
@@ -2315,7 +2463,7 @@ version = "1.1.9"
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
-version = "2.28.2+1"
+version = "2.28.6+0"
 
 [[deps.Measures]]
 git-tree-sha1 = "c13304c81eec1ed3af7fc20e75fb6b26092a1102"
@@ -2330,10 +2478,11 @@ version = "1.2.0"
 
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+version = "1.11.0"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
-version = "2023.1.10"
+version = "2023.12.12"
 
 [[deps.MultivariateStats]]
 deps = ["Arpack", "Distributions", "LinearAlgebra", "SparseArrays", "Statistics", "StatsAPI", "StatsBase"]
@@ -2380,7 +2529,7 @@ version = "1.3.6+0"
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
-version = "0.3.23+4"
+version = "0.3.27+1"
 
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -2446,9 +2595,13 @@ uuid = "30392449-352a-5448-841d-b1acce4e97dc"
 version = "0.44.2+0"
 
 [[deps.Pkg]]
-deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
+deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-version = "1.10.0"
+version = "1.11.0"
+weakdeps = ["REPL"]
+
+    [deps.Pkg.extensions]
+    REPLExt = "REPL"
 
 [[deps.PlotThemes]]
 deps = ["PlotUtils", "Statistics"]
@@ -2509,6 +2662,7 @@ version = "1.5.0"
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+version = "1.11.0"
 
 [[deps.PtrArrays]]
 git-tree-sha1 = "1d36ef11a9aaf1e8b74dacc6a731dd1de8fd493d"
@@ -2552,12 +2706,14 @@ version = "2.11.2"
     Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 
 [[deps.REPL]]
-deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
+deps = ["InteractiveUtils", "Markdown", "Sockets", "StyledStrings", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+version = "1.11.0"
 
 [[deps.Random]]
 deps = ["SHA"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+version = "1.11.0"
 
 [[deps.Ratios]]
 deps = ["Requires"]
@@ -2628,10 +2784,12 @@ version = "1.4.8"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+version = "1.11.0"
 
 [[deps.SharedArrays]]
 deps = ["Distributed", "Mmap", "Random", "Serialization"]
 uuid = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
+version = "1.11.0"
 
 [[deps.Showoff]]
 deps = ["Dates", "Grisu"]
@@ -2646,6 +2804,7 @@ version = "1.2.0"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
+version = "1.11.0"
 
 [[deps.SortingAlgorithms]]
 deps = ["DataStructures"]
@@ -2656,7 +2815,7 @@ version = "1.2.2"
 [[deps.SparseArrays]]
 deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-version = "1.10.0"
+version = "1.11.0"
 
 [[deps.SpecialFunctions]]
 deps = ["IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
@@ -2691,9 +2850,14 @@ uuid = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
 version = "1.4.3"
 
 [[deps.Statistics]]
-deps = ["LinearAlgebra", "SparseArrays"]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "ae3bb1eb3bba077cd276bc5cfc337cc65c3075c0"
 uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-version = "1.10.0"
+version = "1.11.1"
+weakdeps = ["SparseArrays"]
+
+    [deps.Statistics.extensions]
+    SparseArraysExt = ["SparseArrays"]
 
 [[deps.StatsAPI]]
 deps = ["LinearAlgebra"]
@@ -2727,6 +2891,10 @@ git-tree-sha1 = "3b1dcbf62e469a67f6733ae493401e53d92ff543"
 uuid = "f3b207a7-027a-5e70-b257-86293d7955fd"
 version = "0.15.7"
 
+[[deps.StyledStrings]]
+uuid = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
+version = "1.11.0"
+
 [[deps.SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
 uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
@@ -2734,7 +2902,7 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
-version = "7.2.1+1"
+version = "7.7.0+0"
 
 [[deps.TOML]]
 deps = ["Dates"]
@@ -2773,6 +2941,7 @@ version = "0.1.1"
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+version = "1.11.0"
 
 [[deps.TranscodingStreams]]
 git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
@@ -2792,9 +2961,11 @@ version = "1.6.1"
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+version = "1.11.0"
 
 [[deps.Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+version = "1.11.0"
 
 [[deps.UnicodeFun]]
 deps = ["REPL"]
@@ -3084,7 +3255,7 @@ version = "1.1.7+0"
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
-version = "1.52.0+1"
+version = "1.59.0+0"
 
 [[deps.oneTBB_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -3120,8 +3291,11 @@ version = "1.9.2+0"
 # ╟─26c56fd8-d294-11ef-236d-81deef63f37c
 # ╟─ce7d086b-ff20-4da1-a4e8-52b5b7dc9e2b
 # ╟─26c58298-d294-11ef-2a53-2b42b48e0725
-# ╟─26c591fc-d294-11ef-0423-b7a854d09bad
-# ╟─e0d0f3a1-5e00-44f0-9c2b-4308cbd673ce
+# ╟─2497529b-7703-4e3e-b9db-83f8dbf43fa8
+# ╟─a663d6d1-2d73-40c6-8a4c-9e41df74bc84
+# ╟─3948225e-90d8-4b78-ba9b-5f98e228285a
+# ╟─0349720e-5de4-4b39-babd-c0881588f1de
+# ╠═8555aec9-4e80-49e7-8514-ef4a2236801b
 # ╟─f8c8013a-3e87-4d01-a3ae-86b39cf1f002
 # ╟─26c59b52-d294-11ef-1eba-d3f235f85eee
 # ╟─26c5a1f6-d294-11ef-3565-39d027843fbb
@@ -3142,7 +3316,9 @@ version = "1.9.2+0"
 # ╟─26c67f04-d294-11ef-03a4-838ae255689d
 # ╟─26c6e002-d294-11ef-15a4-33e30d0d76ec
 # ╟─ae7ed1fc-fc36-4327-be55-a142477ca0ad
-# ╟─de16b831-7afa-408f-83fa-99c6e24840f5
+# ╟─b4d965d1-91d8-43f8-84a5-b37ad5c6cafa
+# ╟─18f5d694-8869-4265-98ac-9ef7ff451eaf
+# ╟─c4b23b39-e6e4-44ec-b204-0c7d7d5a4026
 # ╟─e6aeee80-9e63-4937-9edf-428d5e3e38d3
 # ╟─baec0494-9557-49d1-b4d8-a8030d3281b7
 # ╟─40ce0abb-a086-4977-9131-10f60ab44152
@@ -3150,28 +3326,27 @@ version = "1.9.2+0"
 # ╟─aea77d69-9ecd-4be0-b6fd-c944d27d68df
 # ╟─3654551d-5d08-4bb0-8a0d-c7d42225bc69
 # ╟─edb179df-5cff-4e7b-8645-6da4818dceee
-# ╟─757465a4-6a7f-4c8e-98de-6df5ca995b03
 # ╟─26c704f6-d294-11ef-1b3d-d52f0fb1c81d
 # ╟─26c728f0-d294-11ef-0c01-6143abe8c3f0
 # ╟─06512595-bdb7-4adf-88ae-62af20210891
 # ╟─26c73cf0-d294-11ef-297b-354eb9c71f57
 # ╟─3e897a59-e7b5-492c-8a8a-724248513a72
 # ╟─93e7c7d5-a940-4764-8784-07af2f056e49
-# ╠═26c74c9a-d294-11ef-2d31-67bd57d56d7c
+# ╟─26c74c9a-d294-11ef-2d31-67bd57d56d7c
 # ╟─26c75b5e-d294-11ef-173e-b3f46a1df536
 # ╟─95d47a10-f3f8-479b-afe0-21241104b758
 # ╟─26c7696e-d294-11ef-25f2-dbc0946c0858
-# ╠═c90176ea-918b-4643-a10f-cef277c5ea75
-# ╟─cc547bfa-a130-4382-af47-73de56e4741b
-# ╠═0349720e-5de4-4b39-babd-c0881588f1de
-# ╠═8555aec9-4e80-49e7-8514-ef4a2236801b
-# ╠═666680b2-315a-4d95-8f7f-3ae50018e112
-# ╠═86c33a7c-135a-461f-a17e-b50bca418e13
-# ╠═98a0ed70-a627-48d6-a1f8-3dec7aba2bb2
-# ╠═55a1c42b-20d8-47a3-aa00-7af905db537c
-# ╠═4ee377c2-a126-4c40-8053-517d40c5ef9d
+# ╟─de0c41a3-6319-4ae3-8a1a-ae6935910fa3
+# ╟─663ac0ef-0577-43af-8df5-15e046ef875c
+# ╟─cd7cf2d0-aff7-49dc-bb12-dc73c6433768
 # ╟─26c796c8-d294-11ef-25be-17dcd4a9d315
-# ╠═0090be18-2453-4ad3-8e2c-6953649b171e
+# ╟─8b887c4a-273c-40fe-83e9-5c79ac6946f8
+# ╠═666680b2-315a-4d95-8f7f-3ae50018e112
+# ╠═4e0c025d-fa39-462d-8e7d-e66d220e9595
+# ╟─4ee377c2-a126-4c40-8053-517d40c5ef9d
+# ╟─86c33a7c-135a-461f-a17e-b50bca418e13
+# ╟─98a0ed70-a627-48d6-a1f8-3dec7aba2bb2
+# ╟─55a1c42b-20d8-47a3-aa00-7af905db537c
 # ╟─f42a1a65-20ce-452f-9974-bc8146943574
 # ╟─26c7b428-d294-11ef-150a-bb37e37f4b5d
 # ╟─b3bb7349-1965-4734-83ed-ba6fef0ccc41
@@ -3188,19 +3363,25 @@ version = "1.9.2+0"
 # ╟─26c8160c-d294-11ef-2a74-6f7009a7c51e
 # ╟─26c82f16-d294-11ef-0fe1-07326b56282f
 # ╟─26c85a22-d294-11ef-3c8e-7b72a4313ced
+# ╟─62868f61-95c7-4e07-854f-a171aadc667b
 # ╟─26c867d8-d294-11ef-2372-d75ed0bcc02d
+# ╟─5af3ff1b-1655-4dd9-a089-91544fc85a0e
+# ╟─fd233604-120a-4838-a660-d5021bccecd0
+# ╟─a7fb83cb-1f40-4c8a-9fda-2165f91e413e
+# ╟─87d94630-c90b-4379-91bd-88641ee7b508
 # ╟─7a3c0ff7-0b32-4954-ae28-b644f4d966ef
-# ╠═de049d59-9863-4bac-91c3-32851cad15d9
-# ╟─26c8a2a4-d294-11ef-1cd3-850e877d7a25
+# ╟─de049d59-9863-4bac-91c3-32851cad15d9
 # ╟─26c8b682-d294-11ef-1331-2bcf8baec73f
 # ╟─26c8c7fa-d294-11ef-0444-6555ecf5c721
 # ╟─26c8e172-d294-11ef-2a9e-89e0f4cbf475
 # ╟─26c9121e-d294-11ef-18e6-ed8105503adc
 # ╟─55570464-89c8-4d9b-b667-dfa64ac62294
 # ╠═df171940-eb54-48e2-a2b8-1a8162cabf3e
+# ╠═c90176ea-918b-4643-a10f-cef277c5ea75
 # ╠═58bd0d43-743c-4745-b353-4a89b35e85ba
 # ╠═489cbd24-1a69-4a00-a2e9-53c2c57cef65
-# ╠═9d2068d7-db54-460e-930c-b7c3273162ee
-# ╠═deba376e-59bd-4b07-814c-8f7937db52a5
+# ╠═c18b7c1b-8011-469b-ad92-7d50c23c46e3
+# ╠═dd1242db-fb20-4732-ac55-a3e021bbd2b7
+# ╟─cc547bfa-a130-4382-af47-73de56e4741b
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
