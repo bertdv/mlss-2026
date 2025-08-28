@@ -775,6 +775,12 @@ let
 	Σb12 = @bind example_Σ_12 Scrubbable(range; default=0.7)
 	Σb22 = @bind example_Σ_22 Scrubbable(range; default=2.0)
 
+
+	μb1 = @bind example_μ_1 Scrubbable(range; default=1.0)
+	μb2 = @bind example_μ_2 Scrubbable(range; default=2.0)
+
+	
+
 	grid2(xs...) = @htl """<div style="display: inline-grid; grid-template-columns: auto auto;">$(xs)</div>"""
 	
 	
@@ -789,7 +795,7 @@ let
 		align-items: center;
 	"
 	>$(a(:μ)) = $(
-		@bind example_μ Scrubbable([1.0 2.0])
+		grid2(μb1, μb2)
 	), $(a(:Σ)) = $(
 		grid2(Σb11, Σb12, Σb12, Σb22)
 	)</code>
@@ -802,7 +808,7 @@ end
 # ╔═╡ b9a99fcc-d294-11ef-3de4-5369d9796de7
 let
 	# Define the joint distribution p(x,y)
-	μ = vec(example_μ)
+	μ = [example_μ_1, example_μ_2]
 	Σ = [
 		example_Σ_11 example_Σ_12
 		example_Σ_12 example_Σ_22

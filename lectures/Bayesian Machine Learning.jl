@@ -1022,6 +1022,53 @@ md"""
 Now, let's update our posteriors iteratively. For every toss, we do a **Bayesian update step** to compute the new posterior for the distribution of ``\mu``. This posterior then becomes the **prior** for the next step.
 """
 
+# ╔═╡ 6a2af90a-d294-11ef-07bd-018326577791
+md"""
+
+For each model, we plot the parameter **posteriors** ``p(\mu|D_n,m_\bullet)`` computed after ``n`` iterations.
+"""
+
+# ╔═╡ d484c41d-9834-4528-bf47-93ab4e35ebaa
+md"""
+Select iteration: $(@bind toss_index_1 Slider(0:n_tosses; show_value=true))
+"""
+
+# ╔═╡ c5c601e4-c792-4096-aa9e-f6b564137123
+keyconcept(
+	"",
+	md"""
+	Bayesian Machine Learning updates a **prior** parameter distribution to generate a **posterior** parameter distribution. The posterior distribution is generally **closer to the true value**.
+	"""
+)
+
+# ╔═╡ 5ea6cefa-621a-4afc-bf9e-02d42b1d53f8
+
+
+# ╔═╡ 6a2b2d44-d294-11ef-33ba-15db357708b1
+md"""
+
+#### What happens with model 1?
+
+Note that both posteriors move toward the "correct" value (``\mu=0.4``). However, the posterior for ``m_1`` (blue) moves much slower because we assumed far more pseudo-observations for ``m_1`` than for ``m_2``. 
+
+
+"""
+
+# ╔═╡ e9b32823-efd2-4a27-b529-4f49752c00bb
+keyconcept(
+	"",
+	md"As we get more observations, the influence of the prior diminishes. "
+)
+
+# ╔═╡ 56b9aba3-6ead-498c-8670-ad93a1953b2a
+
+
+# ╔═╡ c28b7130-f7fb-41ee-852e-9964b091d7fb
+md"""
+### Implementation: Iterative Bayesian Updating
+
+"""
+
 # ╔═╡ e99e7650-bb72-4576-8f2a-c3994533b644
 function handle_coin_toss(prior::Beta, observation::Bool)
     posterior = Beta(prior.α + observation, prior.β + (1 - observation))
@@ -1074,6 +1121,17 @@ begin
 	end
 end
 
+# ╔═╡ 6a2b1106-d294-11ef-0d64-dbc26ba3eb44
+# Animate posterior distributions over time in a gif
+
+let i = toss_index_1
+    p = plot(title="n = $i$(i == 0 ? " (priors)" : "")")
+    for (j,post) in enumerate(posterior_distributions)
+        plot!(post[i+1], xlims = (0, 1), fill=(0, .2,), label="Posterior model $j", linewidth=2, ylims=(0,28), xlabel="μ", legend=:topright)
+    end
+	vline!([mean(secret_distribution)]; style=:dash, color="purple", label="True parameter")
+end
+
 # ╔═╡ 9fcb9c9f-b65f-4a35-8508-7e430ab02c57
 
 
@@ -1090,63 +1148,13 @@ posterior_distributions
 # ╔═╡ 9d82af33-8e91-48e9-8c34-fa6ea31492c2
 log_evidences
 
-# ╔═╡ 6a2af90a-d294-11ef-07bd-018326577791
-md"""
-### Results: Posteriors Visualised
-
-For each model, we plot the parameter **posteriors** ``p(\mu|D_n,m_\bullet)`` computed after ``n`` iterations.
-"""
-
-# ╔═╡ d484c41d-9834-4528-bf47-93ab4e35ebaa
-md"""
-Select iteration: $(@bind toss_index_1 Slider(0:n_tosses; show_value=true))
-"""
-
-# ╔═╡ 6a2b1106-d294-11ef-0d64-dbc26ba3eb44
-# Animate posterior distributions over time in a gif
-
-let i = toss_index_1
-    p = plot(title="n = $i$(i == 0 ? " (priors)" : "")")
-    for (j,post) in enumerate(posterior_distributions)
-        plot!(post[i+1], xlims = (0, 1), fill=(0, .2,), label="Posterior model $j", linewidth=2, ylims=(0,28), xlabel="μ", legend=:topright)
-    end
-	vline!([mean(secret_distribution)]; style=:dash, color="purple", label="True parameter")
-end
-
-# ╔═╡ c5c601e4-c792-4096-aa9e-f6b564137123
-keyconcept(
-	"",
-	md"""
-	Bayesian Machine Learning updates a **prior** parameter distribution to generate a **posterior** parameter distribution. The posterior distribution is generally **closer to the true value**.
-	"""
-)
-
-# ╔═╡ 7c70558d-4605-408f-9098-989345edac6e
-
-
-# ╔═╡ 6a2b2d44-d294-11ef-33ba-15db357708b1
-md"""
-
-#### What happens with model 1?
-
-Note that both posteriors move toward the "correct" value (``\mu=0.4``). However, the posterior for ``m_1`` (blue) moves much slower because we assumed far more pseudo-observations for ``m_1`` than for ``m_2``. 
-
-
-"""
-
-# ╔═╡ e9b32823-efd2-4a27-b529-4f49752c00bb
-keyconcept(
-	"",
-	md"As we get more observations, the influence of the prior diminishes. "
-)
-
 # ╔═╡ 69eaf045-e766-4b7f-a9e8-8eac674ca2ae
 
 
 # ╔═╡ 6a2b3ba4-d294-11ef-3c28-176be260cb15
 md"""
 
-### Results: Evidence Visualised
+### Evidence Visualised
 
 We have an intuition that ``m_2`` is superior over ``m_1``. Let's check this by plotting over time the relative Bayesian evidences for each model:
 
@@ -3211,9 +3219,18 @@ version = "1.9.2+0"
 # ╠═e47b6eb6-2bb3-4c2d-bda6-f1535f2f94c4
 # ╟─e55126ef-e956-464d-8ae0-32b077649f21
 # ╟─f67136ff-f33c-436e-823b-9c530d257ab0
-# ╠═d1d2bb84-7083-435a-9c19-4c02074143e3
 # ╠═9c751f8e-f7ed-464f-b63c-41e318bbff2d
+# ╟─d1d2bb84-7083-435a-9c19-4c02074143e3
 # ╟─6922b899-499e-4f73-a6be-ca427fdc14ea
+# ╟─6a2af90a-d294-11ef-07bd-018326577791
+# ╟─6a2b1106-d294-11ef-0d64-dbc26ba3eb44
+# ╟─d484c41d-9834-4528-bf47-93ab4e35ebaa
+# ╟─c5c601e4-c792-4096-aa9e-f6b564137123
+# ╟─5ea6cefa-621a-4afc-bf9e-02d42b1d53f8
+# ╟─6a2b2d44-d294-11ef-33ba-15db357708b1
+# ╟─e9b32823-efd2-4a27-b529-4f49752c00bb
+# ╟─56b9aba3-6ead-498c-8670-ad93a1953b2a
+# ╟─c28b7130-f7fb-41ee-852e-9964b091d7fb
 # ╠═3a903a4d-1fb0-4566-8151-9c86dfc40ceb
 # ╠═e99e7650-bb72-4576-8f2a-c3994533b644
 # ╟─7a624d2f-812a-47a0-a609-9fe299de94f5
@@ -3222,13 +3239,6 @@ version = "1.9.2+0"
 # ╟─f956e217-3dce-446a-8660-25f2c9cb05e2
 # ╠═2c90eee1-b5d9-434d-bccc-64de8b458a48
 # ╠═9d82af33-8e91-48e9-8c34-fa6ea31492c2
-# ╟─6a2af90a-d294-11ef-07bd-018326577791
-# ╟─6a2b1106-d294-11ef-0d64-dbc26ba3eb44
-# ╟─d484c41d-9834-4528-bf47-93ab4e35ebaa
-# ╟─c5c601e4-c792-4096-aa9e-f6b564137123
-# ╟─7c70558d-4605-408f-9098-989345edac6e
-# ╟─6a2b2d44-d294-11ef-33ba-15db357708b1
-# ╟─e9b32823-efd2-4a27-b529-4f49752c00bb
 # ╟─69eaf045-e766-4b7f-a9e8-8eac674ca2ae
 # ╟─6a2b3ba4-d294-11ef-3c28-176be260cb15
 # ╟─188b5bea-6765-4dcf-9369-3b1fdbe94494
