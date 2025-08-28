@@ -1743,7 +1743,7 @@ begin
 	]
 
 	# Execute the algorithm: iteratively update parameters and responsibilities
-	for i in 1:5
+	for i in 1:10
 		updateResponsibilities!(γ, X, clusters, π_hat)
 		push!(em_result, (i, :E) => rec())
 
@@ -3362,7 +3362,7 @@ version = "1.9.2+0"
 # ╟─a7fb83cb-1f40-4c8a-9fda-2165f91e413e
 # ╟─64819124-865e-48b8-a916-2ce08dba0acc
 # ╟─87d94630-c90b-4379-91bd-88641ee7b508
-# ╠═7a3c0ff7-0b32-4954-ae28-b644f4d966ef
+# ╟─7a3c0ff7-0b32-4954-ae28-b644f4d966ef
 # ╟─26c8b682-d294-11ef-1331-2bcf8baec73f
 # ╟─26c8c7fa-d294-11ef-0444-6555ecf5c721
 # ╟─26c8e172-d294-11ef-2a9e-89e0f4cbf475
