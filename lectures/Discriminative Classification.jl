@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.15
+# v0.20.16
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/Figure4.9.png?raw=true"
@@ -24,20 +24,17 @@ macro bind(def, element)
     #! format: on
 end
 
+# ╔═╡ e379cc2a-43f8-432f-84fc-a88fd4f3ad0a
+using BmlipTeachingTools
+
 # ╔═╡ a759653c-0da4-40b7-9e9e-1e3d2e4df4ea
 using Random, Plots, LaTeXStrings
-
-# ╔═╡ 6a20aa94-e2fa-45ab-9889-62d44cbfc1ba
-using Optim # Optimization library
 
 # ╔═╡ ad196ae6-c65e-4aaa-b0cc-bd72daa41952
 using MarkdownLiteral: @mdx
 
 # ╔═╡ 616e84d7-063d-4d9d-99e4-56aecf3c7ee4
-using Distributions
-
-# ╔═╡ e379cc2a-43f8-432f-84fc-a88fd4f3ad0a
-using BmlipTeachingTools
+using Distributions, ExponentialFamily, LinearAlgebra, LogExpFunctions, StatsFuns, BayesBase, Optim
 
 # ╔═╡ 25eefb10-d294-11ef-0734-2daf18636e8e
 title("Discriminative Classification")
@@ -71,7 +68,7 @@ challenge_statement("difficult class-conditional data distributions" , color= "r
 
 # ╔═╡ 25ef2806-d294-11ef-3cb6-0f3e76b9177e
 md"""
-Our task will be the same as in the preceding class on (generative) classification. But this time, the class-conditional data distributions look very non-Gaussian, yet the linear discriminative boundary looks easy enough:
+Our task will be the same as in the preceding class on (generative) classification. But this time, the class-conditional data distributions look very non-Gaussian, yet the linear discriminative boundary looks easy enough. 
 
 """
 
@@ -80,18 +77,23 @@ begin
 	N_bond = @bindname N Slider(9:200; default=120, show_value=true)
 end
 
-# ╔═╡ cf829697-6283-4d2f-b0dd-bbfbd689a145
+# ╔═╡ 7e7cab21-09ab-4d06-9716-ab7864b229ab
 md"""
-### Implementation
+See [data generation code](#Data-Generation).
 """
 
-# ╔═╡ b5bc379c-5a0e-4b13-99fe-92632250a35e
+# ╔═╡ aeee1072-5173-4eae-8027-3fbf2e338d95
 md"""
-Split X based on class label:
+### Why Not Generative Classification?
+Like in the [last lecture](https://bmlip.github.io/course/lectures/Generative%20Classification.html), let's try to fit a generative distribution to the data. This is what we get when fitting two Gaussians to the two classes:
 """
 
-# ╔═╡ ddb2dc0d-3ef9-4add-93e9-ee575aabd81a
-X_test = [3.75; 1.0] # Features of 'new' data point
+# ╔═╡ 93083660-6a49-4147-b00c-d62a4453f222
+md"""
+That's not a good fit!
+
+Now, we could continue down this road, and try to fit a more complex distribution to the ``y = 1`` class to make it fit. **But let's explore a different approach**, modeling the discrimative boundary directly.
+"""
 
 # ╔═╡ d1bbdc6a-e5ff-4cd6-9175-860b5ec04f3c
 md"""
@@ -179,16 +181,33 @@ Clearly, it follows from this assumption that ``p(y_n =0 \,|\, x_n, w) = 1- \sig
 
 """
 
-# ╔═╡ 7d8f376c-b43f-46f4-87bc-c4d7f94d60e1
-TODO("can we make a mini on the softmax function and its special case, the logistic function? The graph below, including its approximation should be generated in Julia, not taken as an png from Bishop.")
+# ╔═╡ 22121f20-6b90-4782-8bed-25486cc23ae7
+NotebookCard("https://bmlip.github.io/course/minis/Softmax.html")
 
-# ╔═╡ 25f0f618-d294-11ef-0d94-bf80c8e2957b
+# ╔═╡ 56cae988-2f51-4618-8676-f46fa2924ea3
+let
+	logistic_function(a) = 1 / (1 + exp(-a))
+	
+	probit(p) = cdf(Normal(0, 1), p)
+	scaled_proibit(a; λ=sqrt(π/8)) = probit(a*λ)
+
+	p = plot(
+		xlim=(-9, 9),
+		ylim=(0,1),
+		size=(600,250),
+	)
+
+	plot!(logistic_function; label="logistic", lw=2)
+	plot!(scaled_proibit; label="probit", lw=2)
+end
+
+# ╔═╡ 66351c02-1921-44dc-b461-84a536c40fd5
 md"""
-![](https://github.com/bmlip/course/blob/v2/assets/figures/Figure4.9.png?raw=true)
-
-(Bishop fig.4.9). The logistic function ``\sigma(a) = 1/(1+e^{-a})`` (red), together with the $(HTML("<span id='scaled-probit'>scaled probit function</span>")) ``\Phi(\lambda a)``, for ``\lambda^2=\pi/8`` (in blue). We will use this approximation later in the [Laplace approximation](https://bmlip.github.io/course/minis/Laplace%20Approximation.html#gaussian-cdf).
-
+The logistic function ``\sigma(a) = 1/(1+e^{-a})`` (red), together with the $(HTML("<span id='scaled-probit'>scaled probit function</span>")) ``\Phi(\lambda a)``, for ``\lambda^2=\pi/8`` (in blue). We will use this approximation later in the [Laplace approximation](https://bmlip.github.io/course/minis/Laplace%20Approximation.html#gaussian-cdf). _Based on Bishop fig.4.9._
 """
+
+# ╔═╡ e3173267-bd90-47df-9d7f-bd9fd3f688ac
+
 
 # ╔═╡ 25f12528-d294-11ef-0c65-97c61935e9c2
 md"""
@@ -215,7 +234,7 @@ This choice for the class posterior is called **logistic regression**, in analog
 ```math
 \begin{align}
 p(y_n|x_n,w) &= \mathcal{N}(y_n|w^T x_n,\beta^{-1}) \tag{for linear regression} \\
-p(y_n|x_n,w) &= \sigma\left( (2y_n-1) w^T x_n\right) \tag{for logistic regression}
+p(y_n|x_n,w) &= \mathrm{Bernoulli}\left(y_n \,|\, \sigma(w^T x_n) \right) \tag{for logistic regression}
 \end{align}
 ```
 
@@ -328,7 +347,7 @@ w_N &= \arg\max_w \log p(w|D) \\
 S_N^{-1} &= S_0^{-1} + \sum_n \sigma_n (1-\sigma_n) x_n x_n^T \tag{B-4.143}
 \end{align}
 ```
-where we used short-hand ``\sigma_n = \sigma\left((2y_n-1) w^T x_n\right)``.
+where we used short-hand ``\sigma_n = \sigma\left((2y_n-1) w_{N}^T x_n\right)``.
 
 If we substitute the Gaussian approximation from Eq. B-4.143 into the expression for the predictive class distribution (Eq. B-4.145), we obtain (after some additional approximations):
 
@@ -381,6 +400,24 @@ In contrast, if you eliminate uncertainty by representing the weights as fixed-p
 
 """
 
+# ╔═╡ 7932fff4-0568-49de-b34c-711e51487ae3
+challenge_solution("Bayesian Logistic Regression" , color= "green", header_level=1 )
+
+# ╔═╡ 25f3bef2-d294-11ef-1438-e9f7e469336f
+md"""
+
+Let us perform Bayesian inference to estimate the posterior distribution of ``w`` given the data set from the introduction. To allow an offset in the discrimination boundary, we add a constant 1 to the feature vector ``x``. 
+"""
+
+# ╔═╡ aaf764da-cf1b-4bc7-83ea-6d25a80ca3ab
+N_bond
+
+# ╔═╡ 69706576-0333-43bf-8523-e7838f373529
+md"""
+Note that we get a full predictive posterior distribution over the assignment of class labels for every datapoint, so instead of assigning a point to a class, we get a measure of uncertainty over our class assignment!
+
+"""
+
 # ╔═╡ 0045e569-dc3c-4998-86da-9d96f599c599
 md"""
 # Maximum Likelihood Estimation
@@ -389,8 +426,6 @@ md"""
 
 # ╔═╡ 25f365e2-d294-11ef-300e-9914333b1233
 md"""
-
-## MLE Parameter Estimation
 
 Rather than the computationally involved Laplace approximation, in practice, discriminative classification is often executed through maximum likelihood estimation. 
 
@@ -459,29 +494,6 @@ The parameter vector ``w`` for logistic regression can then be estimated through
 \hat{w}^{(i+1)} =  \hat{w}^{(i)} + \eta \cdot \left. \nabla_w   \mathrm{L}(w)  \right|_{w = \hat{w}^{(i)}}
 ```
 until convergence. 
-
-"""
-
-# ╔═╡ 7932fff4-0568-49de-b34c-711e51487ae3
-challenge_solution("Bayesian Logistic Regression for Difficult Class-conditional Data Distributions" , color= "green" )
-
-# ╔═╡ 25f3bef2-d294-11ef-1438-e9f7e469336f
-md"""
-
-Let us perform ML estimation of ``w`` on the data set from the introduction. To allow an offset in the discrimination boundary, we add a constant 1 to the feature vector ``x``. We only have to specify the (negative) log-likelihood and the gradient w.r.t. ``w``. Then, we use an off-the-shelf optimisation library to minimize the negative log-likelihood.
-
-We plot the resulting maximum likelihood discrimination boundary. For comparison we also plot the ML discrimination boundary obtained from the [code example in the generative Gaussian classifier lesson](https://bmlip.github.io/course/lectures/Generative%20Classification.html#code-generative-classification-example).
-
-"""
-
-# ╔═╡ aaf764da-cf1b-4bc7-83ea-6d25a80ca3ab
-N_bond
-
-# ╔═╡ 25f3ee5e-d294-11ef-1fb4-e9d84b1e1ec6
-md"""
-The generative model gives a bad result because the feature distribution of one class is clearly non-Gaussian: the model does not fit the data well. 
-
-The discriminative approach does not suffer from this problem because it makes no assumptions about the feature distribution ``p(x)``. Rather, it just estimates the conditional class distribution ``p(y|x)`` directly.
 
 """
 
@@ -650,14 +662,65 @@ function generate_dataset(N::Int64)
     return (X, y)
 end
 
-# ╔═╡ e3474a09-11ec-43e8-900f-f4fb31283f46
-X, y = generate_dataset(N) # Generate data set, collect in matrix X and vector y
+# ╔═╡ b8790891-1546-48e0-9f96-e09eade31c12
+logσ(x) = -softplus(x)
 
-# ╔═╡ 48c200f1-9363-4ae4-ab9c-b000071aa9d6
-X_c1 = X[:,findall(.!y)]'
+# ╔═╡ b48f8800-473d-48e4-ab78-eb07653db7a5
+function log_likelihood(w, X, y)
+	return sum(logσ.((2*y .- 1) .* (X' * w)))
+end
+	
 
-# ╔═╡ 47ee9e9f-427c-42e1-867a-b6d2c9438d76
+# ╔═╡ 1bfac9c5-e5cf-4a70-b077-11bb00cb1482
+"""
+This  function computes the posterior distribution over regression weights using the Laplace Approximation. We use `logσ` as a numerically stable alternative to `logistic`, and we avoid matrix inversions by computing the precision matrix of the posterior distribution instead of the covariance.
+
+The math in this function corresponds to eq. B-4.143
+"""
+function bayesian_discrimination_boundary(prior_w, X::Matrix, y::Vector{Bool})
+	m_0 = mean(prior_w)
+	p_0 = precision(prior_w)
+	negative_unnormalized_posterior = w -> -log_likelihood(w, X, y) - logpdf(prior_w, w)
+	MAP_w = Optim.minimizer(optimize(negative_unnormalized_posterior, zeros(3)))
+	σ_n = logistic.((2y .- 1) .* (X' * MAP_w))
+	inv_Σ = p_0
+	for i in 1:length(y)
+		slice = view(X, :, i)
+		inv_Σ .+= σ_n[i] * (1.0 - σ_n[i]) .* (slice * slice')
+	end
+		
+	return MvNormalMeanPrecision(MAP_w, inv_Σ)
+end
+
+# ╔═╡ fd908bf5-71a1-4ae8-8416-cc1fdf084dcb
+"""
+Computes the predictive posterior eq. B-4.152 using the given approximation to the sigmoid function.
+"""
+function predictive_posterior(x, weight_posterior)
+	λsq = π / 8
+	wN = mean(weight_posterior)
+	μ = wN' * x
+	σ = x' * cov(weight_posterior) * x
+	query_point = μ / (sqrt(inv(λsq) + σ ))
+	return normcdf(0, 1, query_point)
+end
+
+# ╔═╡ cf829697-6283-4d2f-b0dd-bbfbd689a145
+md"""
+#### Data Generation
+"""
+
+# ╔═╡ 5e4bb719-ea9b-4a30-8800-5d753f405fd1
+X, y = generate_dataset(N); # Generate data set, collect in matrix X and vector y
+
+# ╔═╡ 6b56ec96-4b9d-4281-bd63-061df324867f
+X_c1 = X[:,findall(.!y)]' # Split X based on class label
+
+# ╔═╡ f8bb4fcd-9b20-44e5-8e22-e792e74b69df
 X_c2 = X[:,findall(y)]'
+
+# ╔═╡ b5a19a34-b210-41ec-853d-c5df13ae17ce
+X_test = [3.75; 1.0]; # Features of 'new' data point
 
 # ╔═╡ a65ca01a-0e9a-42cb-b1d7-648102a77eb5
 function plot_dataset()
@@ -669,104 +732,86 @@ function plot_dataset()
 end
 
 # ╔═╡ d29ccc9e-d4a6-46ae-b907-2bc68c8d99bc
-	plot_dataset()
+plot_dataset()
 
-# ╔═╡ 56598859-2824-4242-a894-684bf1ad1f6e
-y_1 = ifelse.(y, 1.0, 0.0)
-
-# ╔═╡ 6f483978-29f0-4165-bd8f-650c403e3512
-# Extend X with a row of ones to allow an offset in the discrimination boundary
-X_ext = vcat(X, ones(1, length(y)))
-
-# ╔═╡ a89af0df-c39b-406e-a30a-4706ad2ea043
-function negative_log_likelihood(θ::Vector)
-	# P(C1|X,θ)
-    p_1 = 1.0 ./ (1.0 .+ exp.(-X_ext' * θ))
-	
-	# negative log-likelihood
-    return -sum(log.( (y_1 .* p_1) + ((1 .- y_1).*(1 .- p_1))) ) 
-end
-
-# ╔═╡ a75d69e1-c1e9-45b4-9924-4c2fe59413dc
-# Use Optim.jl optimiser to minimize the negative log-likelihood function w.r.t. θ
-θ = let
-	results = optimize(negative_log_likelihood, zeros(3), LBFGS())
-	results.minimizer
-end
-
-# ╔═╡ 00488cbb-75c6-4df9-9924-fada8f79a6f1
-function build_generative_discrimination_boundary(X::Matrix, y::Vector{Bool})
-    # Generate discrimination boundary function x[2] = boundary(x[1]) for a Gaussian generative model:
-    # X = [x_1,...,x_N]
-    # y = [y_1;...;y_N]
-    # x is a 2-d real (feature) vector
-    # y ∈ {false,true}
-    # x|y ~ 𝓝(x|μ_y, Σ_y)
-    # We find the class-conditional Gaussian distributions by MLE
-    # See lesson (generative classification) for more details
-    (size(X,1)==2) || error("The columns of X should have length 2")
-
-    # MLE of p(y)
-    p_1_est = sum(y.==true) / length(y)
-    π_hat = [p_1_est; 1 .- p_1_est]
-
-    # MLE of class-conditional multivariate Gaussian densities
-    X_cls1 = X[:,y.==true]
-    X_cls2 = X[:,y.==false]
-    d1 = fit_mle(FullNormal, X_cls1)  # MLE density estimation d1 = N(μ₁, Σ₁)
-    d2 = fit_mle(FullNormal, X_cls2)  # MLE density estimation d2 = N(μ₂, Σ₂)
-    Σ = π_hat[1] * cov(d1) + π_hat[2] * cov(d2) # Combine Σ₁ and Σ₂ into Σ
-
-    conditionals = [MvNormal(mean(d1), Σ); MvNormal(mean(d2), Σ)] # p(x|C)
-
-    # Discrimination boundary of the posterior (p(apple|x;D) = p(peach|x;D) = 0.5)
-    β(k) = inv(Σ)* mean(conditionals[k])
-    γ(k) = -0.5 * mean(conditionals[k])' * inv(Σ) * mean(conditionals[k]) + log(π_hat[k])
-    function discriminant_x2(x1)
-        # Solve discriminant equation for x2
-        
-        β12 = β(1) .- β(2)
-        γ12 = (γ(1) .- γ(2))[1,1]
-        return -1 ./ β12[2]*(β12[1]*x1 .+ γ12) 
-    end
-
-    return discriminant_x2
-end
-
-# ╔═╡ 7ad2f815-9d19-448c-bb7e-044a955f82e0
+# ╔═╡ f37ac438-cd56-4a09-bc8e-a75469955a2f
 let
-	# Plot the data set and ML discrimination boundary
+	d1 = fit_mle(MvNormal, X_c1')
+	d2 = fit_mle(MvNormal, X_c2')
+
 	plot_dataset()
+	
+	xrange = range(-1.6, 9; length=20)
+	yrange = range(-2, 7; length=15)
+	
+	contour!(
+		xrange, yrange,
+		(x,y) -> pdf(d1, [x,y]);
+		opacity=.4,
+		color=:blues,
+	)
+
+	
+	contour!(
+		xrange, yrange,
+		(x,y) -> pdf(d2, [x,y]);
+		opacity=.4,
+		color=:red,
+		colorbar=nothing,
+	)
+end
+
+# ╔═╡ fce5d561-ea76-4bd8-9cce-6f707f72fc60
+let
+	plot_dataset()
+	X_ext = vcat(X, ones(1, length(y)))
+
+	# Define a prior distribution over parameters, play with this to see the result change!
+	prior = MvNormalMeanCovariance(zeros(3), 100 .* diagm(ones(3)))
+	posterior = bayesian_discrimination_boundary(prior, X_ext, y)
+
+	# Plot 50% boundary
+	θ = mean(posterior)
 	disc_boundary(x1) = -1 / θ[2] * (θ[1]*x1 + θ[3])
-	generative_boundary = build_generative_discrimination_boundary(X, y)
-	
-	
-	p_1(x) = 1.0 / (1.0 + exp(-([x;1.]' * θ)))
-	x_test = [3.75;1.0]
-	@debug("P(C1|x•,θ) = $(p_1(x_test))")
-	
 	plot!([-2., 10.], disc_boundary; label="Discr. boundary", linewidth=2)
-	plot!([-2.,10.], generative_boundary; label="Gen. boundary", linewidth=2)
+
+	# Plot heatmap
+	xrange = range(-1.6, 9; length=50)
+	yrange = range(-2, 7; length=30)
+	
+	heatmap!(xrange, yrange, (x,y) -> predictive_posterior([x, y, 1], posterior);
+			 alpha=0.5,
+			 color=:redblue,
+			)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+BayesBase = "b4ee3484-f114-42fe-b91c-797d54a0c67e"
 BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+ExponentialFamily = "62312e5e-252a-4322-ace9-a5f4bf9b357b"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+LogExpFunctions = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
 MarkdownLiteral = "736d6165-7244-6769-4267-6b50796e6954"
 Optim = "429524aa-4258-5aef-a3af-852621145aeb"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 
 [compat]
+BayesBase = "~1.5.7"
 BmlipTeachingTools = "~1.1.0"
 Distributions = "~0.25.120"
+ExponentialFamily = "~2.0.7"
 LaTeXStrings = "~1.4.0"
+LogExpFunctions = "~0.3.29"
 MarkdownLiteral = "~0.1.2"
 Optim = "~1.13.2"
 Plots = "~1.40.17"
+StatsFuns = "~1.5.0"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -775,7 +820,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "4c1f4566735b2d723283baf2680f47646d64d470"
+project_hash = "d392ac7ebb5f5a679f052447cf4176c80ccf0bd5"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "60665b326b75db6517939d0e1875850bc4a54368"
@@ -803,14 +848,11 @@ deps = ["LinearAlgebra", "Requires"]
 git-tree-sha1 = "f7817e2e585aa6d924fd714df1e2a84be7896c60"
 uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
 version = "4.3.0"
+weakdeps = ["SparseArrays", "StaticArrays"]
 
     [deps.Adapt.extensions]
     AdaptSparseArraysExt = "SparseArrays"
     AdaptStaticArraysExt = "StaticArrays"
-
-    [deps.Adapt.weakdeps]
-    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [[deps.AliasTables]]
 deps = ["PtrArrays", "Random"]
@@ -854,6 +896,16 @@ version = "7.19.0"
     StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
     Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
 
+[[deps.ArrayLayouts]]
+deps = ["FillArrays", "LinearAlgebra", "StaticArrays"]
+git-tree-sha1 = "120e392af69350960b1d3b89d41dcc1d66543858"
+uuid = "4c555306-a7a7-4459-81d9-ec55ddd5c99a"
+version = "1.11.2"
+weakdeps = ["SparseArrays"]
+
+    [deps.ArrayLayouts.extensions]
+    ArrayLayoutsSparseArraysExt = "SparseArrays"
+
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 version = "1.11.0"
@@ -862,10 +914,34 @@ version = "1.11.0"
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 version = "1.11.0"
 
+[[deps.BayesBase]]
+deps = ["Distributions", "DomainSets", "LinearAlgebra", "Random", "SpecialFunctions", "StaticArrays", "Statistics", "StatsAPI", "StatsBase", "StatsFuns", "TinyHugeNumbers"]
+git-tree-sha1 = "232c38ab317e6e84596414fb2e1c29786b85806f"
+uuid = "b4ee3484-f114-42fe-b91c-797d54a0c67e"
+version = "1.5.7"
+weakdeps = ["FastCholesky"]
+
+    [deps.BayesBase.extensions]
+    FastCholeskyExt = "FastCholesky"
+
 [[deps.BitFlags]]
 git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
 uuid = "d1d4a3ce-64b1-5f1a-9ba4-7e7e69966f35"
 version = "0.1.9"
+
+[[deps.BlockArrays]]
+deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra"]
+git-tree-sha1 = "84a4360c718e7473fec971ae27f409a2f24befc8"
+uuid = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
+version = "1.7.1"
+
+    [deps.BlockArrays.extensions]
+    BlockArraysAdaptExt = "Adapt"
+    BlockArraysBandedMatricesExt = "BandedMatrices"
+
+    [deps.BlockArrays.weakdeps]
+    Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
+    BandedMatrices = "aae01518-5342-5314-be14-df237901396f"
 
 [[deps.BmlipTeachingTools]]
 deps = ["HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoTeachingTools", "PlutoUI", "Reexport"]
@@ -923,6 +999,11 @@ git-tree-sha1 = "37ea44092930b1811e666c3bc38065d7d87fcc74"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
 version = "0.13.1"
 
+[[deps.Combinatorics]]
+git-tree-sha1 = "8010b6bb3388abe68d95743dcbea77650bb2eddf"
+uuid = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
+version = "1.0.3"
+
 [[deps.CommonMark]]
 deps = ["PrecompileTools"]
 git-tree-sha1 = "351d6f4eaf273b753001b2de4dffb8279b100769"
@@ -950,6 +1031,11 @@ deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
 version = "1.1.1+0"
 
+[[deps.CompositeTypes]]
+git-tree-sha1 = "bce26c3dab336582805503bed209faab1c279768"
+uuid = "b152e2b5-7a66-4b01-a709-34e65c35f657"
+version = "0.1.4"
+
 [[deps.ConcurrentUtilities]]
 deps = ["Serialization", "Sockets"]
 git-tree-sha1 = "d9d26935a0bcffc87d2613ce14c527c99fc543fd"
@@ -960,16 +1046,12 @@ version = "2.5.0"
 git-tree-sha1 = "b4b092499347b18a015186eae3042f72267106cb"
 uuid = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
 version = "1.6.0"
+weakdeps = ["IntervalSets", "LinearAlgebra", "StaticArrays"]
 
     [deps.ConstructionBase.extensions]
     ConstructionBaseIntervalSetsExt = "IntervalSets"
     ConstructionBaseLinearAlgebraExt = "LinearAlgebra"
     ConstructionBaseStaticArraysExt = "StaticArrays"
-
-    [deps.ConstructionBase.weakdeps]
-    IntervalSets = "8197267c-284f-5f27-9208-e0e47529a953"
-    LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [[deps.Contour]]
 git-tree-sha1 = "439e35b0b36e2e5881738abc8857bd92ad6ff9a8"
@@ -982,10 +1064,10 @@ uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
 version = "1.16.0"
 
 [[deps.DataStructures]]
-deps = ["OrderedCollections"]
-git-tree-sha1 = "76b3b7c3925d943edf158ddb7f693ba54eb297a5"
+deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
+git-tree-sha1 = "4e1fe97fdaed23e9dc21d4d664bea76b65fc50a0"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.19.0"
+version = "0.18.22"
 
 [[deps.Dates]]
 deps = ["Printf"]
@@ -1018,9 +1100,9 @@ version = "1.15.1"
 
 [[deps.DifferentiationInterface]]
 deps = ["ADTypes", "LinearAlgebra"]
-git-tree-sha1 = "38989b1532a3c6e2341d52b77c5475c42c3318a8"
+git-tree-sha1 = "16946a4d305607c3a4af54ff35d56f0e9444ed0e"
 uuid = "a0c0ee7d-e4b9-4e03-894e-1c5f64a51d63"
-version = "0.7.6"
+version = "0.7.7"
 
     [deps.DifferentiationInterface.extensions]
     DifferentiationInterfaceChainRulesCoreExt = "ChainRulesCore"
@@ -1092,6 +1174,20 @@ git-tree-sha1 = "7442a5dfe1ebb773c29cc2962a8980f47221d76c"
 uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 version = "0.9.5"
 
+[[deps.DomainSets]]
+deps = ["CompositeTypes", "IntervalSets", "LinearAlgebra", "StaticArrays"]
+git-tree-sha1 = "c249d86e97a7e8398ce2068dce4c078a1c3464de"
+uuid = "5b8099bc-c8ec-5219-889f-1d9e522a28bf"
+version = "0.7.16"
+
+    [deps.DomainSets.extensions]
+    DomainSetsMakieExt = "Makie"
+    DomainSetsRandomExt = "Random"
+
+    [deps.DomainSets.weakdeps]
+    Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
+    Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
@@ -1116,9 +1212,15 @@ version = "0.1.11"
 
 [[deps.Expat_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "d55dffd9ae73ff72f1c0482454dcf2ec6c6c4a63"
+git-tree-sha1 = "7bb1361afdb33c7f2b085aa49ea8fe1b0fb14e58"
 uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
-version = "2.6.5+0"
+version = "2.7.1+0"
+
+[[deps.ExponentialFamily]]
+deps = ["BayesBase", "BlockArrays", "Distributions", "DomainSets", "FastCholesky", "FillArrays", "ForwardDiff", "HCubature", "HypergeometricFunctions", "IntervalSets", "IrrationalConstants", "LinearAlgebra", "LogExpFunctions", "PositiveFactorizations", "Random", "SparseArrays", "SpecialFunctions", "StaticArrays", "StatsBase", "StatsFuns", "TinyHugeNumbers"]
+git-tree-sha1 = "00188d3ea03cfe63d6b82e9e5b81972d56f8403b"
+uuid = "62312e5e-252a-4322-ace9-a5f4bf9b357b"
+version = "2.0.7"
 
 [[deps.FFMPEG]]
 deps = ["FFMPEG_jll"]
@@ -1131,6 +1233,16 @@ deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers",
 git-tree-sha1 = "3a948313e7a41eb1db7a1e733e6335f17b4ab3c4"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "7.1.1+0"
+
+[[deps.FastCholesky]]
+deps = ["LinearAlgebra", "PositiveFactorizations"]
+git-tree-sha1 = "1c0a81e006e40e9fcbd5f6f6cb42ac2700f86889"
+uuid = "2d5283b6-8564-42b6-bb00-83ed8e915756"
+version = "1.4.3"
+weakdeps = ["StaticArraysCore"]
+
+    [deps.FastCholesky.extensions]
+    StaticArraysCoreExt = "StaticArraysCore"
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
@@ -1174,9 +1286,9 @@ version = "0.8.5"
 
 [[deps.Fontconfig_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Expat_jll", "FreeType2_jll", "JLLWrappers", "Libdl", "Libuuid_jll", "Zlib_jll"]
-git-tree-sha1 = "301b5d5d731a0654825f1f2e906990f7141a106b"
+git-tree-sha1 = "f85dac9a96a01087df6e3a749840015a0ca3817d"
 uuid = "a3f928ae-7b40-5064-980b-68af3947d34b"
-version = "2.16.0+0"
+version = "2.17.1+0"
 
 [[deps.Format]]
 git-tree-sha1 = "9c68794ef81b08086aeb32eeaf33531668d5f5fc"
@@ -1185,15 +1297,13 @@ version = "1.3.7"
 
 [[deps.ForwardDiff]]
 deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "LinearAlgebra", "LogExpFunctions", "NaNMath", "Preferences", "Printf", "Random", "SpecialFunctions"]
-git-tree-sha1 = "910febccb28d493032495b7009dce7d7f7aee554"
+git-tree-sha1 = "a2df1b776752e3f344e5116c06d75a10436ab853"
 uuid = "f6369f11-7733-5829-9624-2563aa707210"
-version = "1.0.1"
+version = "0.10.38"
+weakdeps = ["StaticArrays"]
 
     [deps.ForwardDiff.extensions]
     ForwardDiffStaticArraysExt = "StaticArrays"
-
-    [deps.ForwardDiff.weakdeps]
-    StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [[deps.FreeType2_jll]]
 deps = ["Artifacts", "Bzip2_jll", "JLLWrappers", "Libdl", "Zlib_jll"]
@@ -1253,6 +1363,12 @@ git-tree-sha1 = "53bb909d1151e57e2484c3d1b53e19552b887fb2"
 uuid = "42e2da0e-8278-4e71-bc24-59509adca0fe"
 version = "1.0.2"
 
+[[deps.HCubature]]
+deps = ["Combinatorics", "DataStructures", "LinearAlgebra", "QuadGK", "StaticArrays"]
+git-tree-sha1 = "19ef9f0cb324eed957b7fe7257ac84e8ed8a48ec"
+uuid = "19dc6840-f33b-545b-b366-655c7e3ffd49"
+version = "1.7.0"
+
 [[deps.HTTP]]
 deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapping", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "PrecompileTools", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
 git-tree-sha1 = "ed5e9c58612c4e081aecdb6e1a479e18462e041e"
@@ -1294,6 +1410,17 @@ deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 version = "1.11.0"
 
+[[deps.IntervalSets]]
+git-tree-sha1 = "5fbb102dcb8b1a858111ae81d56682376130517d"
+uuid = "8197267c-284f-5f27-9208-e0e47529a953"
+version = "0.7.11"
+weakdeps = ["Random", "RecipesBase", "Statistics"]
+
+    [deps.IntervalSets.extensions]
+    IntervalSetsRandomExt = "Random"
+    IntervalSetsRecipesBaseExt = "RecipesBase"
+    IntervalSetsStatisticsExt = "Statistics"
+
 [[deps.IrrationalConstants]]
 git-tree-sha1 = "e2222959fbc6c19554dc15174c81bf7bf3aa691c"
 uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
@@ -1319,9 +1446,9 @@ version = "0.21.4"
 
 [[deps.JpegTurbo_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "eac1206917768cb54957c65a615460d87b455fc1"
+git-tree-sha1 = "e95866623950267c1e4878846f848d94810de475"
 uuid = "aacddb02-875f-59d6-b918-886e6ef4fbf8"
-version = "3.1.1+0"
+version = "3.1.2+0"
 
 [[deps.LAME_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1419,9 +1546,9 @@ version = "1.18.0+0"
 
 [[deps.Libmount_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "a31572773ac1b745e0343fe5e2c8ddda7a37e997"
+git-tree-sha1 = "706dfd3c0dd56ca090e86884db6eda70fa7dd4af"
 uuid = "4b2f31a3-9ecc-558c-b454-b3730dcb73e9"
-version = "2.41.0+0"
+version = "2.41.1+0"
 
 [[deps.Libtiff_jll]]
 deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "LERC_jll", "Libdl", "XZ_jll", "Zlib_jll", "Zstd_jll"]
@@ -1431,9 +1558,9 @@ version = "4.7.1+0"
 
 [[deps.Libuuid_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "321ccef73a96ba828cd51f2ab5b9f917fa73945a"
+git-tree-sha1 = "d3c8af829abaeba27181db4acb485b18d15d89c6"
 uuid = "38a345b3-de98-5d2b-a5d3-14cd9215e700"
-version = "2.41.0+0"
+version = "2.41.1+0"
 
 [[deps.LineSearches]]
 deps = ["LinearAlgebra", "NLSolversBase", "NaNMath", "Parameters", "Printf"]
@@ -1680,9 +1807,9 @@ version = "0.4.5"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "fcfec547342405c7a8529ea896f98c0ffcc4931d"
+git-tree-sha1 = "8329a3a4f75e178c11c1ce2342778bcbbbfa7e3c"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.70"
+version = "0.7.71"
 
 [[deps.PositiveFactorizations]]
 deps = ["LinearAlgebra"]
@@ -1863,6 +1990,20 @@ git-tree-sha1 = "95af145932c2ed859b63329952ce8d633719f091"
 uuid = "860ef19b-820b-49d6-a774-d7a799459cd3"
 version = "1.0.3"
 
+[[deps.StaticArrays]]
+deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
+git-tree-sha1 = "cbea8a6bd7bed51b1619658dec70035e07b8502f"
+uuid = "90137ffa-7385-5640-81b9-e52037218182"
+version = "1.9.14"
+
+    [deps.StaticArrays.extensions]
+    StaticArraysChainRulesCoreExt = "ChainRulesCore"
+    StaticArraysStatisticsExt = "Statistics"
+
+    [deps.StaticArrays.weakdeps]
+    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+    Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+
 [[deps.StaticArraysCore]]
 git-tree-sha1 = "192954ef1208c7019899fbf8049e717f92959682"
 uuid = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
@@ -1937,6 +2078,11 @@ version = "0.1.1"
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 version = "1.11.0"
+
+[[deps.TinyHugeNumbers]]
+git-tree-sha1 = "83c6abf376718345a85c071b249ef6692a8936d4"
+uuid = "783c9a47-75a3-44ac-a16b-f1ab7b3acf04"
+version = "1.0.3"
 
 [[deps.TranscodingStreams]]
 git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
@@ -2277,14 +2423,10 @@ version = "1.9.2+0"
 # ╟─25ef2806-d294-11ef-3cb6-0f3e76b9177e
 # ╟─4ceede48-a4d5-446b-bb34-26cec4af357a
 # ╟─d29ccc9e-d4a6-46ae-b907-2bc68c8d99bc
-# ╟─cf829697-6283-4d2f-b0dd-bbfbd689a145
-# ╟─a65ca01a-0e9a-42cb-b1d7-648102a77eb5
-# ╠═e3474a09-11ec-43e8-900f-f4fb31283f46
-# ╟─b5bc379c-5a0e-4b13-99fe-92632250a35e
-# ╠═48c200f1-9363-4ae4-ab9c-b000071aa9d6
-# ╠═47ee9e9f-427c-42e1-867a-b6d2c9438d76
-# ╠═ddb2dc0d-3ef9-4add-93e9-ee575aabd81a
-# ╠═a759653c-0da4-40b7-9e9e-1e3d2e4df4ea
+# ╟─7e7cab21-09ab-4d06-9716-ab7864b229ab
+# ╟─aeee1072-5173-4eae-8027-3fbf2e338d95
+# ╟─f37ac438-cd56-4a09-bc8e-a75469955a2f
+# ╟─93083660-6a49-4147-b00c-d62a4453f222
 # ╟─d1bbdc6a-e5ff-4cd6-9175-860b5ec04f3c
 # ╟─25ef6ece-d294-11ef-270a-999c8d457b24
 # ╟─25ef7f54-d294-11ef-3f05-0d85fe6e7a17
@@ -2293,8 +2435,10 @@ version = "1.9.2+0"
 # ╟─25efd6b6-d294-11ef-3b21-6363ef531eb5
 # ╟─25f02ac6-d294-11ef-26c4-f142b8ac4b5f
 # ╟─25f0adde-d294-11ef-353e-4b4773df9ff5
-# ╟─7d8f376c-b43f-46f4-87bc-c4d7f94d60e1
-# ╟─25f0f618-d294-11ef-0d94-bf80c8e2957b
+# ╟─22121f20-6b90-4782-8bed-25486cc23ae7
+# ╟─56cae988-2f51-4618-8676-f46fa2924ea3
+# ╟─66351c02-1921-44dc-b461-84a536c40fd5
+# ╟─e3173267-bd90-47df-9d7f-bd9fd3f688ac
 # ╟─25f12528-d294-11ef-0c65-97c61935e9c2
 # ╟─25f14226-d294-11ef-369f-e545d5fe2700
 # ╟─25f14f82-d294-11ef-02fb-2dc632b8f118
@@ -2311,20 +2455,15 @@ version = "1.9.2+0"
 # ╟─e4cc517b-d3b5-4517-a28b-efb8aba24496
 # ╟─33b859f2-9ea8-4f8b-b0f8-08a19c6a96fc
 # ╟─38b4854f-be02-4696-802f-2106481e3aea
+# ╟─7932fff4-0568-49de-b34c-711e51487ae3
+# ╟─25f3bef2-d294-11ef-1438-e9f7e469336f
+# ╟─aaf764da-cf1b-4bc7-83ea-6d25a80ca3ab
+# ╟─fce5d561-ea76-4bd8-9cce-6f707f72fc60
+# ╟─69706576-0333-43bf-8523-e7838f373529
 # ╟─0045e569-dc3c-4998-86da-9d96f599c599
 # ╟─25f365e2-d294-11ef-300e-9914333b1233
 # ╟─3b24b142-2239-4951-9177-ff87b5da4b68
 # ╟─ff31d8c1-db35-4c85-a609-67fc40e9e78d
-# ╟─7932fff4-0568-49de-b34c-711e51487ae3
-# ╟─25f3bef2-d294-11ef-1438-e9f7e469336f
-# ╠═aaf764da-cf1b-4bc7-83ea-6d25a80ca3ab
-# ╟─7ad2f815-9d19-448c-bb7e-044a955f82e0
-# ╠═56598859-2824-4242-a894-684bf1ad1f6e
-# ╠═6f483978-29f0-4165-bd8f-650c403e3512
-# ╠═a89af0df-c39b-406e-a30a-4706ad2ea043
-# ╠═a75d69e1-c1e9-45b4-9924-4c2fe59413dc
-# ╟─25f3ee5e-d294-11ef-1fb4-e9d84b1e1ec6
-# ╠═6a20aa94-e2fa-45ab-9889-62d44cbfc1ba
 # ╟─1f2bfcf4-fef4-4612-8683-d5c86a326eef
 # ╟─25f3ff84-d294-11ef-0031-63b23d23324d
 # ╟─25f41118-d294-11ef-13a8-3fa6587c1bf3
@@ -2334,10 +2473,20 @@ version = "1.9.2+0"
 # ╟─9554ed0b-69dd-443c-9538-03a4117eeb78
 # ╟─6eee35ee-fd55-498f-9441-f18c2508de19
 # ╟─1128cb07-68c8-4b80-8fb4-ee9fcc76c050
+# ╠═e379cc2a-43f8-432f-84fc-a88fd4f3ad0a
+# ╠═a759653c-0da4-40b7-9e9e-1e3d2e4df4ea
 # ╠═ad196ae6-c65e-4aaa-b0cc-bd72daa41952
 # ╠═616e84d7-063d-4d9d-99e4-56aecf3c7ee4
 # ╠═fcec3c3a-8b0b-4dfd-b010-66abbf330069
-# ╠═00488cbb-75c6-4df9-9924-fada8f79a6f1
-# ╠═e379cc2a-43f8-432f-84fc-a88fd4f3ad0a
+# ╟─a65ca01a-0e9a-42cb-b1d7-648102a77eb5
+# ╟─b8790891-1546-48e0-9f96-e09eade31c12
+# ╟─b48f8800-473d-48e4-ab78-eb07653db7a5
+# ╠═1bfac9c5-e5cf-4a70-b077-11bb00cb1482
+# ╠═fd908bf5-71a1-4ae8-8416-cc1fdf084dcb
+# ╟─cf829697-6283-4d2f-b0dd-bbfbd689a145
+# ╠═5e4bb719-ea9b-4a30-8800-5d753f405fd1
+# ╠═6b56ec96-4b9d-4281-bd63-061df324867f
+# ╠═f8bb4fcd-9b20-44e5-8e22-e792e74b69df
+# ╠═b5a19a34-b210-41ec-853d-c5df13ae17ce
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
