@@ -23,11 +23,11 @@ macro bind(def, element)
     #! format: on
 end
 
-# ╔═╡ 5394e37c-ae00-4042-8ada-3bbf32fbca9e
-using Distributions
-
 # ╔═╡ eeb9a1f5-b857-4843-920b-2e4a9656f66b
 using Plots, LaTeXStrings
+
+# ╔═╡ 5394e37c-ae00-4042-8ada-3bbf32fbca9e
+using Distributions
 
 # ╔═╡ b305a905-06c2-4a15-8042-72ef6375720f
 using BmlipTeachingTools
@@ -783,6 +783,10 @@ let
 			ylabel=L"p(y=%$y | θ)", xlabel=L"θ", 
 			title="Likelihood Function", label=""
 		 )
+	scatter!(p2,
+			[θ], [f(y, θ)];
+			label=nothing,
+			)
 	
 	plot(p1, p2)
 end
@@ -1123,16 +1127,14 @@ begin
 	z = Normal(μz, σz)
 end;
 
-# ╔═╡ 842fd4e6-7873-45d4-aa29-e4aa9eb94fe4
-begin
+# ╔═╡ c0ea3253-a06b-426c-91a3-a6dd33e42779
+let
+	
 	# Calculate the x-range for plotting
 	range_min = min(μx-2*σx, μy-2*σy, μz-2*σz)
 	range_max = max(μx+2*σx, μy+2*σy, μz+2*σz)
 	range_grid = range(range_min, stop=range_max, length=100)
-end;
-
-# ╔═╡ c0ea3253-a06b-426c-91a3-a6dd33e42779
-let
+	
 	plot(range_grid, t -> pdf(x,t), label=L"p_x", fill=(0, 0.1))
 	plot!(range_grid, t -> pdf(y,t), label=L"p_y", fill=(0, 0.1))
 	plot!(range_grid, t -> pdf(z,t), label=L"p_z", fill=(0, 0.1))
@@ -1533,7 +1535,7 @@ BmlipTeachingTools = "~1.2.1"
 Distributions = "~0.25.120"
 LaTeXStrings = "~1.4.0"
 MarkdownLiteral = "~0.1.2"
-Plots = "~1.40.17"
+Plots = "~1.40.19"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -1542,7 +1544,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "e40d37a129181591b70713a388c890af9599ac02"
+project_hash = "1e5b5386f4ac7813e9fbfe6b3093b4a62c85f96a"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -2886,10 +2888,8 @@ version = "1.9.2+0"
 # ╠═6485575d-c5a5-4891-8210-f50d6f75476f
 # ╟─0abaed25-decc-4dcd-aa04-b68ec0d5c73e
 # ╟─218d3b6e-50b6-4b98-a00c-a19dd33d2c03
-# ╠═5394e37c-ae00-4042-8ada-3bbf32fbca9e
 # ╠═e836f877-5ed6-4865-ba3a-1ca5a86b2349
-# ╠═c0ea3253-a06b-426c-91a3-a6dd33e42779
-# ╠═842fd4e6-7873-45d4-aa29-e4aa9eb94fe4
+# ╟─c0ea3253-a06b-426c-91a3-a6dd33e42779
 # ╟─3e1f4f46-d294-11ef-29b8-69e546763781
 # ╟─3e1f68fa-d294-11ef-31b2-e7670da8c08c
 # ╟─3e1f7d5e-d294-11ef-2878-05744036f32c
@@ -2918,6 +2918,7 @@ version = "1.9.2+0"
 # ╟─d3b003c6-70ca-419f-a343-e35b266323f3
 # ╟─dd31ec7c-708d-4fd7-958d-f9887798a5bc
 # ╠═eeb9a1f5-b857-4843-920b-2e4a9656f66b
+# ╠═5394e37c-ae00-4042-8ada-3bbf32fbca9e
 # ╠═b305a905-06c2-4a15-8042-72ef6375720f
 # ╟─70d79732-0f55-40ba-929d-fba431318848
 # ╠═4f6dd225-c64d-4b76-b075-0bf71c863b5a

@@ -1,8 +1,8 @@
 ### A Pluto.jl notebook ###
-# v0.20.15
+# v0.20.16
 
 #> [frontmatter]
-#> image = "https://github.com/bmlip/course/blob/v2/assets/figures/fig-bishop12.png?raw=true"
+#> image = "https://i.imgur.com/azbCpRW.png"
 #> description = "Introduction to Bayesian linear regression and predictive modeling for continuous data."
 #> 
 #>     [[frontmatter.author]]
@@ -79,6 +79,10 @@ challenge_statement("Finding a Secret Function" , color= "Red" )
 # ╔═╡ b5a2304d-6a70-42b2-9269-98370680aed8
 secret_function(x) = sin(x * 2π);
 
+# Or use one of these functions:
+# secret_function(x) = sign(0.4 - x);
+# secret_function(x) = x ^ 2;
+
 # ╔═╡ f1bf64f6-09f9-45a3-acd1-7975ab9e79fc
 md"""
 
@@ -91,9 +95,22 @@ y = f(x) = \sin(2 \pi x)\,,
 ```
 from which we observe a set of noisy measurements of the function values ``y_n``, for a given set of inputs ``x_n``.
 
-Let's generate some observations from this function. 
+Let's generate some random observations from this function. You can change the **number of observations** and the **measurement noise**.
+"""
 
-![](https://i.imgur.com/8iYoXt5.png)
+# ╔═╡ 37f06a96-07ac-43e0-ae4d-c64db09bde76
+begin
+	N_bond = @bindname N Slider(1:150; show_value=true, default=13)
+end
+
+# ╔═╡ 2baf33ce-2ffe-4c99-ab61-a0d578da5117
+begin
+	σ_noise_bond = @bindname σ_data_noise Slider(0.0:0.01:0.2; default=0.12, show_value=true)
+end
+
+# ╔═╡ f2387991-2d70-46ce-950d-73a9e2c0e8db
+md"""
+Here is the randomly generated dataset:
 """
 
 # ╔═╡ 2ff8c0d7-30f5-4593-9533-fee6114a3443
@@ -104,18 +121,6 @@ The challenge is to uncover the underlying data-generating process and predict r
 
 To be solved later in this lecture. 
 """
-
-# ╔═╡ d0b7b1fe-59f8-4618-b8b4-156d2d84f84d
-md"""
-
-_Take a look at the Mini to play with this interactive model yourself! You can change the **number of observations** and the **measurement noise**._
-
-"""
-
-# ╔═╡ 390f2359-43cb-4948-bd9c-9406d883f1a9
-NotebookCard(
-	"https://bmlip.github.io/course/minis/Regression.html";
-)
 
 # ╔═╡ 234bb452-d294-11ef-24cb-3d171fe9cb4e
 md"""
@@ -159,7 +164,7 @@ md"""
 ## Model Specification
 
 
-#### data-generating distribution
+#### Data-Generating Distribution
 
 In a traditional *regression* model, we try to "explain the data" by a purely deterministic function ``f(x_n,w)``, plus a purely random term ``\epsilon_n`` for 'unexplained noise':
 
@@ -193,10 +198,18 @@ In *ordinary linear regression* , it is further assumed that the noise process `
 
 """
 
+# ╔═╡ 2c2dd8ea-aa41-430a-9066-8c2a20ce9b71
+md"""
+💡 _We model our function as a **linear combination of basis functions**. Check out this mini to learn more about this:_
+"""
+
+# ╔═╡ 23010dab-3e07-401a-aa09-bcba760f0894
+NotebookCard("https://bmlip.github.io/course/lectures/minis/Basis%20Functions.html")
+
 # ╔═╡ 234c8850-d294-11ef-3707-6722628bd9dc
 md"""
 
-#### likelihood function
+#### Likelihood Function
 
 For the ordinary linear regression model in Eq. B-3.10, we are interested in learning the parameters ``w`` from an observed data set ``D=\{(x_1,y_1),\dotsc,(x_N,y_N)\}``.
 
@@ -217,7 +230,7 @@ Note that, if parameter ``\beta`` is given, then Eq. B-3.10 is a proper likeliho
 
 # ╔═╡ 234cab14-d294-11ef-1e7c-777fc35ddbd9
 md"""
-#### prior
+#### Prior
 
 For full Bayesian learning, we should also choose a prior ``p(w)``. Let's choose a Gaussian prior, 
 
@@ -276,7 +289,7 @@ which comprises only given variables, so ``m_N`` evaluates to a fixed vector.
 
 # ╔═╡ 234d6dd8-d294-11ef-3abf-8d6cb00b1907
 md"""
-## Application: Predicting future data points
+## Application: Predicting Future Data Points
 
 Assume we are interested in the distribution ``p(y_\bullet \,|\, x_\bullet, D)`` for a new input ``x_\bullet``. This can be worked out to
 
@@ -357,17 +370,54 @@ Then we equate probability masses in both domains:
 keyconcept("", md"This is a satisfying result: for an ordinary linear regression task, with inputs ``x``, outputs ``y``, and weights ``w``, placing a Gaussian prior on the weights ``w`` leads to both a Gaussian posterior over the weights and a Gaussian predictive distribution for the outputs. Importantly, both distributions can be computed in closed form. ")
 
 # ╔═╡ f600c228-e048-42aa-b79a-60592b367dec
-challenge_solution("Finding a Secret Function" , color= "Green" )
+challenge_solution("Finding a Secret Function" , color= "Green", big=true)
 
 # ╔═╡ c0c57aa6-155a-49a9-9ed2-d568de1b5be2
 md"""
 We can use this model to approximate the secret function! Let's see it in action:
 """
 
-# ╔═╡ 7a585a05-64c5-4d18-8e07-2d5d0beead53
-NotebookCard(
-	"https://bmlip.github.io/course/minis/Regression.html"
-)
+# ╔═╡ b48b93c3-1ff2-4be0-8fad-181035f3e50e
+md"""
+We also have a _prior_ for the weights: ``\mathcal{N}(0,σ_{prior}^2)``. You can control this parameter:
+"""
+
+# ╔═╡ 3fe01c67-6f95-4f6d-8c7f-5a389272ff65
+@bindname σ_prior² Slider([(2.0 .^ (-14:2))..., 1e10]; show_value=true, default=0.5)
+
+# ╔═╡ 018b6c7b-36bc-4867-a058-3802b43fd1eb
+
+
+# ╔═╡ 90cb881a-7b5d-44e3-a7d1-bb93bef4a82b
+md"""
+### Implementation
+
+#### Basic functions
+
+See the [Mini about Basis Functions](https://bmlip.github.io/course/lectures/minis/Basis%20Functions.html) to learn more!
+"""
+
+# ╔═╡ 142f4700-ccf4-4019-b3a9-57035c458276
+σ_basis² = 0.01;
+
+# ╔═╡ 70ca3a3f-ee1c-4f3d-9d77-bf55e8e808c1
+μ_basis = range(0.0, 1.0; length=10);
+
+# ╔═╡ 3a3b7ff2-68aa-411c-b7fb-c6cd00d0dd7b
+ϕ(μ, x) = exp(-(x - μ)^2 / σ_basis²);
+
+# ╔═╡ 290bc994-d0f9-4af3-bd63-78de1640c85c
+function f(w, x)
+	sum(enumerate(μ_basis)) do (i, μ)
+		w[i] * ϕ(μ, x)
+	end
+end;
+
+# ╔═╡ 4d2be102-8849-4b8d-9962-8b45099ab8f2
+md"""
+#### Bayesian inference
+We have a closed-form solution for the posterior:
+"""
 
 # ╔═╡ ec0ccf94-e12e-422d-b4d2-dcb933453146
 md"""
@@ -548,23 +598,23 @@ v(x) &= 10e^{2x^2}-9.5
 """
 
 # ╔═╡ b6443a13-9301-4559-a5c3-396bae2a27b9
-@bindname N Slider(1:50; default=10)
+@bindname N_points Slider(1:50; default=10)
 
 # ╔═╡ 234ef126-d294-11ef-17a9-3da87a7e7d0a
 let
 	# Model specification: y|x ~ 𝒩(f(x), v(x))
-	f(x) = 5*x .- 2 
-	v(x) = 10*exp.(2*x.^2) .- 9.5 # input dependent noise variance
+	f(x) = 5x - 2 
+	v(x) = 10exp(2*x^2) .- 9.5 # input dependent noise variance
 	x_test = [0.0, 1.0]
-	plot(x_test, f(x_test), ribbon=sqrt.(v(x_test)), label=L"f(x)") # plot f(x)
+	plot(x_test, f.(x_test), ribbon=sqrt.(v.(x_test)), label=L"f(x)") # plot f(x)
 	
 	# Generate N samples (x,y), where x ~ Unif[0,1]
 	x = rand(MersenneTwister(345435), N)
-	y = f(x) + sqrt.(v(x)) .* randn(MersenneTwister(8484893), N)
+	y = f.(x) + sqrt.(v.(x)) .* rand(MersenneTwister(848483), Normal(0,1), N)
 	scatter!(x, y, xlabel="x", ylabel="y", label=L"y") # Plot samples
 	
 	# Add constant to input so we can estimate both the offset and the slope
-	_x = [x ones(N)]
+	_x = [x ones(N_points)]
 	_x_test = hcat(x_test, ones(2))
 	
 	# LS regression
@@ -572,17 +622,22 @@ let
 	plot!(x_test, _x_test*w_ls, color=:red, label="LS") # plot LS solution
 	
 	# Weighted LS regression
-	W = Diagonal(1 ./ v(x)) # weight matrix
+	W = Diagonal(1 ./ v.(x)) # weight matrix
 	w_wls = inv(_x'*W*_x) * _x' * W * y
 	plot!(x_test, _x_test*w_wls, color=:green, label="WLS") # plot WLS solution
 
 	plot!(legend=:topleft, ylim=(-12,16))
 end
 
+# ╔═╡ e9804f92-29b0-4463-bf37-872183061ee2
+md"""
+_Reading this lecture online? Click **"View code"** in the top right to read the implementation of this visualisation._
+"""
+
 # ╔═╡ 234f5d32-d294-11ef-279f-f331396e47ad
 md"""
 
-## Uncertainty about Inputs?
+## Uncertainty About Inputs?
 
 In this lesson, we focused on modelling the map from given inputs ``x`` to uncertain outputs ``y``, or more formally, on the distribution ``p(y|x)``. 
 
@@ -733,7 +788,7 @@ Set derivative to zero for MAP estimate leads to
 
 # ╔═╡ 234f7254-d294-11ef-316a-05ef2edb9699
 md"""
-#  OPTIONAL SLIDES
+# Optional
 
 """
 
@@ -776,8 +831,89 @@ md"""
 # Appendix
 """
 
-# ╔═╡ 5f00f990-1c7c-4c78-9d86-2dfc88a90a36
+# ╔═╡ 22e76656-b9f4-463e-9bf8-bd383e92948b
+const Layout = PlutoUI.ExperimentalLayout
 
+# ╔═╡ 9fd4a9b4-3296-4fe3-931f-17744bc4df81
+Layout.vbox([
+	N_bond,
+	σ_noise_bond, 
+])
+
+# ╔═╡ 338ee8e9-b786-48e1-b084-a0e8a6d12118
+baseplot(args...; kwargs...) = plot(args...; size=(650,400), xlim=(-0.0, 1.0), ylim=(-1.2,1.2), kwargs...)
+
+# ╔═╡ 0e9435fc-3206-4249-b5ff-42cc35c98d47
+function plot_data!(D)
+	plot!(; legend=:bottomleft)
+	plot!(secret_function;
+		  label="True function",
+		  color=3,
+		  lw=3,
+			linestyle=:dash,
+		 )
+	scatter!(
+		D; 
+		label="Observations",
+		color=1,
+		# markerstrokewidth=0,
+	)
+end
+
+# ╔═╡ 88a2bd82-6663-48cc-a535-5b3e47d814a9
+const deterministic_randomness = MersenneTwister
+
+# ╔═╡ 68141653-e444-4e29-bbec-4cd7359cb84c
+σ_data_noise² = σ_data_noise^2
+
+# ╔═╡ 72fcb6a3-36ee-4840-bdc3-ddb743e5c149
+D = let
+	xs = rand(deterministic_randomness(19), Uniform(0,1), N)
+
+	ys_exact = secret_function.(xs)
+	ys = ys_exact .+ rand(deterministic_randomness(37), MvNormal(zeros(N), σ_data_noise²*I))
+
+	collect(zip(xs, ys))
+end
+
+# ╔═╡ 5d48e25f-9a98-43ce-8f23-d9ab28f69996
+let
+	baseplot()
+	plot_data!(D)
+end
+
+# ╔═╡ 8a2730b8-3262-48cc-81f0-777cf85b9836
+# This is called the "design matrix"
+Φ = [
+	ϕ(μ, datum[1])
+	for datum in D, μ in μ_basis
+];
+
+# ╔═╡ 98d729ab-79f8-4a0f-9db5-387f488fc19d
+weights_posterior = MvNormalCanon(
+	# Posterior potential vector
+	Φ' * last.(D) / σ_data_noise²,
+	# Posterior precision matrix (inverse covariance)
+	Φ' * Φ / σ_data_noise² + I / σ_prior²
+);
+
+# ╔═╡ f9a5c91e-12be-4e8b-930d-74e46e39ea58
+let
+	baseplot()
+	if true
+		for i in 1:40
+			w = rand(weights_posterior)
+			plot!(
+				x -> f(w, x);
+				opacity=.3, 
+				color=2, 
+				label=i==1 ? "Posterior samples" : nothing,
+			)
+		end
+	end
+
+	plot_data!(D)
+end
 
 # ╔═╡ 3b2ca3c2-ada2-447f-818d-e3cc7c52facb
 md"""
@@ -848,7 +984,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "61c8164fc50937999e83534a3a559f7fe70b536f"
+project_hash = "8f82368119a1c152e87bacee1ce5eb82d6b55bf3"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -2086,15 +2222,20 @@ version = "1.9.2+0"
 # ╟─234ba8c2-d294-11ef-36f6-b1f61f65557a
 # ╠═b5a2304d-6a70-42b2-9269-98370680aed8
 # ╟─f1bf64f6-09f9-45a3-acd1-7975ab9e79fc
+# ╟─37f06a96-07ac-43e0-ae4d-c64db09bde76
+# ╟─2baf33ce-2ffe-4c99-ab61-a0d578da5117
+# ╟─f2387991-2d70-46ce-950d-73a9e2c0e8db
+# ╟─72fcb6a3-36ee-4840-bdc3-ddb743e5c149
+# ╟─5d48e25f-9a98-43ce-8f23-d9ab28f69996
 # ╟─2ff8c0d7-30f5-4593-9533-fee6114a3443
-# ╟─d0b7b1fe-59f8-4618-b8b4-156d2d84f84d
-# ╟─390f2359-43cb-4948-bd9c-9406d883f1a9
 # ╟─234bb452-d294-11ef-24cb-3d171fe9cb4e
 # ╟─234be90e-d294-11ef-2257-496f155c2b59
 # ╟─234c3684-d294-11ef-1c08-d9d61fc3d471
 # ╟─234c5394-d294-11ef-1614-c9847412c8fb
 # ╟─234c6104-d294-11ef-0a18-15e51a878079
 # ╟─234c7766-d294-11ef-36fa-1d2beee3dec0
+# ╟─2c2dd8ea-aa41-430a-9066-8c2a20ce9b71
+# ╟─23010dab-3e07-401a-aa09-bcba760f0894
 # ╟─234c8850-d294-11ef-3707-6722628bd9dc
 # ╟─234cab14-d294-11ef-1e7c-777fc35ddbd9
 # ╟─234cdca6-d294-11ef-0ba3-dd5356b65236
@@ -2103,7 +2244,19 @@ version = "1.9.2+0"
 # ╟─fb113692-f00c-4b48-85cc-d7bba88c7099
 # ╟─f600c228-e048-42aa-b79a-60592b367dec
 # ╟─c0c57aa6-155a-49a9-9ed2-d568de1b5be2
-# ╟─7a585a05-64c5-4d18-8e07-2d5d0beead53
+# ╟─9fd4a9b4-3296-4fe3-931f-17744bc4df81
+# ╟─f9a5c91e-12be-4e8b-930d-74e46e39ea58
+# ╟─b48b93c3-1ff2-4be0-8fad-181035f3e50e
+# ╟─3fe01c67-6f95-4f6d-8c7f-5a389272ff65
+# ╟─018b6c7b-36bc-4867-a058-3802b43fd1eb
+# ╟─90cb881a-7b5d-44e3-a7d1-bb93bef4a82b
+# ╠═142f4700-ccf4-4019-b3a9-57035c458276
+# ╠═70ca3a3f-ee1c-4f3d-9d77-bf55e8e808c1
+# ╠═3a3b7ff2-68aa-411c-b7fb-c6cd00d0dd7b
+# ╠═290bc994-d0f9-4af3-bd63-78de1640c85c
+# ╟─4d2be102-8849-4b8d-9962-8b45099ab8f2
+# ╠═98d729ab-79f8-4a0f-9db5-387f488fc19d
+# ╠═8a2730b8-3262-48cc-81f0-777cf85b9836
 # ╟─ec0ccf94-e12e-422d-b4d2-dcb933453146
 # ╟─234da212-d294-11ef-1fdc-c38e13cb41db
 # ╟─234dab5e-d294-11ef-30b4-39c5e05dfb31
@@ -2123,6 +2276,7 @@ version = "1.9.2+0"
 # ╟─234ec962-d294-11ef-1033-7b1599057825
 # ╟─b6443a13-9301-4559-a5c3-396bae2a27b9
 # ╟─234ef126-d294-11ef-17a9-3da87a7e7d0a
+# ╟─e9804f92-29b0-4463-bf37-872183061ee2
 # ╟─234f5d32-d294-11ef-279f-f331396e47ad
 # ╟─8e2b2c1d-81f3-4283-ae2e-d8b3e9c201b3
 # ╟─bbb461b0-d1eb-4584-89b0-96af3e615484
@@ -2133,9 +2287,13 @@ version = "1.9.2+0"
 # ╟─234f8a6e-d294-11ef-175e-f316d6b39583
 # ╟─c6532830-3161-4b2a-97c4-6d27d24762c9
 # ╠═f8c69b91-4415-454e-a50d-c4a37ada89d1
-# ╠═5f00f990-1c7c-4c78-9d86-2dfc88a90a36
 # ╠═33ca4c67-d96f-457f-bc19-171f4b4b03c6
 # ╠═3ff2bd04-1490-4be6-8b26-b82d1902bb07
+# ╟─22e76656-b9f4-463e-9bf8-bd383e92948b
+# ╟─338ee8e9-b786-48e1-b084-a0e8a6d12118
+# ╟─0e9435fc-3206-4249-b5ff-42cc35c98d47
+# ╟─88a2bd82-6663-48cc-a535-5b3e47d814a9
+# ╟─68141653-e444-4e29-bbec-4cd7359cb84c
 # ╟─3b2ca3c2-ada2-447f-818d-e3cc7c52facb
 # ╟─234d143c-d294-11ef-2663-d9753288a3a7
 # ╟─234d858e-d294-11ef-0db5-dbc27b2567a8

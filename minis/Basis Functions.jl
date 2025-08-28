@@ -1,10 +1,11 @@
 ### A Pluto.jl notebook ###
-# v0.20.14
+# v0.20.16
 
 #> [frontmatter]
-#> image = "https://i.imgur.com/azbCpRW.png"
-#> title = " Mini: Bayesian regression in 1D"
-#> description = "Simple demo of Bayesian linear regression with one-dimensional data"
+#> image = "https://i.imgur.com/0OtNLMd.png"
+#> language = "en-US"
+#> title = "Mini: Basis Functions"
+#> description = "Simple demo of basis functions, and the linear vector space they create."
 
 using Markdown
 using InteractiveUtils
@@ -21,71 +22,31 @@ macro bind(def, element)
     #! format: on
 end
 
-# ╔═╡ d336abb0-ab62-4596-baed-dc2ae608fe81
-using HypertextLiteral
-
 # ╔═╡ e497536d-ab0d-4e9c-be95-9e52777642f9
-using PlutoTeachingTools
+using BmlipTeachingTools
 
 # ╔═╡ fa6fc38e-5006-11f0-2421-4152864a7aae
-using Plots, Distributions, PlutoUI
+using Plots, Distributions
 
 # ╔═╡ 2a1c0dbe-6f7e-43ea-9914-27148e40a9e7
 using LinearAlgebra, Random
 
-# ╔═╡ 6eabe335-2291-4a56-8fe9-d73f65afd495
-md"""
-# Mini: Bayesian regression in 1D
-
-This mini demonstrates the core concepts of Bayesian linear regression with one-dimensional data.
-
-The challenge of this Mini is to find the **secret function** of unknown shape, given a small set of noisy observations.
-"""
-
-# ╔═╡ 84a26e26-0ac2-4d87-a216-30ef2b8f2ddc
-secret_function(x) = sin(x * 2π);
-
-# Or use one of these functions:
-# secret_function(x) = sign(0.4 - x);
-# secret_function(x) = x ^ 2;
-
-# ╔═╡ 7a5f0292-106e-4196-9c98-c7e63ef631bc
-TableOfContents()
-
-# ╔═╡ 166d4436-4b97-491f-9c03-6ded1adb302e
-md"""
-Let's generate some random observations from this function. You can change the **number of observations** and the **measurement noise**.
-"""
-
-# ╔═╡ 36cecff5-f37c-4967-b153-5394eb4a6056
-begin
-	N_bond = @bindname N Slider(1:150; show_value=true, default=13)
-end
-
-# ╔═╡ afac91b3-c37a-4a32-8121-efc017f05b86
-begin
-	σ_noise_bond = @bindname σ_data_noise Slider(0.0:0.01:0.2; default=0.12, show_value=true)
-end
-
-# ╔═╡ 5c5b86d1-aa16-4161-b75a-1534a7edd05e
-md"""
-Here is the randomly generated dataset:
-"""
+# ╔═╡ 853c3bde-566b-400f-aaab-158aac553582
+title("Mini: Basis Functions")
 
 # ╔═╡ 3a9f60a8-e4b6-4f0a-881e-ec6ce8098720
 md"""
-# Basis functions
 
-We will try to approximate our function use the [radial function](https://en.wikipedia.org/wiki/Radial_basis_function) basis. This means that we have a fixed set of basis functions, and we approximate our function as a linear combination of that basis.
+In the Regression lecture, we will try to approximate a function using the [radial function](https://en.wikipedia.org/wiki/Radial_basis_function) basis. This means that we have a fixed set of basis functions, and we approximate our function as a linear combination of that basis.
 
 Let's look at the individual basis functions first:
 """
 
 # ╔═╡ ca02a3dc-6251-4c6c-80ff-0782ae72a259
-σ_basis² = 0.01
+σ_basis² = 0.01;
 
 # ╔═╡ 2ec7d4f8-409d-4c38-9081-be7125afa715
-μ_basis = range(0.0, 1.0; length=10)
+μ_basis = range(0.0, 1.0; length=10);
 
 # ╔═╡ 4906d7e7-92c4-48c4-a2a9-fe663f948823
 ϕ(μ, x) = exp(-(x - μ)^2 / σ_basis²)
@@ -96,6 +57,11 @@ highlighted_basis_index = length(μ_basis) ÷ 2
 # ╔═╡ 7713d556-f056-42f4-8e12-98bcb62b5293
 md"""
 Here are the $(length(μ_basis)) basic functions in one graph. The $(highlighted_basis_index)th basis is highlighted.
+"""
+
+# ╔═╡ 9fe1d66c-fd05-46ee-b777-4abea9a78397
+md"""
+> _What would a linear combination of these **functions** look like?_
 """
 
 # ╔═╡ d4e5acbd-fdc3-4da1-8f1c-d7bca2443c9c
@@ -236,27 +202,7 @@ w
 # ╔═╡ f16d06fe-2e9a-490d-a120-e47a45cae889
 md"""
 # Bayesian Inference
-So how do we find these weights _automatically_ to model a set of observations, and how sure are we about the result?
-"""
-
-# ╔═╡ d3caaa98-aca0-4199-9f4f-6a435ec52649
-md"""
-We also have a _prior_ for the weights: ``\mathcal{N}(0,σ_{prior}^2)``. You can control this parameter:
-"""
-
-# ╔═╡ f894f9b3-ba9d-487b-8596-1b8c4826f1d1
-	@bindname σ_prior² Slider([(2.0 .^ (-14:2))..., 1e10]; show_value=true, default=0.5)
-
-
-# ╔═╡ ca6acc39-af25-4de8-b19f-4302d574e8b4
-
-
-# ╔═╡ c3a28b48-fc19-495a-98d5-1bd3d327eb73
-md"""
-
-# Further reading
-
-You can read the full lecture here:
+So how do we **find these weights _automatically_** to model a set of observations, and how sure are we about the result? You can read the full lecture here:
 """
 
 # ╔═╡ dcfc2adb-6f11-472f-b291-2099856391e1
@@ -270,18 +216,12 @@ md"""
 # ╔═╡ 4bb83eaf-dafe-4476-aef9-a707f480f1d7
 const Layout = PlutoUI.ExperimentalLayout
 
-# ╔═╡ db0bdb31-764c-4f50-820e-5439516550f0
-Layout.vbox([
-	N_bond,
-	σ_noise_bond, 
-])
-
 # ╔═╡ 494071d2-5130-4388-b598-f3339d5c89e1
 baseplot(args...; kwargs...) = plot(args...; size=(650,400), xlim=(-0.0, 1.0), ylim=(-1.2,1.2), kwargs...)
 
 # ╔═╡ 12a77bed-2ed3-4e3d-ab1c-b94852a783b4
 let
-	baseplot(; ylim=(0,1), legend=false)
+	baseplot(;  legend=false)
 
 	for (i,μ) in enumerate(μ_basis)
 		higlight = i == highlighted_basis_index
@@ -309,104 +249,31 @@ let
 	plot!(x -> f(w, x); color="black", lw=3, label="linear combination")
 end
 
-# ╔═╡ d72ec1a6-3eb5-4f0e-9d34-e8ab0b728221
-function plot_data!(D)
-	plot!(; legend=:bottomleft)
-	plot!(secret_function;
-		  label="True function",
-		  color=3,
-		  lw=3,
-			linestyle=:dash,
-		 )
-	scatter!(
-		D; 
-		label="Observations",
-		color=1,
-		# markerstrokewidth=0,
-	)
-end
-
 # ╔═╡ 300fe006-24a6-4134-bf91-d5fb6cb72f2e
 const deterministic_randomness = MersenneTwister
-
-# ╔═╡ 2037adc1-0acd-4fed-afcd-deb285792dce
-σ_data_noise² = σ_data_noise^2
-
-# ╔═╡ 73830436-9b92-41e3-a3ab-d6b2a2b7a573
-D = let
-	xs = rand(deterministic_randomness(19), Uniform(0,1), N)
-
-	ys_exact = secret_function.(xs)
-	ys = ys_exact .+ rand(deterministic_randomness(37), MvNormal(zeros(N), σ_data_noise²*I))
-
-	collect(zip(xs, ys))
-end
-
-# ╔═╡ 6e0d58fa-6f05-4e14-8f98-c3c5a2e06b32
-let
-	baseplot()
-	plot_data!(D)
-end
-
-# ╔═╡ 263a5ef6-0819-4a9f-b9e1-73371c4bfaeb
-# Design matrix
-Φ = [
-	ϕ(μ, datum[1])
-	for datum in D, μ in μ_basis
-];
-
-# ╔═╡ 73d0cff6-614d-4467-b16d-19f6c4667104
-weights_posterior = MvNormalCanon(
-	# Posterior potential vector
-	Φ' * last.(D) / σ_data_noise²,
-	# Posterior precision matrix (inverse covariance)
-	Φ' * Φ / σ_data_noise² + I / σ_prior²
-)
-
-# ╔═╡ 2f504df9-e594-45ba-8450-d3c4144a8515
-let
-	baseplot()
-	if true
-		for i in 1:40
-			w = rand(weights_posterior)
-			plot!(
-				x -> f(w, x);
-				opacity=.3, 
-				color=2, 
-				label=i==1 ? "Posterior samples" : nothing,
-			)
-		end
-	end
-
-	plot_data!(D)
-end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
-HypertextLiteral = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-PlutoTeachingTools = "661c6b06-c737-4d37-b85c-46df65de6f69"
-PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
+BmlipTeachingTools = "~1.2.1"
 Distributions = "~0.25.120"
-HypertextLiteral = "~0.9.5"
 Plots = "~1.40.14"
-PlutoTeachingTools = "~0.4.1"
-PlutoUI = "~0.7.65"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.10"
+julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "40758e3e0dd4dc48e7ed8e18028698943d573cfb"
+project_hash = "83c94ef0cba83d916c80a8523c1f39caa67d5ecf"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -422,18 +289,26 @@ version = "1.1.3"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
-version = "1.1.1"
+version = "1.1.2"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
+version = "1.11.0"
 
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+version = "1.11.0"
 
 [[deps.BitFlags]]
 git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
 uuid = "d1d4a3ce-64b1-5f1a-9ba4-7e7e69966f35"
 version = "0.1.9"
+
+[[deps.BmlipTeachingTools]]
+deps = ["HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoTeachingTools", "PlutoUI", "Reexport"]
+git-tree-sha1 = "65337543996a6be4383f92aed118716dcafa6b0d"
+uuid = "656a7065-6f73-6c65-7465-6e646e617262"
+version = "1.2.1"
 
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -464,12 +339,10 @@ deps = ["FixedPointNumbers", "Random"]
 git-tree-sha1 = "67e11ee83a43eb71ddc950302c53bf33f0690dfe"
 uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 version = "0.12.1"
+weakdeps = ["StyledStrings"]
 
     [deps.ColorTypes.extensions]
     StyledStringsExt = "StyledStrings"
-
-    [deps.ColorTypes.weakdeps]
-    StyledStrings = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
 
 [[deps.ColorVectorSpace]]
 deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "Requires", "Statistics", "TensorCore"]
@@ -527,6 +400,7 @@ version = "0.18.22"
 [[deps.Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+version = "1.11.0"
 
 [[deps.Dbus_jll]]
 deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl"]
@@ -598,6 +472,7 @@ version = "4.4.4+1"
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+version = "1.11.0"
 
 [[deps.FillArrays]]
 deps = ["LinearAlgebra"]
@@ -720,6 +595,7 @@ version = "0.2.5"
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+version = "1.11.0"
 
 [[deps.IrrationalConstants]]
 git-tree-sha1 = "e2222959fbc6c19554dc15174c81bf7bf3aa691c"
@@ -805,16 +681,17 @@ version = "0.6.4"
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "8.4.0+0"
+version = "8.6.0+0"
 
 [[deps.LibGit2]]
 deps = ["Base64", "LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
+version = "1.11.0"
 
 [[deps.LibGit2_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll"]
 uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
-version = "1.6.4+0"
+version = "1.7.2+0"
 
 [[deps.LibSSH2_jll]]
 deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
@@ -823,6 +700,7 @@ version = "1.11.0+1"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+version = "1.11.0"
 
 [[deps.Libffi_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -863,6 +741,7 @@ version = "2.41.0+0"
 [[deps.LinearAlgebra]]
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+version = "1.11.0"
 
 [[deps.LogExpFunctions]]
 deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
@@ -882,6 +761,7 @@ version = "0.3.29"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+version = "1.11.0"
 
 [[deps.LoggingExtras]]
 deps = ["Dates", "Logging"]
@@ -902,6 +782,7 @@ version = "0.5.16"
 [[deps.Markdown]]
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+version = "1.11.0"
 
 [[deps.MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
@@ -912,7 +793,7 @@ version = "1.1.9"
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
-version = "2.28.2+1"
+version = "2.28.6+0"
 
 [[deps.Measures]]
 git-tree-sha1 = "c13304c81eec1ed3af7fc20e75fb6b26092a1102"
@@ -927,10 +808,11 @@ version = "1.2.0"
 
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+version = "1.11.0"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
-version = "2023.1.10"
+version = "2023.12.12"
 
 [[deps.NaNMath]]
 deps = ["OpenLibm_jll"]
@@ -951,7 +833,7 @@ version = "1.3.5+1"
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
-version = "0.3.23+4"
+version = "0.3.27+1"
 
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -1017,9 +899,13 @@ uuid = "30392449-352a-5448-841d-b1acce4e97dc"
 version = "0.44.2+0"
 
 [[deps.Pkg]]
-deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
+deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-version = "1.10.0"
+version = "1.11.0"
+weakdeps = ["REPL"]
+
+    [deps.Pkg.extensions]
+    REPLExt = "REPL"
 
 [[deps.PlotThemes]]
 deps = ["PlotUtils", "Statistics"]
@@ -1055,15 +941,15 @@ version = "1.40.14"
 
 [[deps.PlutoTeachingTools]]
 deps = ["Downloads", "HypertextLiteral", "Latexify", "Markdown", "PlutoUI"]
-git-tree-sha1 = "537c439831c0f8d37265efe850ee5c0d9c7efbe4"
+git-tree-sha1 = "85778cdf2bed372008e6646c64340460764a5b85"
 uuid = "661c6b06-c737-4d37-b85c-46df65de6f69"
-version = "0.4.1"
+version = "0.4.5"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "3151a0c8061cc3f887019beebf359e6c4b3daa08"
+git-tree-sha1 = "8329a3a4f75e178c11c1ce2342778bcbbbfa7e3c"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.65"
+version = "0.7.71"
 
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
@@ -1080,6 +966,7 @@ version = "1.4.3"
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+version = "1.11.0"
 
 [[deps.PtrArrays]]
 git-tree-sha1 = "1d36ef11a9aaf1e8b74dacc6a731dd1de8fd493d"
@@ -1123,12 +1010,14 @@ version = "2.11.2"
     Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 
 [[deps.REPL]]
-deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
+deps = ["InteractiveUtils", "Markdown", "Sockets", "StyledStrings", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+version = "1.11.0"
 
 [[deps.Random]]
 deps = ["SHA"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+version = "1.11.0"
 
 [[deps.RecipesBase]]
 deps = ["PrecompileTools"]
@@ -1183,6 +1072,7 @@ version = "1.3.0"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+version = "1.11.0"
 
 [[deps.Showoff]]
 deps = ["Dates", "Grisu"]
@@ -1197,6 +1087,7 @@ version = "1.2.0"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
+version = "1.11.0"
 
 [[deps.SortingAlgorithms]]
 deps = ["DataStructures"]
@@ -1207,7 +1098,7 @@ version = "1.2.1"
 [[deps.SparseArrays]]
 deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-version = "1.10.0"
+version = "1.11.0"
 
 [[deps.SpecialFunctions]]
 deps = ["IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
@@ -1228,9 +1119,14 @@ uuid = "860ef19b-820b-49d6-a774-d7a799459cd3"
 version = "1.0.3"
 
 [[deps.Statistics]]
-deps = ["LinearAlgebra", "SparseArrays"]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "ae3bb1eb3bba077cd276bc5cfc337cc65c3075c0"
 uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-version = "1.10.0"
+version = "1.11.1"
+weakdeps = ["SparseArrays"]
+
+    [deps.Statistics.extensions]
+    SparseArraysExt = ["SparseArrays"]
 
 [[deps.StatsAPI]]
 deps = ["LinearAlgebra"]
@@ -1258,6 +1154,10 @@ version = "1.5.0"
     ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
     InverseFunctions = "3587e190-3f89-42d0-90ee-14403ec27112"
 
+[[deps.StyledStrings]]
+uuid = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
+version = "1.11.0"
+
 [[deps.SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
 uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
@@ -1265,7 +1165,7 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
-version = "7.2.1+1"
+version = "7.7.0+0"
 
 [[deps.TOML]]
 deps = ["Dates"]
@@ -1286,6 +1186,7 @@ version = "0.1.1"
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+version = "1.11.0"
 
 [[deps.TranscodingStreams]]
 git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
@@ -1293,9 +1194,9 @@ uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 version = "0.11.3"
 
 [[deps.Tricks]]
-git-tree-sha1 = "6cae795a5a9313bbb4f60683f7263318fc7d1505"
+git-tree-sha1 = "372b90fe551c019541fafc6ff034199dc19c8436"
 uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
-version = "0.1.10"
+version = "0.1.12"
 
 [[deps.URIs]]
 git-tree-sha1 = "24c1c558881564e2217dcf7840a8b2e10caeb0f9"
@@ -1305,9 +1206,11 @@ version = "1.6.0"
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+version = "1.11.0"
 
 [[deps.Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+version = "1.11.0"
 
 [[deps.UnicodeFun]]
 deps = ["REPL"]
@@ -1597,7 +1500,7 @@ version = "1.1.7+0"
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
-version = "1.52.0+1"
+version = "1.59.0+0"
 
 [[deps.p7zip_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -1624,15 +1527,7 @@ version = "1.8.1+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─6eabe335-2291-4a56-8fe9-d73f65afd495
-# ╠═84a26e26-0ac2-4d87-a216-30ef2b8f2ddc
-# ╟─7a5f0292-106e-4196-9c98-c7e63ef631bc
-# ╟─166d4436-4b97-491f-9c03-6ded1adb302e
-# ╟─36cecff5-f37c-4967-b153-5394eb4a6056
-# ╟─afac91b3-c37a-4a32-8121-efc017f05b86
-# ╟─5c5b86d1-aa16-4161-b75a-1534a7edd05e
-# ╟─73830436-9b92-41e3-a3ab-d6b2a2b7a573
-# ╠═6e0d58fa-6f05-4e14-8f98-c3c5a2e06b32
+# ╟─853c3bde-566b-400f-aaab-158aac553582
 # ╟─3a9f60a8-e4b6-4f0a-881e-ec6ce8098720
 # ╠═ca02a3dc-6251-4c6c-80ff-0782ae72a259
 # ╠═2ec7d4f8-409d-4c38-9081-be7125afa715
@@ -1640,6 +1535,7 @@ version = "1.8.1+0"
 # ╟─7713d556-f056-42f4-8e12-98bcb62b5293
 # ╟─12a77bed-2ed3-4e3d-ab1c-b94852a783b4
 # ╟─02409d93-5b09-4395-9086-60de8d7adadd
+# ╟─9fe1d66c-fd05-46ee-b777-4abea9a78397
 # ╟─d4e5acbd-fdc3-4da1-8f1c-d7bca2443c9c
 # ╠═8584b1dc-a087-4898-9962-80e40ee9efff
 # ╟─a5159da7-9951-494a-8112-16647ce1c076
@@ -1653,24 +1549,13 @@ version = "1.8.1+0"
 # ╟─d07b0443-1901-4f15-996e-61ccc9905046
 # ╟─bd43e34b-18f3-42ca-ad73-fb7c47852001
 # ╟─f16d06fe-2e9a-490d-a120-e47a45cae889
-# ╟─db0bdb31-764c-4f50-820e-5439516550f0
-# ╟─2f504df9-e594-45ba-8450-d3c4144a8515
-# ╟─d3caaa98-aca0-4199-9f4f-6a435ec52649
-# ╟─f894f9b3-ba9d-487b-8596-1b8c4826f1d1
-# ╟─ca6acc39-af25-4de8-b19f-4302d574e8b4
-# ╠═263a5ef6-0819-4a9f-b9e1-73371c4bfaeb
-# ╠═73d0cff6-614d-4467-b16d-19f6c4667104
-# ╟─c3a28b48-fc19-495a-98d5-1bd3d327eb73
 # ╟─dcfc2adb-6f11-472f-b291-2099856391e1
 # ╟─7049ee1c-cdae-473f-a3ef-339bde7f0ee9
-# ╠═d336abb0-ab62-4596-baed-dc2ae608fe81
 # ╠═e497536d-ab0d-4e9c-be95-9e52777642f9
 # ╠═fa6fc38e-5006-11f0-2421-4152864a7aae
 # ╠═2a1c0dbe-6f7e-43ea-9914-27148e40a9e7
 # ╟─4bb83eaf-dafe-4476-aef9-a707f480f1d7
 # ╟─494071d2-5130-4388-b598-f3339d5c89e1
-# ╟─d72ec1a6-3eb5-4f0e-9d34-e8ab0b728221
 # ╟─300fe006-24a6-4134-bf91-d5fb6cb72f2e
-# ╟─2037adc1-0acd-4fed-afcd-deb285792dce
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
