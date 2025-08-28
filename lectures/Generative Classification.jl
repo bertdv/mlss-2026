@@ -32,6 +32,12 @@ using Random
 # ╔═╡ f1575443-c9fb-4674-bbce-bf3a5a6d5a8d
 using Plots, Distributions
 
+# ╔═╡ 26853cdc-0644-4f44-b6db-b5624a4a8689
+using MarkdownLiteral: @mdx
+
+# ╔═╡ 50cbe27e-009f-4df1-b80a-cf1e73fc525e
+using LaTeXStrings
+
 # ╔═╡ 23c689fc-d294-11ef-086e-47c4f871bed2
 title("Generative Classification")
 
@@ -64,6 +70,17 @@ challenge_statement("Apple or Peach?" , color= "red" )
 begin
 	N_bond = @bindname N Slider(1:250; show_value=true, default=50)
 end
+
+# ╔═╡ f63b65b9-86c8-420b-b2d5-28268782f155
+md"""
+In the scatter plot, the two features are represented along the two ``x``-coordinates, while the fruit label ``y \in \{\text{apple}, \text{peach}\}`` is encoded by the marker style.
+
+"""
+
+# ╔═╡ 70a620bc-47c7-46c4-870b-22b3e05039a1
+md"""
+The features are stored in two matrices, corresponding to the two classes:
+"""
 
 # ╔═╡ 5730758d-80cd-4d95-b16c-399c38cf585b
 md"""
@@ -392,28 +409,37 @@ Because the quadratic term ``x_\bullet^T \hat{\Sigma}_k^{-1} x_\bullet`` is now 
 """	)
 
 # ╔═╡ 1a890e4b-b8a9-4a6e-b1f3-17863e1416d7
-challenge_solution("Apple or Peach", header_level=2, color="green")
+challenge_solution("Apple or Peach", header_level=1, color="green")
 
 # ╔═╡ 4481b38d-dc67-4c1f-ac0b-b348f0aea461
 md"""
 #### Multinomial (in this case binomial) density estimation
+
+We can fit a Bernouilly distribution to [`y` (see definition)](#y), this is simple:
 """
 
 # ╔═╡ 5092090d-cfac-4ced-b61e-fb7107a4c638
 md"""
-#### Estimate class-conditional multivariate Gaussian densities
+#### Estimate class-conditional distributions
+Now, for each class, we fit a Gaussian distribution to the data of that class:
 """
 
-# ╔═╡ 90b862a5-d5bc-4122-a942-f01062daa86a
+# ╔═╡ 3228f074-7c1d-420a-bfb0-c3bd693003ad
 md"""
-#### Posterior class probability of ``x_∙`` (prediction)
+Our model assumes that both distributions have the same covariance matrix. We get this in practice by taking the weighted average of the two:
 """
 
-# ╔═╡ 3791ac2a-8dc2-4d9a-8310-beae13d5a694
+# ╔═╡ e91effb4-b3ac-4d7a-b93f-33a78a125110
 md"""
-#### Discrimination boundary of the posterior 
-Given by the condition ``p(apple|x;D) = p(peach|x;D) = 0.5``
+
+We now have class-conditional Gaussian distributions for each class:
 """
+
+# ╔═╡ 689ea1f9-0a72-478e-b8a9-ebf450ce95ef
+N_bond
+
+# ╔═╡ 845f19c4-c3c5-4368-a48a-a7b57687ddf9
+N_bond
 
 # ╔═╡ 21602809-d98b-43d7-8c41-80dc8de6da57
 md"""
@@ -433,26 +459,26 @@ The following answer was provided:
 
 If you are only interested in approximating a function, and you have lots of examples of desired behavior, then often a non-probabilistic DNN is a fine approach. However, if you are willing to formulate your models in a probabilistic framework, you can frequently improve on the deterministic approach in many ways. We list a few below:
 
-1.	Bayesian Evidence as a Performance Metric
+1.	**Bayesian Evidence as a Performance Metric**
   - Model performance is evaluated using the evidence ``p(D|m)`` for a model, which inherently balances fit and complexity. This enables the use of the entire dataset for learning: there is no need for arbitrary splits into training and test sets.
 
-2.	Parameter Uncertainty Enables Active Learning
+2.	**Parameter Uncertainty Enables Active Learning**
   - By maintaining uncertainty over model parameters, Bayesian models support active learning, i.e., the selection of data points that are expected to be most informative (See the [lesson on intelligent agents](https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html)). This allows learning from smaller datasets, unlike deterministic deep networks, which often require massive amounts of labeled data.
 
-3.	Predictions with Confidence Bounds
+3.	**Predictions with Confidence Bounds**
   - Bayesian models naturally yield predictive distributions, enabling uncertainty quantification (e.g., confidence intervals) around predictions.
 
-4.	Explicit and Modular Assumptions
+4.	**Explicit and Modular Assumptions**
   - Priors, likelihoods, and structural assumptions are explicitly specified and can be independently modified, promoting transparency and model modularity.
 
-5.	Unified Treatment of Accuracy and Complexity
+5.	**Unified Treatment of Accuracy and Complexity**
   - Both data fit and model complexity are scored in the same probabilistic units. In contrast, how would you penalize overparameterized architectures (e.g., deep networks) in a deterministic framework?
 
-6.	Data-Dependent, Optimal Learning Rates
+6.	**Data-Dependent, Optimal Learning Rates**
   - Learning rates emerge naturally from Bayesian updates. Contrast this with the trial-and-error tuning needed in standard optimization.
   - Example: The Kalman gain is an optimal learning rate based on current uncertainty.
 
-7.	Principled Knowledge Transfer
+7.	**Principled Knowledge Transfer**
   - Bayesian inference enables posterior-to-prior propagation: results from one experiment (posterior) can inform the next (as a prior). This provides a principled mechanism for sequential learning and integration of heterogeneous information sources.
 
 
@@ -631,17 +657,17 @@ Our data is structured as follows:
 # ╔═╡ 3842654e-6dd7-427c-bb77-8b35a2f324fb
 const Σ_secret = [0.2 0.1; 0.1 0.3];
 
-# ╔═╡ 156d7866-00e1-47d8-ac38-52d72158f4d8
-y = let
-		p_apple = 0.7
-		y = rand(MersenneTwister(23), Bernoulli(p_apple), N)
-    end
+# ╔═╡ c91ed138-9885-43ce-a00e-1ba6e996f1aa
+const p_apple_secret = Bernoulli(0.7);
 
-# ╔═╡ 1c67b796-fd70-4e0c-9027-d69eaf295419
-y
+# ╔═╡ 841ddfc8-85e0-47ee-9288-2d90a84a5dc3
+y = rand(MersenneTwister(23), p_apple_secret, N)
+
+# ╔═╡ fedb7530-6fce-496c-a55a-3e9908f9711a
+y .|> Int |> join
 
 # ╔═╡ cc8144d9-9ecf-4cbd-aea9-0c7a2fca2d94
-p_apple_est = sum(y) / length(y)
+p_apple_est = sum(y) / length(y) # or: p_apple_est = fit_mle(Bernoulli, y).p
 
 # ╔═╡ 19360d53-93d8-46fe-82d5-357015e75e22
 π_hat = [p_apple_est; 1-p_apple_est]
@@ -661,10 +687,13 @@ X = let
 			X[:,n] = rand(rng, y[n] ? p_given_apple : p_given_peach)
 		end # for
 	    X
-	end
+	end;
 
 # ╔═╡ 24d3c1f4-432f-419f-8854-69d8bfc135f8
-X_apples, X_peaches =  X[:,findall(y)]', X[:,findall(.!y)]'
+X_apples, X_peaches = collect(X[:,findall(y)]'), collect(X[:,findall(.!y)]');
+
+# ╔═╡ cff683bf-0488-41d2-9858-cf8776a48992
+X_apples, X_peaches
 
 # ╔═╡ 10bfb9ea-46a6-4f4d-980e-ed2afce7b39a
 d1 = fit_mle(FullNormal, X_apples')  # MLE density estimation d1 = N(μ₁, Σ₁)
@@ -682,54 +711,65 @@ conditionals = [
 ] # p(x|C)
 
 # ╔═╡ 33d5d6e7-1208-4c5b-b651-429b3b6ad50b
-function predict_class(k, X) # calculate p(Ck|X)
-    norm = π_hat[1]*pdf(conditionals[1],X) + π_hat[2]*pdf(conditionals[2],X)
-    return π_hat[k]*pdf(conditionals[k], X) ./ norm
+# calculate p(C_k | point)
+function predict_class(k::Int64, point::Vector{<:Real})::Real 
+	norm = 
+		π_hat[1]*pdf(conditionals[1],point) + 
+		π_hat[2]*pdf(conditionals[2],point)
+	
+	return π_hat[k]*pdf(conditionals[k], point) ./ norm
 end
-
-# ╔═╡ b06c93fa-3439-4ed1-84ed-befc1ab7e40b
-β(k) = inv(Σ)*mean(conditionals[k]);
-
-# ╔═╡ 8610196d-2e0b-4a7f-96b2-2ca09078ffd6
-γ(k) = -0.5 * mean(conditionals[k])' * inv(Σ) * mean(conditionals[k]) + 
-		log(π_hat[k]);
-
-# ╔═╡ 25002ffd-79c9-44bf-85d8-28c87df6c9df
-function discriminant_x2(x1::Real)
-    # Solve discriminant equation for x2
-    β12 = β(1) .- β(2)
-    γ12 = (γ(1) .- γ(2))[1,1]
-    return -(β12[1]*x1 + γ12) / β12[2]
-end;
 
 # ╔═╡ d9efe8bb-c32c-40f4-89d9-8ace7a0665ba
 x_test = [2.3; 1.5] # Features of 'new' data point
 
+# ╔═╡ bf39f423-7df3-4990-a254-c28a1bdf23bf
+x_test
+
+# ╔═╡ 723e09fc-ec63-4c47-844c-d821515ce0f4
+@mdx("``p(\\text{apple}|x=x_∙) = $(round(predict_class(1,x_test), digits=3))``")
+
+# ╔═╡ ffa01b68-c3ba-4509-8df6-00596974be0f
+const plot_lims = (
+	xlim=(-.3, 3.1), ylim=(-.4, 4.1),
+)
+
 # ╔═╡ 69732524-90fd-46f4-9706-c07ce6226d2b
 let
 	# plot training data
-	scatter(X_apples[:,1], X_apples[:,2], label="apples", marker=:x, markerstrokewidth=3)
-	scatter!(X_peaches[:,1], X_peaches[:,2], label="peaches", marker=:+,  markerstrokewidth=3)
-	plot!(; xlim=(-0.5, 2.5), ylim=(-0.5, 3.5))
+	scatter(X_apples[:,1], X_apples[:,2], label="apple", marker=:x, markerstrokewidth=3)
+	scatter!(X_peaches[:,1], X_peaches[:,2], label="peach", marker=:+,  markerstrokewidth=3)
+	plot!(; plot_lims..., legend=:topleft)
 
 	# plot test point
 	scatter!([x_test[1]], [x_test[2]], label="unknown", c=:yellow, ms=9)
 end # let
 
-# ╔═╡ 723e09fc-ec63-4c47-844c-d821515ce0f4
-@debug("p(apple|x=x∙) = $(predict_class(1,x_test))")
-
-# ╔═╡ d5a342ff-6c5c-45af-affb-baf66ac7a7c1
+# ╔═╡ 36e6b874-a1b8-40d7-8762-f0c5f9121e40
 let
-	scatter(X_apples[:,1], X_apples[:,2], label="apples", marker=:x, markerstrokewidth=3)
-	scatter!(X_peaches[:,1], X_peaches[:,2], label="peaches", marker=:+,  markerstrokewidth=3)
+	plot(; plot_lims..., legend=:topleft)
+	scatter!(X_apples[:,1], X_apples[:,2], label="apple", marker=:x, markerstrokewidth=3)
+	scatter!(X_peaches[:,1], X_peaches[:,2], label="peach", marker=:+,  markerstrokewidth=3)
 	scatter!([x_test[1]], [x_test[2]], label="unknown", color="yellow") # 'new' unlabelled data point
 
-	# Discrimination boundary
-	x1 = range(-1,length=10,stop=3)
-	plot!(x1, discriminant_x2, color="black", label="")
-	plot!(x1, discriminant_x2, fillrange=-10, alpha=0.2, color=:blue, label="")
-	plot!(x1, discriminant_x2, fillrange=10, alpha=0.2, color=:red, xlims=(-0.5, 3), ylims=(-1, 4), label="")
+	x = y = range(-1, stop = 5, length = 40)
+	for distr in conditionals
+		contour!(x, y, (x, y) -> pdf(distr, [x,y]); opacity=.4, color=cgrad(:grays, rev=true))
+	end
+	plot!()
+end
+
+# ╔═╡ 4ada77d1-09f2-49c7-a44f-1928e0dc5421
+let
+	plot(; plot_lims..., legend=:topleft, title=L"p(apple | x)")
+	scatter!(X_apples[:,1], X_apples[:,2], label="apple", marker=:x, markerstrokewidth=3)
+	scatter!(X_peaches[:,1], X_peaches[:,2], label="peach", marker=:+,  markerstrokewidth=3)
+	scatter!([x_test[1]], [x_test[2]], label="unknown", color="yellow") # 'new' unlabelled data point
+
+	x = range(plot_lims.xlim..., length=60)
+	y = range(plot_lims.ylim..., length=60)
+	heatmap!(x, y, (x, y) -> predict_class(1, [x,y]); opacity=.4, color=cgrad(:bluesreds, rev=true))
+	plot!()
 end
 
 # ╔═╡ c79525b1-7b44-4585-8292-84abe20a1a3d
@@ -742,11 +782,30 @@ unknown_marker = @htl """ <svg style="vertical-align: -.15em;" xmlns="http://www
   <circle cx="12" cy="12" r="10" fill="#ffff00" stroke="#000" stroke-width="2"/>
 </svg> """
 
+# ╔═╡ fe324e92-d753-46cd-aad9-794a76dc806b
+md"""
+
+You are also given a test fruit $unknown_marker, which has known feature values but an **unknown fruit label**.
+
+"""
+
 # ╔═╡ a985e1d3-4867-4991-a60e-e85a9730311b
 apple_marker = @htl """<svg style="vertical-align: -.15em;" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
   <line x1="2" y1="2" x2="14" y2="14" stroke="#009af9" stroke-width="3" />
   <line x1="14" y1="2" x2="2" y2="14" stroke="#009af9" stroke-width="3" />
 </svg>"""
+
+# ╔═╡ 90b862a5-d5bc-4122-a942-f01062daa86a
+md"""
+#### Posterior class probability of ``x_∙`` (prediction)
+
+Now we can answer the question from the challenge, and calculate the probability that ``x_∙`` is an apple $apple_marker.
+"""
+
+# ╔═╡ 9973e8e5-4744-4ff6-9494-1c93503f11c1
+md"""
+We can use this function on every point of the plot, to draw a heatmap of apple $apple_marker probability:
+"""
 
 # ╔═╡ e8cbfc78-04dd-4196-8011-90283969e5b1
 peach_marker = @htl """<svg style="vertical-align: -.15em;" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
@@ -762,11 +821,8 @@ You're given the numerical values for two features (let's say, _sugar content_ a
 Generate this data yourself by selecting the total number of fruits with the slider:
 """
 
-# ╔═╡ e774041a-672d-40f3-ac8f-fc5dbf1bfc59
+# ╔═╡ 77280f3b-e391-482f-936f-703d1d3c4006
 md"""
-In the scatter plot, the two features are represented along the two ``x``-coordinates, while the fruit label ``y \in \{\text{apple}, \text{peach}\}`` is encoded by the marker style.
-
-You are also given a test fruit $unknown_marker, which has known feature values but an **unknown fruit label**.
 
 ##### Problem
 
@@ -789,12 +845,16 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+MarkdownLiteral = "736d6165-7244-6769-4267-6b50796e6954"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
 BmlipTeachingTools = "~1.1.0"
 Distributions = "~0.25.120"
+LaTeXStrings = "~1.4.0"
+MarkdownLiteral = "~0.1.2"
 Plots = "~1.40.18"
 """
 
@@ -804,7 +864,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "2b1dacbedc2f54a3470343559415575c67cedefc"
+project_hash = "737975aa4d2ac53dac1846baf435d33a03b3ea26"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -890,6 +950,12 @@ deps = ["ColorTypes", "FixedPointNumbers", "Reexport"]
 git-tree-sha1 = "37ea44092930b1811e666c3bc38065d7d87fcc74"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
 version = "0.13.1"
+
+[[deps.CommonMark]]
+deps = ["PrecompileTools"]
+git-tree-sha1 = "351d6f4eaf273b753001b2de4dffb8279b100769"
+uuid = "a80b9123-70ca-4bc0-993e-6e3bcb318db6"
+version = "0.9.1"
 
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -1304,6 +1370,12 @@ version = "0.5.16"
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 version = "1.11.0"
+
+[[deps.MarkdownLiteral]]
+deps = ["CommonMark", "HypertextLiteral"]
+git-tree-sha1 = "f7d73634acd573bf3489df1ee0d270a5d6d3a7a3"
+uuid = "736d6165-7244-6769-4267-6b50796e6954"
+version = "0.1.2"
 
 [[deps.MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
@@ -2043,7 +2115,14 @@ version = "1.9.2+0"
 # ╟─51a46b5e-0c35-4841-a4f3-413d5d294805
 # ╟─876f47d8-b272-4e23-b5ec-5c7d615ff618
 # ╟─69732524-90fd-46f4-9706-c07ce6226d2b
-# ╟─e774041a-672d-40f3-ac8f-fc5dbf1bfc59
+# ╟─f63b65b9-86c8-420b-b2d5-28268782f155
+# ╟─841ddfc8-85e0-47ee-9288-2d90a84a5dc3
+# ╠═fedb7530-6fce-496c-a55a-3e9908f9711a
+# ╟─70a620bc-47c7-46c4-870b-22b3e05039a1
+# ╠═cff683bf-0488-41d2-9858-cf8776a48992
+# ╟─fe324e92-d753-46cd-aad9-794a76dc806b
+# ╠═bf39f423-7df3-4990-a254-c28a1bdf23bf
+# ╟─77280f3b-e391-482f-936f-703d1d3c4006
 # ╟─5730758d-80cd-4d95-b16c-399c38cf585b
 # ╟─23c73302-d294-11ef-0c12-571686b202a9
 # ╟─23c73b54-d294-11ef-0ef8-8d9159139a1b
@@ -2074,22 +2153,23 @@ version = "1.9.2+0"
 # ╟─1a890e4b-b8a9-4a6e-b1f3-17863e1416d7
 # ╟─23c82e10-d294-11ef-286a-ff6fee0f2805
 # ╟─4481b38d-dc67-4c1f-ac0b-b348f0aea461
-# ╠═1c67b796-fd70-4e0c-9027-d69eaf295419
 # ╠═cc8144d9-9ecf-4cbd-aea9-0c7a2fca2d94
 # ╠═19360d53-93d8-46fe-82d5-357015e75e22
-# ╟─5092090d-cfac-4ced-b61e-fb7107a4c638
+# ╠═5092090d-cfac-4ced-b61e-fb7107a4c638
 # ╠═10bfb9ea-46a6-4f4d-980e-ed2afce7b39a
 # ╠═cd310392-aabd-40e0-b06f-f8297c7eed6f
+# ╟─3228f074-7c1d-420a-bfb0-c3bd693003ad
 # ╠═ba9fa93f-093c-4783-988f-27f4ba228e88
 # ╠═46d2d5e9-bb6b-409a-acdc-cdffd1a6f797
+# ╟─e91effb4-b3ac-4d7a-b93f-33a78a125110
+# ╟─36e6b874-a1b8-40d7-8762-f0c5f9121e40
+# ╟─689ea1f9-0a72-478e-b8a9-ebf450ce95ef
 # ╟─90b862a5-d5bc-4122-a942-f01062daa86a
 # ╠═33d5d6e7-1208-4c5b-b651-429b3b6ad50b
-# ╠═723e09fc-ec63-4c47-844c-d821515ce0f4
-# ╟─3791ac2a-8dc2-4d9a-8310-beae13d5a694
-# ╠═b06c93fa-3439-4ed1-84ed-befc1ab7e40b
-# ╠═8610196d-2e0b-4a7f-96b2-2ca09078ffd6
-# ╠═25002ffd-79c9-44bf-85d8-28c87df6c9df
-# ╟─d5a342ff-6c5c-45af-affb-baf66ac7a7c1
+# ╟─723e09fc-ec63-4c47-844c-d821515ce0f4
+# ╟─9973e8e5-4744-4ff6-9494-1c93503f11c1
+# ╟─4ada77d1-09f2-49c7-a44f-1928e0dc5421
+# ╟─845f19c4-c3c5-4368-a48a-a7b57687ddf9
 # ╟─21602809-d98b-43d7-8c41-80dc8de6da57
 # ╟─23c85d90-d294-11ef-375e-7101d4d3cbfa
 # ╟─23c8698e-d294-11ef-2ae8-83bebd89d6c0
@@ -2105,13 +2185,16 @@ version = "1.9.2+0"
 # ╠═f1a40378-a27c-4aa0-a62c-600ffde0032f
 # ╠═6631c0e4-4941-442e-8dd4-fa307ee7a8c0
 # ╠═f1575443-c9fb-4674-bbce-bf3a5a6d5a8d
+# ╠═26853cdc-0644-4f44-b6db-b5624a4a8689
+# ╠═50cbe27e-009f-4df1-b80a-cf1e73fc525e
 # ╟─86f217fc-379c-46a0-a720-de956d456b2a
 # ╟─a4463d74-04ea-428a-b5a5-504d96432a0a
 # ╠═3842654e-6dd7-427c-bb77-8b35a2f324fb
+# ╠═c91ed138-9885-43ce-a00e-1ba6e996f1aa
 # ╠═eac2821e-b25c-4605-857a-cd3bd06303c1
-# ╠═156d7866-00e1-47d8-ac38-52d72158f4d8
 # ╠═24d3c1f4-432f-419f-8854-69d8bfc135f8
 # ╠═d9efe8bb-c32c-40f4-89d9-8ace7a0665ba
+# ╠═ffa01b68-c3ba-4509-8df6-00596974be0f
 # ╟─c79525b1-7b44-4585-8292-84abe20a1a3d
 # ╟─79fa1b47-460f-457e-aebc-646f60ffecc1
 # ╟─a985e1d3-4867-4991-a60e-e85a9730311b
