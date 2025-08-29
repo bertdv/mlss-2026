@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.17
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/Figure4.9.png?raw=true"
@@ -64,7 +64,7 @@ md"""
 """
 
 # ╔═╡ fe66a986-2f55-4417-a71d-b3b99f6369cc
-challenge_statement("difficult class-conditional data distributions" , color= "red" )
+challenge_statement("difficult class-conditional data distributions" , header_level=1, color= "red" )
 
 # ╔═╡ 25ef2806-d294-11ef-3cb6-0f3e76b9177e
 md"""
@@ -259,6 +259,21 @@ p(w) = \mathcal{N}(w \,|\, m_0, S_0) \tag{B-4.140}
 ```
 """
 
+# ╔═╡ 22f4972e-0f6d-49a1-bd1f-10569b77a852
+keyconcept("", 
+md"""
+Discriminative classification follows the approach we used for Regression, namely, a direct model
+		   
+```math
+\begin{align}
+p(y_n \,|\, x_n, w) &= \mathrm{Bernoulli}\left(y_n \,|\, \sigma(w^T x_n) \right) \\  
+p(w) &= \mathcal{N}(w \,|\, m_0, S_0)		   
+\end{align}
+```
+		   
+for outputs ``y_n``, given inputs ``x_n``.
+""")
+
 # ╔═╡ 25f19ed8-d294-11ef-3298-efa16dda1dde
 md"""
 ## Parameter Inference
@@ -388,6 +403,22 @@ The numerical issues associated with the Laplace approximation and the evaluatio
 # ╔═╡ 33b859f2-9ea8-4f8b-b0f8-08a19c6a96fc
 NotebookCard("https://bmlip.github.io/course/minis/Laplace%20Approximation.html")
 
+# ╔═╡ 9704ee6a-e233-49f1-8c66-d81543927342
+keyconcept("",
+md"""
+It is easy to write down the Bayesian equations for the weight posterior and the predictive distribution of ``y_\bullet``, but in practice these do not admit closed-form solutions. A traditional workaround is the **Laplace approximation**, which has long been used to approximate the marginalization integrals in Bayesian inference.
+""")
+
+# ╔═╡ 4ab4bcca-da6e-4137-858d-257c04388277
+keyconcept("",
+md"""
+The Laplace approximation renders a closed-form and interpretable (approximate) solution for the predictive class distribution,
+```math
+p(y_\bullet = 1 | x_\bullet, D) \approx \Phi\left( \frac{w^T_{N} x_\bullet}{\sqrt{(8/\pi) +x^T_\bullet S_N x_\bullet)}}\right)\,.
+```
+	
+""")
+
 # ╔═╡ 38b4854f-be02-4696-802f-2106481e3aea
 md"""
 ## Bayesian Processing of Uncertainties
@@ -420,7 +451,7 @@ Note that we get a full predictive posterior distribution over the assignment of
 
 # ╔═╡ 98ef7093-f8ed-4a44-a153-0a64ab483f65
 md"""
-### Implementation
+## Implementation Issues
 """
 
 # ╔═╡ 0045e569-dc3c-4998-86da-9d96f599c599
@@ -523,9 +554,13 @@ Still, consider the following:
 
 """
 
+# ╔═╡ 5d91a2ae-975c-4913-b8ff-3df043cb1f03
+md"""
+## Recap Classification
+"""
+
 # ╔═╡ 25f41118-d294-11ef-13a8-3fa6587c1bf3
 @mdx """
-## Recap Classification
 
 Let us recapitulate the differences between the generative and discriminative approaches to classification in a table:
 
@@ -593,10 +628,11 @@ In a short paper by [T. Minka (2005)](https://github.com/bmlip/course/blob/main/
 
 """
 
+# ╔═╡ ed236461-49c4-4444-93d9-909ac60ab901
+TODO("Put key concepts slide here")
+
 # ╔═╡ a00c545c-2274-4086-94ca-319d1436fa26
-md"""
-# Exercises
-"""
+exercises(header_level=1)
 
 # ╔═╡ b94644f8-725d-49bf-9641-3dad8b647f45
 md"""
@@ -633,12 +669,7 @@ for the discrimination boundary, which is a line.
 
 # ╔═╡ 6eee35ee-fd55-498f-9441-f18c2508de19
 md"""
-# Appendix
-"""
-
-# ╔═╡ 1128cb07-68c8-4b80-8fb4-ee9fcc76c050
-md"""
-## Behind the scenes
+# Code
 """
 
 # ╔═╡ fcec3c3a-8b0b-4dfd-b010-66abbf330069
@@ -2450,6 +2481,7 @@ version = "1.9.2+0"
 # ╟─25f14226-d294-11ef-369f-e545d5fe2700
 # ╟─25f14f82-d294-11ef-02fb-2dc632b8f118
 # ╟─25f15e0a-d294-11ef-3737-79a68c9b3c61
+# ╟─22f4972e-0f6d-49a1-bd1f-10569b77a852
 # ╟─25f19ed8-d294-11ef-3298-efa16dda1dde
 # ╟─25f1390c-d294-11ef-364d-17e4c93b9a57
 # ╟─bda07a2e-3769-4ffe-9bc5-2b8a515247f6
@@ -2461,6 +2493,8 @@ version = "1.9.2+0"
 # ╟─ae2b23f0-853e-4237-aab2-81c961f52cf6
 # ╟─e4cc517b-d3b5-4517-a28b-efb8aba24496
 # ╟─33b859f2-9ea8-4f8b-b0f8-08a19c6a96fc
+# ╟─9704ee6a-e233-49f1-8c66-d81543927342
+# ╟─4ab4bcca-da6e-4137-858d-257c04388277
 # ╟─38b4854f-be02-4696-802f-2106481e3aea
 # ╟─7932fff4-0568-49de-b34c-711e51487ae3
 # ╟─25f3bef2-d294-11ef-1438-e9f7e469336f
@@ -2475,13 +2509,14 @@ version = "1.9.2+0"
 # ╟─ff31d8c1-db35-4c85-a609-67fc40e9e78d
 # ╟─1f2bfcf4-fef4-4612-8683-d5c86a326eef
 # ╟─25f3ff84-d294-11ef-0031-63b23d23324d
+# ╟─5d91a2ae-975c-4913-b8ff-3df043cb1f03
 # ╟─25f41118-d294-11ef-13a8-3fa6587c1bf3
 # ╟─25f19230-d294-11ef-2dfd-6d4927e86f57
+# ╠═ed236461-49c4-4444-93d9-909ac60ab901
 # ╟─a00c545c-2274-4086-94ca-319d1436fa26
 # ╟─b94644f8-725d-49bf-9641-3dad8b647f45
 # ╟─9554ed0b-69dd-443c-9538-03a4117eeb78
 # ╟─6eee35ee-fd55-498f-9441-f18c2508de19
-# ╟─1128cb07-68c8-4b80-8fb4-ee9fcc76c050
 # ╠═e379cc2a-43f8-432f-84fc-a88fd4f3ad0a
 # ╠═a759653c-0da4-40b7-9e9e-1e3d2e4df4ea
 # ╠═ad196ae6-c65e-4aaa-b0cc-bd72daa41952

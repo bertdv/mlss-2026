@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.15
+# v0.20.17
 
 #> [frontmatter]
 #> description = "Bayesian and maximum likelihood density estimation for discretely valued data sets."
@@ -83,6 +83,9 @@ x_k = \begin{cases} 1 & \text{if die landed on $k$th face}\\
 It turns out that the one-hot coding scheme is mathematically more convenient!
 
 """
+
+# ╔═╡ f9977fc0-0d3f-467e-822d-72f3a338f717
+keyconcept("", "Discrete event outcomes are typically represented via one-hot encoding, in which each outcome corresponds to a unique binary indicator vector.")
 
 # ╔═╡ d842fe4c-d294-11ef-15a9-a9a6e359f47d
 md"""
@@ -255,7 +258,7 @@ p(D_m|\mu) =\frac{N!}{m_1! m_2!\ldots m_K!} \,\prod_k \mu_k^{m_k}\,.
 
 # ╔═╡ d84422a6-d294-11ef-148b-c762a90cd620
 md"""
-We insert this slide only to alert you to the difference between using one-hot encoded outcomes ``D=\{x_1,x_2,\ldots,x_N\}`` as the data, versus using counts ``D_m = \{m_1mm_3,\ldots,m_K\}`` as the data. When used as a likelihood function for ``\mu``, it makes no difference whether you use ``p(D|\mu)`` or ``p(D_m|\mu)``. Why? 
+(We insert this slide only to alert you to the difference between using one-hot encoded outcomes ``D=\{x_1,x_2,\ldots,x_N\}`` as the data, versus using counts ``D_m = \{m_1mm_3,\ldots,m_K\}`` as the data. When used as a likelihood function for ``\mu``, it makes no difference whether you use ``p(D|\mu)`` or ``p(D_m|\mu)``.)
 
 """
 
@@ -348,40 +351,11 @@ where we get ``\lambda`` from the constraint
 
 """
 
-# ╔═╡ d8455278-d294-11ef-2455-376c205e7edf
-md"""
-
-# Summary
-
-Assume a data set of ``N`` IID observations ``D=\{x_1,\dotsc,x_N\}``.
-
-For discrete outcomes modeled by a 1-of-K **categorical distribution**, ``p(x_n) = \mathrm{Cat}(x_n|\mu)``, we find that the Maximum Likelihood (ML) estimate of ``\mu = (\mu_1,\mu_2,\ldots,\mu_K)^T`` is given by the sample proportions:
-
-```math
-\begin{align}
-\hat\mu_k  = \frac{1}{N} \sum_n x_{nk} \quad \left(= \frac{m_k}{N} \right) \tag{sample proportion}
-\end{align}
-```
-
-Let us contrast this with the earlier results for a multivariate **Gaussian model**, where the ML estimates for the mean and variance parameters coincide with the sample mean and sample variance, respectively.
-
-```math
-\begin{align}
-\hat{\mu} &= \frac{1}{N}\sum_{n=1}^N x_n \tag{sample mean} \\  
-\hat{\Sigma} &= \frac{1}{N} \sum_{n=1}^N (x_n-\mu)(x_n-\mu)^T \tag{sample variance}
-\end{align}
-```
-
-
-Note the similarity for the ML estimates of the mean. 
-
-
-"""
+# ╔═╡ 63cc56b7-588a-43c3-8327-ad6367608601
+TODO("Insert key concepts slide here")
 
 # ╔═╡ 204bec3f-6fde-48c1-b2b6-9f88d484c130
-md"""
-# Exercises
-"""
+exercises(header_level=1)
 
 # ╔═╡ 62b42d1d-be91-4740-bac6-b4527494959d
 md"""
@@ -507,7 +481,7 @@ This decomposition is the natural consequence of doing Bayesian estimation, whic
 
 # ╔═╡ 59fb1e66-cf05-4f2b-8027-7ff3b1a57c15
 md"""
-# Appendix
+# Code
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -525,7 +499,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "e635641d8e55b0485ecb2515c1996f4b47f0454e"
+project_hash = "bcb429f04e846701697c16c8e131f09449decb36"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -868,6 +842,7 @@ version = "17.4.0+2"
 # ╟─d8424e52-d294-11ef-0083-fbb77df4d853
 # ╟─d842ad86-d294-11ef-3266-253f80ecf4b7
 # ╟─d842d368-d294-11ef-024d-45e58ca994e0
+# ╟─f9977fc0-0d3f-467e-822d-72f3a338f717
 # ╟─d842fe4c-d294-11ef-15a9-a9a6e359f47d
 # ╟─d843540a-d294-11ef-3846-2bf27b7e9b30
 # ╟─d84369a4-d294-11ef-38f7-7f393869b705
@@ -884,7 +859,7 @@ version = "17.4.0+2"
 # ╟─d844bcfa-d294-11ef-0874-b154f3ed810b
 # ╟─d844d564-d294-11ef-0454-416352d43524
 # ╟─d844fa76-d294-11ef-172a-85e68842c252
-# ╟─d8455278-d294-11ef-2455-376c205e7edf
+# ╠═63cc56b7-588a-43c3-8327-ad6367608601
 # ╟─204bec3f-6fde-48c1-b2b6-9f88d484c130
 # ╟─62b42d1d-be91-4740-bac6-b4527494959d
 # ╟─01c4c590-fece-49a5-8979-6e0d54f7850a

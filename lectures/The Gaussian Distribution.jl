@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.17
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/fig-linear-system.png?raw=true"
@@ -73,8 +73,8 @@ md"""
 
 """
 
-# ╔═╡ 82025c2f-a21f-4080-b301-3ffe3715442d
-challenge_statement("Classify a Gaussian Sample" , color= "red" )
+# ╔═╡ 8e436806-af9d-4aa4-88a4-d37e10b69c36
+challenge_statement("Gaussian Density Estimation",header_level=1)
 
 # ╔═╡ b9a48c60-d294-11ef-3b90-03053fcd82fb
 md"""
@@ -215,6 +215,16 @@ Why is the Gaussian distribution so ubiquitously used in science and engineering
 See also [Jaynes, section 7.14](http://www.med.mcgill.ca/epidemiology/hanley/bios601/GaussianModel/JaynesProbabilityTheory.pdf#page=250), and the whole chapter 7 in his book for more details on why the Gaussian distribution is so useful.
 
 """
+
+# ╔═╡ 085233ee-f5ad-4731-89bb-84773182bba6
+keyconcept("",
+md""" 
+Why is the Gaussian distribution so ubiquitously used in science and engineering?
+
+  - Operations on probability distributions tend to lead to Gaussian distributions.
+  - Once the Gaussian has been attained, this form tends to be preserved. 		   
+		   
+""")
 
 # ╔═╡ 9501922f-b928-46e2-8f23-8eb9c64f6198
 md"""
@@ -908,12 +918,8 @@ K &= \frac{\sigma_0^2}{\sigma_0^2+\sigma^2} \qquad \text{($K$ is called: Kalman 
 \end{align*}
 ```
 
+Hence, for jointly Gaussian systems, inference can be performed in a single step using closed-form expressions for conditioning and marginalization of (multivariate) Gaussian distributions.
 """
-
-# ╔═╡ b9aa3950-d294-11ef-373f-d5d330694bfd
-
-keyconcept("", md"For jointly Gaussian systems, inference can be performed in a single step using closed-form expressions for conditioning and marginalization of (multivariate) Gaussian distributions.")
-
 
 # ╔═╡ b426f9c8-4506-43ef-92fa-2ee30be621ca
 md"""
@@ -1016,7 +1022,7 @@ and transition ``2`` derives from using the multiplication rule for Gaussians.
 """)
 
 # ╔═╡ 9bd38e28-73d4-4c6c-a1fe-35c7a0e750b3
-challenge_solution("Classify a Gaussian Sample", header_level=2, color="red")
+challenge_solution("Gaussian Density Estimation", header_level=1)
 
 # ╔═╡ b9ac2d3c-d294-11ef-0d37-65a65525ad28
 md"""
@@ -1172,9 +1178,11 @@ K_t &= \frac{\sigma_{t-1}^2}{\sigma_{t-1}^2+\sigma^2} \qquad \text{(Kalman gain)
 
 # ╔═╡ b9aaee4a-d294-11ef-2ed7-0dcb360d8bb7
 md"""
-This *online* (recursive) estimator of mean and variance in Gaussian observations is called a **Kalman Filter**.
+This online (recursive) estimator of the mean and variance of Gaussian observations is known as the **Kalman filter**.
 
- 
+In this simplified case, the process mean (``\theta``) is assumed to remain constant. In the general Kalman filter, however, the mean may evolve over time; see the [Dynamic Models lecture](https://bmlip.github.io/course/lectures/Dynamic%20Models.html) for details.
+
+
 
 """
 
@@ -1324,11 +1332,11 @@ Here's a nice [summary of Gaussian calculations](https://github.com/bertdv/AIP-5
 
 """
 
-# ╔═╡ 79a99a22-3bb5-431b-bf84-5dce5cccfe25
-md"""
-# Exercises
+# ╔═╡ a439c0a7-afa1-4d9a-8737-58d341744016
+TODO("key concepts")
 
-"""
+# ╔═╡ 79a99a22-3bb5-431b-bf84-5dce5cccfe25
+exercises(header_level=1)
 
 # ╔═╡ 14b3edcc-0d16-4055-9b1c-7f324514a0a9
 md"""
@@ -1596,7 +1604,7 @@ Now we work out ``\Sigma_{x\theta}``:
 
 # ╔═╡ 6dfc31a0-d0d7-4901-a876-890df9ab4258
 md"""
-# Optional
+# Optional Slides
 """
 
 # ╔═╡ b9acd5d4-d294-11ef-1ae5-ed4e13d238ef
@@ -1781,7 +1789,7 @@ In short, Gaussian-distributed variables remain Gaussian in linear systems, but 
 
 # ╔═╡ f78bc1f5-cf7b-493f-9c5c-c2fbd6788616
 md"""
-# Appendix
+# Code
 """
 
 # ╔═╡ 026da6b9-dee1-485e-af00-3b9e35f71b6b
@@ -3187,7 +3195,7 @@ version = "1.9.2+0"
 # ╟─b9a38e20-d294-11ef-166b-b5597125ed6d
 # ╟─5e9a51b1-c6e5-4fb5-9df3-9b189f3302e8
 # ╟─b9a46c3e-d294-11ef-116f-9b97e0118e5b
-# ╟─82025c2f-a21f-4080-b301-3ffe3715442d
+# ╟─8e436806-af9d-4aa4-88a4-d37e10b69c36
 # ╟─b9a48c60-d294-11ef-3b90-03053fcd82fb
 # ╟─7a8e77b8-1692-41b7-88ef-26560aad5f08
 # ╟─ba57ecbb-b64e-4dd8-8398-a90af1ac71f3
@@ -3206,6 +3214,7 @@ version = "1.9.2+0"
 # ╟─b9a50d0c-d294-11ef-0e60-2386cf289478
 # ╟─b9a52b18-d294-11ef-2d42-19c5e3ef3549
 # ╟─b9a5589a-d294-11ef-3fc3-0552a69df7b2
+# ╟─085233ee-f5ad-4731-89bb-84773182bba6
 # ╟─9501922f-b928-46e2-8f23-8eb9c64f6198
 # ╟─b9a5889c-d294-11ef-266e-d90225222e10
 # ╟─56510a09-073c-4fc8-b0b7-17b20dbb95f0
@@ -3253,7 +3262,6 @@ version = "1.9.2+0"
 # ╟─b9a9dca8-d294-11ef-04ec-a9202c319f89
 # ╟─b9a9f98e-d294-11ef-193a-0dbdbfffa86f
 # ╟─b9aa27da-d294-11ef-0780-af9d89f9f599
-# ╟─b9aa3950-d294-11ef-373f-d5d330694bfd
 # ╟─b426f9c8-4506-43ef-92fa-2ee30be621ca
 # ╟─b9a80522-d294-11ef-39d8-53a536d66bf9
 # ╟─364cd002-92ee-4fb6-b89a-3251eff7502c
@@ -3262,7 +3270,7 @@ version = "1.9.2+0"
 # ╟─b9ac2d3c-d294-11ef-0d37-65a65525ad28
 # ╟─9fc14c8b-98bc-4fe9-9b58-6c5774ac5f64
 # ╟─b9ac5190-d294-11ef-0a99-a9d369b34045
-# ╠═dbf97d8d-62f2-4996-a6aa-5ae4601d456b
+# ╟─dbf97d8d-62f2-4996-a6aa-5ae4601d456b
 # ╟─b9a85716-d294-11ef-10e0-a7b08b800a98
 # ╟─0d303dba-51d4-4413-8001-73ed98bf74df
 # ╟─4a2cd378-0960-4089-81ad-87bf1be9a3b2
@@ -3288,6 +3296,7 @@ version = "1.9.2+0"
 # ╠═115eabf2-c476-40f8-8d7b-868a7359c1b6
 # ╠═61764e4a-e5ef-4744-8c71-598b2155f4d9
 # ╟─b9ac7486-d294-11ef-13e5-29b7ffb440bc
+# ╟─a439c0a7-afa1-4d9a-8737-58d341744016
 # ╟─79a99a22-3bb5-431b-bf84-5dce5cccfe25
 # ╟─14b3edcc-0d16-4055-9b1c-7f324514a0a9
 # ╟─dd7786e2-d6ac-4dba-abca-3686242c067d

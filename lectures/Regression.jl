@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.17
 
 #> [frontmatter]
 #> image = "https://i.imgur.com/azbCpRW.png"
@@ -57,8 +57,8 @@ md"""
 
   * [Bishop PRML book](https://www.microsoft.com/en-us/research/wp-content/uploads/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf),  pp. 152-158
 
-  * [matrix calculus slide](#matrix-calculus)
-    * In this and forthcoming lectures, we will make use of some elementary matrix calculus. The most important formulas are summarized here. For derivations, see Appendix C in [Bishop (2006)](https://www.microsoft.com/en-us/research/wp-content/uploads/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf).
+  * Matrix Calculus
+    * In this and forthcoming lectures, we will make use of some elementary matrix calculus. Please see the [Formula Cheatsheet](https://github.com/bmlip/course/blob/main/assets/files/5SSD0_formula_sheet.pdf) for formulas that will be made available to you at the written exam.
 
   * [RxInfer Bayesian Linear Regression example](https://examples.rxinfer.com/categories/basic_examples/bayesian_linear_regression/)
      *  A tutorial on Bayesian linear regression with RxInfer.
@@ -72,7 +72,7 @@ md"""
 # ╔═╡ 234ba8c2-d294-11ef-36f6-b1f61f65557a
 
 
-challenge_statement("Finding a Secret Function" , color= "Red" )
+challenge_statement("Finding a Secret Function", header_level=1 )
 
 
 
@@ -124,6 +124,13 @@ The challenge is to uncover the underlying data-generating process and predict r
 To be solved later in this lecture. 
 """
 
+# ╔═╡ 234c3684-d294-11ef-1c08-d9d61fc3d471
+md"""
+# Bayesian Linear Regression
+
+
+"""
+
 # ╔═╡ 234bb452-d294-11ef-24cb-3d171fe9cb4e
 md"""
 ## Regression as Discriminative Learning
@@ -150,15 +157,12 @@ we can focus attention on developing a model for the **conditional distribution*
 
 Building a conditional model ``p(y_n|x_n)`` directly for outputs ``y`` and given inputs ``x_n``, is called the **discriminative** approach to Bayesian modelling. We will see more of this approach in the [discriminative classification lecture](https://bmlip.github.io/course/lectures/Discriminative%20Classification.html#Discriminative-Classification). 
 
-"""
-
-# ╔═╡ 234c3684-d294-11ef-1c08-d9d61fc3d471
-md"""
-# Bayesian Linear Regression
-
-Next, we discuss (1) model specification, (2) Inference and (3) a prediction application for a Bayesian linear regression problem. 
+Next, we discuss (1) model specification, (2) Inference, and (3) a prediction application for a Bayesian linear regression problem. 
 
 """
+
+# ╔═╡ 8a7af8b4-f56c-48b2-83b6-afef30bb423e
+keyconcept("", "Regression problems can be formulated as the task of developing a predictive model ``p(y | x)`` for outputs ``y`` given inputs ``x``. This is referred to as the **discriminative approach** to probabilistic modeling.")
 
 # ╔═╡ 234c5394-d294-11ef-1614-c9847412c8fb
 md"""
@@ -213,9 +217,7 @@ md"""
 
 #### Likelihood Function
 
-For the ordinary linear regression model in Eq. B-3.10, we are interested in learning the parameters ``w`` from an observed data set ``D=\{(x_1,y_1),\dotsc,(x_N,y_N)\}``.
-
-The likelihood function for ``w`` is
+For an observed data set ``D=\{(x_1,y_1),\dotsc,(x_N,y_N)\}``., the likelihood function for ``w`` is then
 
 ```math
 \begin{align*}
@@ -234,7 +236,7 @@ Note that, if parameter ``\beta`` is given, then Eq. B-3.10 is a proper likeliho
 md"""
 #### Prior
 
-For full Bayesian learning, we should also choose a prior ``p(w)``. Let's choose a Gaussian prior, 
+For full Bayesian learning of the weights ``w``, we should also choose a prior ``p(w)``. Let's choose a Gaussian prior, 
 
 ```math
 \begin{equation}
@@ -369,10 +371,10 @@ Then we equate probability masses in both domains:
 	   )
 
 # ╔═╡ fb113692-f00c-4b48-85cc-d7bba88c7099
-keyconcept("", md"This is a satisfying result: for an ordinary linear regression task, with inputs ``x``, outputs ``y``, and weights ``w``, placing a Gaussian prior on the weights ``w`` leads to both a Gaussian posterior over the weights and a Gaussian predictive distribution for the outputs. Importantly, both distributions can be computed in closed form. ")
+keyconcept("", md"For an ordinary linear regression task, with inputs ``x``, outputs ``y``, and weights ``w``, placing a Gaussian prior on the weights ``w`` leads to both a Gaussian posterior over the weights and a Gaussian predictive distribution for the outputs. Importantly, both distributions can be computed in closed form. ")
 
 # ╔═╡ f600c228-e048-42aa-b79a-60592b367dec
-challenge_solution("Finding a Secret Function" , color= "Green", big=true)
+challenge_solution("Finding a Secret Function" , color="green", header_level=1)
 
 # ╔═╡ c0c57aa6-155a-49a9-9ed2-d568de1b5be2
 md"""
@@ -392,7 +394,7 @@ We also have a _prior_ for the weights: ``\mathcal{N}(0,σ_{prior}^2)``. You can
 
 # ╔═╡ 90cb881a-7b5d-44e3-a7d1-bb93bef4a82b
 md"""
-### Implementation
+## Implementation Issues
 
 #### Basic functions
 
@@ -649,10 +651,11 @@ While this is a very common problem that occurs throughout the sciences, a prope
 
 """
 
+# ╔═╡ 9577225a-9ce3-4cf2-ac63-499ae8e905bd
+TODO("add key concepts slide here")
+
 # ╔═╡ 8e2b2c1d-81f3-4283-ae2e-d8b3e9c201b3
-md"""
-# Exercises
-"""
+exercises(header_level=1)
 
 # ╔═╡ bbb461b0-d1eb-4584-89b0-96af3e615484
 md"""
@@ -790,47 +793,13 @@ Set derivative to zero for MAP estimate leads to
 
 # ╔═╡ 234f7254-d294-11ef-316a-05ef2edb9699
 md"""
-# Optional
-
-"""
-
-# ╔═╡ 234f8a6e-d294-11ef-175e-f316d6b39583
-md"""
-## $(HTML("<span id='matrix-calculus'>Some Useful Matrix Calculus</span>"))
-
-When doing derivatives with matrices, e.g. for maximum likelihood estimation, it will be helpful to be familiar with some matrix calculus. We shortly recapitulate used formulas here. 
-
-We define the **gradient** of a scalar function ``f(A)`` w.r.t. an ``n \times k`` matrix ``A`` as
-
-```math
-\nabla_A f \triangleq
-    \begin{bmatrix}
-\frac{\partial{f}}{\partial a_{11}} & \frac{\partial{f}}{\partial a_{12}} & \cdots & \frac{\partial{f}}{\partial a_{1k}}\\
-\frac{\partial{f}}{\partial a_{21}} & \frac{\partial{f}}{\partial a_{22}} & \cdots & \frac{\partial{f}}{\partial a_{2k}}\\
-\vdots & \vdots & \cdots & \vdots\\
-\frac{\partial{f}}{\partial a_{n1}} & \frac{\partial{f}}{\partial a_{n2}} & \cdots & \frac{\partial{f}}{\partial a_{nk}}
-    \end{bmatrix}
-```
-
-The following formulas are useful (see Bishop App.-C)
-
-```math
-\begin{align*}
-|A^{-1}|&=|A|^{-1} \tag{B-C.4} \\
-\nabla_A \log |A| &= (A^{T})^{-1} = (A^{-1})^T \tag{B-C.28} \\
-\mathrm{Tr}[ABC]&= \mathrm{Tr}[CAB] = \mathrm{Tr}[BCA] \tag{B-C.9} \\
-\nabla_A \mathrm{Tr}[AB] &=\nabla_A \mathrm{Tr}[BA]= B^T \tag{B-C.25} \\
-\nabla_A \mathrm{Tr}[ABA^T] &= A(B+B^T)  \tag{B-C.27}\\
- \nabla_x x^TAx &= (A+A^T)x \tag{from B-C.27}\\
-\nabla_X a^TXb &= \nabla_X \mathrm{Tr}[ba^TX] = ab^T \notag
-\end{align*}
-```
+# Optional Slides
 
 """
 
 # ╔═╡ c6532830-3161-4b2a-97c4-6d27d24762c9
 md"""
-# Appendix
+# Code
 """
 
 # ╔═╡ 22e76656-b9f4-463e-9bf8-bd383e92948b
@@ -917,52 +886,6 @@ let
 
 	plot_data!(D)
 end
-
-# ╔═╡ 3b2ca3c2-ada2-447f-818d-e3cc7c52facb
-md"""
-# scratchbook (to be removed in final version)
-
-"""
-
-# ╔═╡ 234d143c-d294-11ef-2663-d9753288a3a7
-md"""
-
-## Illustration of sequential Bayesian learning for a simple linear model
-(Bishop Fig.3.7) Illustration of sequential Bayesian learning for a simple linear model of the form ``y(x, w) = w_0 + w_1 x``. (Bishop Fig.3.7, detailed description at Bishop, pg.154.)
-
-![](https://github.com/bmlip/course/blob/v2/assets/figures/Figure3.7.png?raw=true)
-
-"""
-
-# ╔═╡ 234d858e-d294-11ef-0db5-dbc27b2567a8
-md"""
-## Example Predictive Distribution
-
-As an example, let's do Bayesian Linear Regression for a synthetic sinusoidal data set and a model with 9 Gaussian basis functions 
-
-```math
-\begin{align*}
-y_n &=\sum_{m=1}^9 w_m \phi_m(x_n) + \epsilon_n \\
-\phi_m(x_n) &= \exp\left( - \frac{(x_n-\mu_m)^2}{\sigma^2}\right) \\
-\epsilon_n &\sim \mathcal{N}(0,\beta^{-1})
-\end{align*}
-```
-
-![](https://github.com/bmlip/course/blob/v2/assets/figures/Figure3.1b.png?raw=true)
-
-The predictive distributions for ``y`` are shown in the following plots (Bishop, Fig.3.8)
-
-![](https://github.com/bmlip/course/blob/v2/assets/figures/Figure3.8.png?raw=true)
-
-"""
-
-# ╔═╡ 234d8fac-d294-11ef-09e6-f522dc9a3a6b
-md"""
-And some plots of draws of posteriors for the functions ``w^T \phi(x)`` (Bishop, Fig.3.9) 
-
-![](https://github.com/bmlip/course/blob/v2/assets/figures/Figure3.9.png?raw=true) 
-
-"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -2231,9 +2154,10 @@ version = "1.9.2+0"
 # ╟─72fcb6a3-36ee-4840-bdc3-ddb743e5c149
 # ╟─5d48e25f-9a98-43ce-8f23-d9ab28f69996
 # ╟─2ff8c0d7-30f5-4593-9533-fee6114a3443
+# ╟─234c3684-d294-11ef-1c08-d9d61fc3d471
 # ╟─234bb452-d294-11ef-24cb-3d171fe9cb4e
 # ╟─234be90e-d294-11ef-2257-496f155c2b59
-# ╟─234c3684-d294-11ef-1c08-d9d61fc3d471
+# ╟─8a7af8b4-f56c-48b2-83b6-afef30bb423e
 # ╟─234c5394-d294-11ef-1614-c9847412c8fb
 # ╟─234c6104-d294-11ef-0a18-15e51a878079
 # ╟─234c7766-d294-11ef-36fa-1d2beee3dec0
@@ -2281,13 +2205,13 @@ version = "1.9.2+0"
 # ╟─234ef126-d294-11ef-17a9-3da87a7e7d0a
 # ╟─e9804f92-29b0-4463-bf37-872183061ee2
 # ╟─234f5d32-d294-11ef-279f-f331396e47ad
+# ╠═9577225a-9ce3-4cf2-ac63-499ae8e905bd
 # ╟─8e2b2c1d-81f3-4283-ae2e-d8b3e9c201b3
 # ╟─bbb461b0-d1eb-4584-89b0-96af3e615484
 # ╟─2705ce62-baea-484d-a7fe-6f284a4a8f71
 # ╟─d92d1dd3-736b-4911-a8d8-dcf7a297f48d
 # ╟─d8e384c8-fe26-47c3-a7d4-04ae4c592ee5
 # ╟─234f7254-d294-11ef-316a-05ef2edb9699
-# ╟─234f8a6e-d294-11ef-175e-f316d6b39583
 # ╟─c6532830-3161-4b2a-97c4-6d27d24762c9
 # ╠═f8c69b91-4415-454e-a50d-c4a37ada89d1
 # ╠═33ca4c67-d96f-457f-bc19-171f4b4b03c6
@@ -2297,9 +2221,5 @@ version = "1.9.2+0"
 # ╟─0e9435fc-3206-4249-b5ff-42cc35c98d47
 # ╟─88a2bd82-6663-48cc-a535-5b3e47d814a9
 # ╟─68141653-e444-4e29-bbec-4cd7359cb84c
-# ╟─3b2ca3c2-ada2-447f-818d-e3cc7c52facb
-# ╟─234d143c-d294-11ef-2663-d9753288a3a7
-# ╟─234d858e-d294-11ef-0db5-dbc27b2567a8
-# ╟─234d8fac-d294-11ef-09e6-f522dc9a3a6b
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
