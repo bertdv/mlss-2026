@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.17
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/scientific-inquiry-loop-w-BML-eqs.png?raw=true"
@@ -68,9 +68,11 @@ md"""
 
 """
 
+# ╔═╡ eca027f8-40c9-4e53-85b5-d08b8fe9dd97
+challenge_statement("Predicting a Coin Toss",header_level=1)
+
 # ╔═╡ 4f6a2d4f-bd89-4b0c-b544-397de2e34e72
 md"""
-$(challenge_statement("Predicting a Coin Toss"))
 
 ##### Problem 
 We observe the following sequence of heads (outcome ``=1``) and tails (outcome ``=0``) when tossing the same coin repeatedly.
@@ -491,6 +493,9 @@ Your problems are only of computational nature. Perhaps the integral to compute 
 
 """
 
+# ╔═╡ 55dec435-aa78-41ba-aad5-9d79ce292f42
+keyconcept("", "Bayesian machine learning is a subfield of machine learning that commits entirely to probability theory as the framework for all information-processing tasks. This is well justified, because probability theory is the optimal calculus for representing and manipulating states of knowledge.")
+
 # ╔═╡ 6a27b114-d294-11ef-099d-1d55968934a6
 md"""
 ## Bayesian Evidence as a Model Performance Criterion
@@ -591,9 +596,11 @@ pluto-output img {
 </style>
 """
 
+# ╔═╡ 1dbc69a3-b3ec-44de-af7c-944ebc01f523
+challenge_solution("Predicting a Coin Toss",header_level=1)
+
 # ╔═╡ 6a2898ea-d294-11ef-39ec-31e4bac1e048
 md"""
-# Revisiting the Challenge: Predicting a Coin Toss
 
 At the beginning of this lesson, we posed the following challenge:
 
@@ -1033,14 +1040,6 @@ md"""
 Select iteration: $(@bind toss_index_1 Slider(0:n_tosses; show_value=true))
 """
 
-# ╔═╡ c5c601e4-c792-4096-aa9e-f6b564137123
-keyconcept(
-	"",
-	md"""
-	Bayesian Machine Learning updates a **prior** parameter distribution to generate a **posterior** parameter distribution. The posterior distribution is generally **closer to the true value**.
-	"""
-)
-
 # ╔═╡ 5ea6cefa-621a-4afc-bf9e-02d42b1d53f8
 
 
@@ -1057,7 +1056,7 @@ Note that both posteriors move toward the "correct" value (``\mu=0.4``). However
 # ╔═╡ e9b32823-efd2-4a27-b529-4f49752c00bb
 keyconcept(
 	"",
-	md"As we get more observations, the influence of the prior diminishes. "
+	"As additional observations are acquired, the influence of the prior progressively diminishes, while the likelihood increasingly dominates the posterior."
 )
 
 # ╔═╡ 56b9aba3-6ead-498c-8670-ad93a1953b2a
@@ -1073,7 +1072,7 @@ md"""
 function handle_coin_toss(prior::Beta, observation::Bool)
     posterior = Beta(prior.α + observation, prior.β + (1 - observation))
 	return posterior
-end
+end;
 
 # ╔═╡ 51829800-1781-49ae-8ee7-ac15c0bfcb88
 # computes log10 of Gamma function
@@ -1119,7 +1118,7 @@ begin
 			prior_distributions[i] = posterior
 		end
 	end
-end
+end;
 
 # ╔═╡ 6a2b1106-d294-11ef-0d64-dbc26ba3eb44
 # Animate posterior distributions over time in a gif
@@ -1131,9 +1130,6 @@ let i = toss_index_1
     end
 	vline!([mean(secret_distribution)]; style=:dash, color="purple", label="True parameter")
 end
-
-# ╔═╡ 9fcb9c9f-b65f-4a35-8508-7e430ab02c57
-
 
 # ╔═╡ f956e217-3dce-446a-8660-25f2c9cb05e2
 md"""
@@ -1340,15 +1336,19 @@ In fact, this is a serious disadvantage because Bayesian evidence is a principle
 # ╔═╡ 6a2ca496-d294-11ef-0043-1f350b36773e
 keyconcept(" ", 
 	md"""
-	
-	**Maximum Likelihood estimation is at best an approximation to Bayesian learning**, but for good reason, a very popular learning method when faced with lots of available data.
+	Maximum likelihood estimation is, at best, an approximation to Bayesian learning. Still, it is a very popular method, and with good reason: when plenty of data are available, it often provides a practical and effective solution.
 	"""
 )
 
 
+# ╔═╡ e54992b7-8989-44c5-96e0-993486702db7
+TODO("Add key concepts slide")
+
+# ╔═╡ 4bfd141f-fe2f-46a0-aa35-872cab45ea00
+exercises(header_level=1)
+
 # ╔═╡ f2969d91-4a5b-4665-9fa5-521db750302f
 md"""
-$(section_outline("Exercises","",header_level=1))
 
 #####  Bayes estimate (**)
 
@@ -1598,7 +1598,7 @@ NotebookCard("https://bmlip.github.io/course/minis/KL%20Divergence.html")
 
 # ╔═╡ 1f92c406-6792-4af6-9132-35efd8223bc5
 md"""
-# Appendix
+# Code
 """
 
 # ╔═╡ 7a764a14-a5df-4f76-8836-f0a571fc3519
@@ -3119,6 +3119,7 @@ version = "1.9.2+0"
 # ╟─6a23b828-d294-11ef-371a-05d061144a43
 # ╟─6be2e966-4048-44d0-a37e-95060e3fe30b
 # ╟─6a23df9e-d294-11ef-3ddf-a51d4cea00fc
+# ╟─eca027f8-40c9-4e53-85b5-d08b8fe9dd97
 # ╟─4f6a2d4f-bd89-4b0c-b544-397de2e34e72
 # ╟─b791e819-f5a0-4c44-983b-07d8497516fb
 # ╟─daa1df0e-4ec5-4fb1-a355-a42c35bd35b9
@@ -3169,6 +3170,7 @@ version = "1.9.2+0"
 # ╟─c03229ef-3e0f-4612-909b-97f488a1e4c9
 # ╟─6a27951c-d294-11ef-2e1a-b5a4ce84aceb
 # ╟─6a27a28a-d294-11ef-1f33-41b444761429
+# ╟─55dec435-aa78-41ba-aad5-9d79ce292f42
 # ╟─6a27b114-d294-11ef-099d-1d55968934a6
 # ╟─6a27beca-d294-11ef-1895-d57b11b827c1
 # ╟─cc8af69e-6d00-4327-aaa2-0b1023052b8a
@@ -3182,6 +3184,7 @@ version = "1.9.2+0"
 # ╟─6a2879e6-d294-11ef-37db-df7babe24d25
 # ╟─6a2889ae-d294-11ef-2439-e1a541a5ccd7
 # ╟─c050f468-7eec-403f-9304-552bd0d9b222
+# ╟─1dbc69a3-b3ec-44de-af7c-944ebc01f523
 # ╟─6a2898ea-d294-11ef-39ec-31e4bac1e048
 # ╟─6a28a704-d294-11ef-1bf2-efbdb0cb4cbc
 # ╟─6a28b44c-d294-11ef-15da-81be8753d311
@@ -3225,7 +3228,6 @@ version = "1.9.2+0"
 # ╟─6a2af90a-d294-11ef-07bd-018326577791
 # ╟─6a2b1106-d294-11ef-0d64-dbc26ba3eb44
 # ╟─d484c41d-9834-4528-bf47-93ab4e35ebaa
-# ╟─c5c601e4-c792-4096-aa9e-f6b564137123
 # ╟─5ea6cefa-621a-4afc-bf9e-02d42b1d53f8
 # ╟─6a2b2d44-d294-11ef-33ba-15db357708b1
 # ╟─e9b32823-efd2-4a27-b529-4f49752c00bb
@@ -3235,7 +3237,6 @@ version = "1.9.2+0"
 # ╠═e99e7650-bb72-4576-8f2a-c3994533b644
 # ╟─7a624d2f-812a-47a0-a609-9fe299de94f5
 # ╟─51829800-1781-49ae-8ee7-ac15c0bfcb88
-# ╟─9fcb9c9f-b65f-4a35-8508-7e430ab02c57
 # ╟─f956e217-3dce-446a-8660-25f2c9cb05e2
 # ╠═2c90eee1-b5d9-434d-bccc-64de8b458a48
 # ╠═9d82af33-8e91-48e9-8c34-fa6ea31492c2
@@ -3261,6 +3262,8 @@ version = "1.9.2+0"
 # ╟─6a2c7f5a-d294-11ef-2e17-9108a39df280
 # ╟─6a2c8f4a-d294-11ef-213c-dfa929a403bc
 # ╟─6a2ca496-d294-11ef-0043-1f350b36773e
+# ╠═e54992b7-8989-44c5-96e0-993486702db7
+# ╟─4bfd141f-fe2f-46a0-aa35-872cab45ea00
 # ╟─f2969d91-4a5b-4665-9fa5-521db750302f
 # ╟─7dd9a456-9dca-47c8-98c5-51f87f28e6a4
 # ╟─b2820dfd-b3ca-477b-8cb7-c430e0fe18dd

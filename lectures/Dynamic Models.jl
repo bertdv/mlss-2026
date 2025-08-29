@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.17
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/Faragher-2012-cart-1.png?raw=true"
@@ -62,7 +62,7 @@ md"""
 """
 
 # ╔═╡ 50c601c9-ec68-4155-932c-190bced1ac9a
-challenge_statement("Tracking of Cart Position"; color="red", big=true)
+challenge_statement("Tracking of Cart Position"; color="red", header_level=1)
 
 # ╔═╡ 2728b7c8-d294-11ef-06e6-5329a76c16be
 md"""
@@ -150,6 +150,11 @@ where ``a_1, \ldots, a_K`` are the **autoregressive coefficients**, and ``\sigma
 
 
 """
+
+# ╔═╡ 73104616-8cb4-4665-b09b-1c771ecdf372
+keyconcept("",
+"Dynamical systems do not obey the sample-by-sample independence assumption, but still can be specified, and state and parameter estimation equations can be solved by similar tools as for static models.
+")
 
 # ╔═╡ 2728dece-d294-11ef-2dda-af89555d838f
 md"""
@@ -245,6 +250,18 @@ md"""
 Note that the joint distribution over all states and observations ``\{(x_1,z_1),\ldots,(x_t,z_t)\}`` is a (large-dimensional) Gaussian distribution. This means that, in principle, every inference problem on the LGDS model also leads to a Gaussian distribution.
 
 """
+
+# ╔═╡ 6bcabd28-f72b-47d9-b846-b1528f3758bb
+keyconcept("",
+md"""
+A very common and flexible probabilistic dynamical model is the **state-space model**,
+```math
+\begin{align}
+ p(x^T,z^T) &= \underbrace{p(z_1)}_{\text{initial state}} \prod_{t=2}^T \underbrace{p(z_t\,|\,z_{t-1})}_{\text{state transitions}}\,\prod_{t=1}^T \underbrace{p(x_t\,|\,z_t)}_{\text{observations}}\,,
+\end{align}
+```
+with observations ``x_t`` and latent states ``z_t``.
+""")
 
 # ╔═╡ 27298004-d294-11ef-06db-490237bf9408
 md"""
@@ -432,12 +449,10 @@ p(x_t|x^{t-1}) = \mathcal{N}\left(x_t \,|\, ca \mu_{t-1}, \sigma_x^2 + c^2(\sigm
 
 For an observed sequence ``x^t``, the evidence ``p(x_t|x^{t-1})`` is a scalar number that scores how well the model predicts ``x_t``, based on past observations ``x^{t-1}``.
 
-
+!!! info "Exam Guide"
+	The above manual derivation of the Kalman filter is too long and error-prone to be asked at an exam. You should be able to follow the derivation in detail, but you will not be requested to reproduce the full derivation without some guidance. The complexity of the derivation underlines why inference should be automated by a toolbox (like RxInfer).
 
 """
-
-# ╔═╡ e804a2a0-3f67-4eea-a9c8-f603a8df9a03
-tip("Exam guide: the above manual derivation of the Kalman filter is too long and error-prone to be asked at an exam. You should be able to follow the derivation in detail, but you will not be requested to reproduce the full derivation without some guidance. The complexity of the derivation underlines why inference should be automated by a toolbox (like RxInfer).")
 
 # ╔═╡ 272a00a6-d294-11ef-18ba-a3700f78b13f
 md"""
@@ -465,6 +480,18 @@ V_t &= \left(I-K_t C \right) P_{t}  \tag{posterior state variance}
 
 """
 
+# ╔═╡ e44c6138-7f59-48f3-8f4d-7c5db8e1c016
+keyconcept("",
+md"""
+Two of the more famous and powerful models with latent states include the hidden Markov model (with discrete states) and the Linear Gaussian Dynamical system (with continuous states). The LDGS model is 
+```math
+\begin{align*}
+z_t &= A z_{t-1} + \epsilon^{(z)}_t, \quad && \epsilon^{(z)}_t \sim \mathcal{N}(0,\Gamma) \\
+x_t &= C z_t + \epsilon^{(x)}_t \quad && \epsilon^{(x)}_t \sim \mathcal{N}(0,\Sigma) \,
+\end{align*}
+```
+""")
+
 # ╔═╡ bbaa44b9-9bac-4fb8-8014-fbf400a93039
 challenge_solution("Tracking of Cart Position", color="green", header_level=1)
 
@@ -476,7 +503,7 @@ Let's use the Kalman filtering equations to solve the cart position tracking cha
 # ╔═╡ 272a0d3a-d294-11ef-2537-39a6e410e56b
 md"""
 
-#### Inference by Explicit Kalman Filtering
+## Inference by Explicit Kalman Filtering
 
 We can now solve the cart tracking problem of the introductory example by executing the Kalman filter equations KF-2.
 """
@@ -571,40 +598,20 @@ autoupdates = @autoupdates begin
 	z_prev_m_0, z_prev_v_0 = mean_cov(q(z))
 end
 
-# ╔═╡ 272ac73e-d294-11ef-0526-55f6dfa019d1
-md"""
-## Recap Dynamical Models
-
-Dynamical systems do not obey the sample-by-sample independence assumption, but still can be specified, and state and parameter estimation equations can be solved by similar tools as for static models.
-
-"""
-
-# ╔═╡ 272ad3fa-d294-11ef-030a-5b8e2070d654
-md"""
-Two of the more famous and powerful models with latent states include the hidden Markov model (with discrete states) and the Linear Gaussian dynamical system (with continuous states).
-
-"""
-
-# ╔═╡ 272ae098-d294-11ef-3214-95b92faefeb5
-md"""
-For the LGDS, the Kalman filter is a well-known recursive state estimation procedure. The Kalman filter can be derived through Bayesian update rules on Gaussian distributions. 
-
-"""
-
-# ╔═╡ 272aed72-d294-11ef-0e8b-a7826a811284
-md"""
-If anything changes in the model, e.g., the state noise is not Gaussian, then you have to re-derive the inference equations again from scratch and it may not lead to an analytically pleasing answer. 
-
-"""
-
 # ╔═╡ 272afaec-d294-11ef-3953-5f868ec73cb8
-keyconcept("", md"Generally, we will want to automate inference processes in dynamic models. We showed how Kalman filtering emerged naturally by automated message passing.")
+keyconcept("", 
+md"""
+Generally, we will want to automate inference processes in dynamic models. We showed how Kalman filtering *emerged naturally* by automated message passing.
+	   
+
+""")
  
 
+# ╔═╡ b9839d29-3a1d-4deb-b457-7ae4b6089897
+TODO("Add key concepts slide here")
+
 # ╔═╡ 7505d957-0c4d-41ba-a662-45ba4dfe4d05
-md"""
-# Exercises
-"""
+exercises(header_level=1)
 
 # ╔═╡ 3a188b49-919d-4168-b789-ce6a5cebf509
 md"""
@@ -744,7 +751,7 @@ An HMM can be interpreted as a Gaussian-Mixture-model-over-time.
 
 # ╔═╡ 272b07f8-d294-11ef-3bfe-bffd9e3623aa
 md"""
-#  Optional
+#  Optional Slides
 
 """
 
@@ -760,7 +767,7 @@ Using the methods of the previous lessons, it is possible to create your own new
 
 # ╔═╡ f44e0303-dd28-48ad-9de2-7f7882f3923d
 md"""
-# Appendix
+# Code
 """
 
 # ╔═╡ dab295ff-5a02-4e4f-8f46-b0842b6bf1ff
@@ -3471,6 +3478,7 @@ version = "1.9.2+0"
 # ╟─fc919736-d9e3-4ca0-a53c-5fac18539ab5
 # ╟─2728c344-d294-11ef-1c5e-8d601b7ac3f9
 # ╟─2728d136-d294-11ef-27bc-6de51ace159c
+# ╟─73104616-8cb4-4665-b09b-1c771ecdf372
 # ╟─2728dece-d294-11ef-2dda-af89555d838f
 # ╟─2728e5c2-d294-11ef-1788-9b3699bb4ccd
 # ╟─2729087c-d294-11ef-3f71-51112552f7b9
@@ -3479,6 +3487,7 @@ version = "1.9.2+0"
 # ╟─27290f78-d294-11ef-2ac4-b179be83b812
 # ╟─27295340-d294-11ef-3a56-131df0415315
 # ╟─27296132-d294-11ef-0d39-9da05d6c20b7
+# ╟─6bcabd28-f72b-47d9-b846-b1528f3758bb
 # ╟─27298004-d294-11ef-06db-490237bf9408
 # ╟─d51bd37b-a12f-426a-87ca-6d4e6701fdb4
 # ╟─030d6de1-1f63-47d3-bea0-abe3ddf24be4
@@ -3492,8 +3501,8 @@ version = "1.9.2+0"
 # ╟─2729b6dc-d294-11ef-390f-6fa53c0b04f1
 # ╟─2729c4ba-d294-11ef-1ccc-df1f4ef5f3d4
 # ╟─2729ec24-d294-11ef-2547-cbb5238bb18d
-# ╟─e804a2a0-3f67-4eea-a9c8-f603a8df9a03
 # ╟─272a00a6-d294-11ef-18ba-a3700f78b13f
+# ╠═e44c6138-7f59-48f3-8f4d-7c5db8e1c016
 # ╟─bbaa44b9-9bac-4fb8-8014-fbf400a93039
 # ╟─599e21c8-1141-4192-9dd7-46b83314a1ef
 # ╟─272a0d3a-d294-11ef-2537-39a6e410e56b
@@ -3514,11 +3523,8 @@ version = "1.9.2+0"
 # ╠═32f7bc6a-cf3d-44f3-9603-8c4fe5c1a32d
 # ╠═25b3697e-6171-402c-97a5-201ca6bbe3a7
 # ╠═331415dc-70fd-4b58-8536-8ed47b071e25
-# ╟─272ac73e-d294-11ef-0526-55f6dfa019d1
-# ╟─272ad3fa-d294-11ef-030a-5b8e2070d654
-# ╟─272ae098-d294-11ef-3214-95b92faefeb5
-# ╟─272aed72-d294-11ef-0e8b-a7826a811284
 # ╟─272afaec-d294-11ef-3953-5f868ec73cb8
+# ╠═b9839d29-3a1d-4deb-b457-7ae4b6089897
 # ╟─7505d957-0c4d-41ba-a662-45ba4dfe4d05
 # ╟─3a188b49-919d-4168-b789-ce6a5cebf509
 # ╟─e8cab5ea-4906-4c64-b1bb-f33e267762a1
