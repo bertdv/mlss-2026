@@ -258,7 +258,7 @@ p(D_m|\mu) =\frac{N!}{m_1! m_2!\ldots m_K!} \,\prod_k \mu_k^{m_k}\,.
 
 # ╔═╡ d84422a6-d294-11ef-148b-c762a90cd620
 md"""
-(We insert this slide only to alert you to the difference between using one-hot encoded outcomes ``D=\{x_1,x_2,\ldots,x_N\}`` as the data, versus using counts ``D_m = \{m_1mm_3,\ldots,m_K\}`` as the data. When used as a likelihood function for ``\mu``, it makes no difference whether you use ``p(D|\mu)`` or ``p(D_m|\mu)``.)
+(We insert this slide only to alert you to the difference between using one-hot encoded outcomes ``D=\{x_1,x_2,\ldots,x_N\}`` as the data, versus using counts ``D_m = \{m_1,m_2,\ldots,m_K\}`` as the data. When used as a likelihood function for ``\mu``, it makes no difference whether you use ``p(D|\mu)`` or ``p(D_m|\mu)``.)
 
 """
 
