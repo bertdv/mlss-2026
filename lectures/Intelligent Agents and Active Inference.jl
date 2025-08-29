@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.15
+# v0.20.17
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/ai_agent/agent-cart-interaction2.png?raw=true"
@@ -87,7 +87,7 @@ In this lesson, we will describe how **goal-directed behavior** by biological (a
 """
 
 # ╔═╡ aed436fd-6773-4932-a5d8-d01cf99c10ec
-challenge_statement("The Door-Key MiniGrid Problem", color="red")
+challenge_statement("The Door-Key MiniGrid Problem", color="red",header_level=1)
 
 # ╔═╡ 983873d0-e1bc-4e1b-9b6c-3df0a17d83f6
 TwoColumn(
@@ -139,6 +139,9 @@ Later in his lectures and papers, Friston expands on this belief-based objective
 
 """
 
+# ╔═╡ 126c3221-34b8-4a8f-b5b5-c14ff4c6a2a1
+keyconcept("","Friston’s key insight is that intelligent behavior necessarily involves uncertainty-reducing behavior, which should be framed as the optimization of a functional of beliefs (i.e., probabilities) over future states.")
+
 # ╔═╡ 29592915-cadf-4674-958b-5743a8f73a8b
 md"""
 
@@ -147,7 +150,7 @@ md"""
 The Free Energy Principle (FEP) is neither a model nor a theory. Rather, it is a principle, that is, a **methodological framework** for describing the information-processing dynamics that *must* unfold in living systems to keep them within viable (i.e., livable) states over extended periods of time.
   -  Think of the processes continuously occurring in our bodies to maintain an internal temperature between approximately ``36^{\circ}\text{C}`` and ``37^{\circ}\text{C}``, regardless of the surrounding ambient temperature.
 
-The literature on the FEP is widely regarded as difficult to access. It was first formally derived by Friston in his monograph [Friston (2019), A Free Energy Principle for a Particular Physics (2019)](https://arxiv.org/abs/1906.10184), and later presented in a more accessible form in [Friston et al. (2023), The Free Energy Principle Made Simpler but Not Too Simple](https://doi.org/10.1016/j.physrep.2023.07.001). For a concise and approachable introduction, the explainer by [Noumenal Labs (2025), WTF is the FEP?](https://www.noumenal.ai/post/wtf-is-the-fep-a-short-explainer-on-the-free-energy-principle) is currently the most accessible resource I am aware of.
+The literature on the FEP is widely regarded as difficult to access. It was first formally derived as a specific case of the [Least Action Principle](#The-FEP-is-a-Least-Action-Principle-for-"Things") by Friston in his monograph [Friston (2019), A Free Energy Principle for a Particular Physics (2019)](https://arxiv.org/abs/1906.10184), and later presented in a more accessible form in [Friston et al. (2023), The Free Energy Principle Made Simpler but Not Too Simple](https://doi.org/10.1016/j.physrep.2023.07.001). For a concise and approachable introduction, the explainer by [Noumenal Labs (2025), WTF is the FEP?](https://www.noumenal.ai/post/wtf-is-the-fep-a-short-explainer-on-the-free-energy-principle) is currently the most accessible resource I am aware of.
 
 In this lecture, we present only a simplified account. According to the FEP, the brain is a generative model for its sensory inputs, such as visual and auditory signals, and **continuously minimizes variational free energy** (VFE) in that model to stay aligned with these observations. Crucially, VFE minimization is the *only* ongoing process, and it underlies perception, learning, attention, emotions, consciousness, intelligent decision-making, etc. 
 
@@ -161,6 +164,9 @@ This perceptual flip arises because the brain’s generative model assigns a muc
 
 In short, the FEP characterizes “intelligent” behavior as the outcome of a VFE minimization process. Next, we derive the dynamics of an *Active Inference* agent—an agent whose behavior is entirely governed by VFE minimization. We will demonstrate that minimizing VFE within a generative model constitutes a sufficient mechanism for producing basic intelligent behavior.
 """
+
+# ╔═╡ 5b8405f7-8878-43dd-8f84-bca17450924f
+keyconcept("","The **Free Energy Principle** (FEP) can be seen as a specific instance of the Least Action Principle applied to biological systems, which are technically systems that act to preserve their functional and structural integrity.")
 
 # ╔═╡ 9708215c-72c9-408f-bd10-68ae02e17243
 md"""
@@ -386,6 +392,9 @@ From an engineering perspective, if one accepts that effective decision-making s
 
 """
 
+# ╔═╡ 63609dc2-2413-4822-8401-2d2ba22adfce
+keyconcept("","The process underlying naturally intelligent behavior is termed **Active Inference** (AIF). It can be described as the minimization of a variational free energy under a generative model that incorporates a rollout into the future.")
+
 # ╔═╡ 5b66f8e5-4f01-4448-82e3-388bc8ea31de
 md"""
 ## Interpretation of the Epistemic Priors
@@ -423,13 +432,8 @@ The figure shows the state of the system at time ``t``, after having executed ac
 
 """
 
-# ╔═╡ 6ef5a268-81bb-4418-a54b-a1e37a089381
-md"""
-# Implementation
-"""
-
 # ╔═╡ 64474167-bf52-456c-9099-def288bd17bf
-challenge_solution("The Door-Key MiniGrid Problem", color="green")
+challenge_solution("The Door-Key MiniGrid Problem", header_level=1,color="green")
 
 # ╔═╡ 2784f45e-d294-11ef-0439-1903016c1f14
 md"""
@@ -515,6 +519,9 @@ While the advantages listed above hold great promise for the future of synthetic
 
 """
 
+# ╔═╡ e3b4d8cc-d028-4e00-b4f3-369f1601510d
+keyconcept("","In principle, active inference offers a unified way to address several long-standing challenges faced by current approaches to agentic AI. In practice, however, the available toolboxes for active inference remain less mature than those for more conventional AI paradigms, such as deep learning, large language models, and reinforcement learning.")
+
 # ╔═╡ d823599e-a87f-4586-999f-fbbd99d0db65
 md"""
 ## The FEP: A New Frontier for Understanding Intelligent Behavior
@@ -530,11 +537,15 @@ Looking ahead to the future of artificial intelligence, adaptive robotics, and a
 
 """
 
+# ╔═╡ df4950bc-4532-44e3-b8c7-18dd62fdfb09
+TODO("add keyconcepts slide here")
+
+# ╔═╡ aed24f2d-105e-4583-b9d6-24d1886002d8
+exercises(header_level=1)
+
 # ╔═╡ acefdbf6-1beb-4ce5-9106-0fc7be63dabe
 md"""
-# Exercises
-
-- There are no more exercises. If you understand the Free Energy Principle and active inference, you now hold a lens for seeing into the mechanics of life, consciousness, and intelligent behavior. The next insights are yours to discover.
+There are no more exercises. If you understand the Free Energy Principle and active inference, you now hold a lens for seeing into the mechanics of life, consciousness, and intelligent behavior. The next insights are yours to discover.
 """
 
 # ╔═╡ 6d697856-cc58-4d6a-afd3-c0c6bfbc0d88
@@ -581,7 +592,7 @@ The challenge is computational efficiency: the human brain runs on about 20 [W],
 
 # ╔═╡ be0dc5c0-6340-4d47-85ae-d70e06df1676
 md"""
-# Appendix
+# Code
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -599,7 +610,7 @@ RxInfer = "~4.5.1"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.4"
+julia_version = "1.11.6"
 manifest_format = "2.0"
 project_hash = "0dc7c39b2f794078a8a747fa66a5835ffec15ddd"
 
@@ -1377,7 +1388,7 @@ version = "0.3.27+1"
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.1+4"
+version = "0.8.5+0"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
@@ -1814,7 +1825,9 @@ version = "17.4.0+2"
 # ╟─939e74b0-8ceb-4214-bbc0-407c8f0b2f26
 # ╟─e3d5786b-49e0-40f7-9056-13e26e09a4cf
 # ╟─2783c686-d294-11ef-3942-c75d2b559fb3
+# ╟─126c3221-34b8-4a8f-b5b5-c14ff4c6a2a1
 # ╟─29592915-cadf-4674-958b-5743a8f73a8b
+# ╟─5b8405f7-8878-43dd-8f84-bca17450924f
 # ╟─9708215c-72c9-408f-bd10-68ae02e17243
 # ╟─f9b241fd-d853-433e-9996-41d8a60ed9e8
 # ╟─97136f81-3468-439a-8a22-5aae96725937
@@ -1825,9 +1838,9 @@ version = "17.4.0+2"
 # ╟─ef54a162-d0ba-47ef-af75-88c92276ed66
 # ╟─94391132-dee6-4b22-9900-ba394f4ad66b
 # ╟─a8c88dff-b10c-4c25-8dbe-8f04ee04cffa
+# ╟─63609dc2-2413-4822-8401-2d2ba22adfce
 # ╟─5b66f8e5-4f01-4448-82e3-388bc8ea31de
 # ╟─07c48a8b-522b-4c26-a177-e8d0611f7b59
-# ╟─6ef5a268-81bb-4418-a54b-a1e37a089381
 # ╟─64474167-bf52-456c-9099-def288bd17bf
 # ╟─2784f45e-d294-11ef-0439-1903016c1f14
 # ╠═0b5b816b-2dd2-4fe8-8f84-4eb2d58b5d59
@@ -1837,7 +1850,10 @@ version = "17.4.0+2"
 # ╟─f4509603-36be-4d24-8933-eb7a705eb933
 # ╟─8d7058c4-0e13-4d05-b131-32b1f118129f
 # ╟─1c53d48b-6950-4921-bf03-292b5ed8980e
+# ╟─e3b4d8cc-d028-4e00-b4f3-369f1601510d
 # ╟─d823599e-a87f-4586-999f-fbbd99d0db65
+# ╠═df4950bc-4532-44e3-b8c7-18dd62fdfb09
+# ╟─aed24f2d-105e-4583-b9d6-24d1886002d8
 # ╟─acefdbf6-1beb-4ce5-9106-0fc7be63dabe
 # ╟─6d697856-cc58-4d6a-afd3-c0c6bfbc0d88
 # ╟─345fa88c-98c2-4c41-b046-0c2d868b1d36
