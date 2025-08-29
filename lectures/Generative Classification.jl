@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.17
 
 #> [frontmatter]
 #> description = "Can you teach a computer to tell apples from peaches? Discover generative classification!"
@@ -64,7 +64,7 @@ md"""
 """
 
 # ╔═╡ f7a19975-a919-4659-9b6a-d8963a1cd6d9
-challenge_statement("Apple or Peach?" , color= "red" )
+challenge_statement("Apple or Peach?" , color= "red", header_level=1 )
 
 # ╔═╡ 876f47d8-b272-4e23-b5ec-5c7d615ff618
 begin
@@ -170,6 +170,16 @@ As usual, once the model has been specified, the rest (inference for parameters 
 
 """
 
+# ╔═╡ 20cd1582-d7f7-448c-8685-607f7cc1dc9c
+keyconcept("",md"""
+A common generative model for classification is the **Gaussian–Categorical model**:
+
+```math
+p(x,\mathcal{C}_k|\,\theta) = \pi_k \cdot \mathcal{N}(x|\mu_k,\Sigma) \,.
+```   
+
+""")
+
 # ╔═╡ 23c7779a-d294-11ef-2e2c-6ba6cadb1381
 md"""
 ## Parameter Estimation
@@ -258,6 +268,13 @@ Note that the binary class selection variable ``y_{nk}`` groups data from the sa
 
 """
 
+# ╔═╡ 14362031-7977-4a0c-b329-23da9b5b2f62
+keyconcept("",
+md"""
+ML estimation for ``\{\pi_k,\mu_k,\Sigma\}`` in the GCM model breaks down to simple density estimation for Gaussian and multinomial/categorical distributions.
+
+""")
+
 # ╔═╡ 23c7baa4-d294-11ef-22c1-31b0d86f5586
 md"""
 ## Application: Class prediction for new Data
@@ -315,6 +332,17 @@ Importantly, we did not impose the softmax posterior by assumption; rather, it e
 
 # ╔═╡ 2f2cb20f-ff7c-4b7f-8aa0-f5b3addb9299
 NotebookCard("https://bmlip.github.io/course/minis/Softmax.html")
+
+# ╔═╡ 866d8e7a-2b33-4635-84c0-6cbf900b523b
+keyconcept("",
+md"""For the GCM with equal covariances, the posterior class probability is a softmax function,
+
+```math
+ p(\mathcal{C}_k|x,\theta ) \propto \exp\{\beta_k^T x + \gamma_k\}
+```
+
+where ``\beta _k= \Sigma^{-1} \mu_k`` and ``\gamma_k=- \frac{1}{2} \mu_k^T \Sigma^{-1} \mu_k  + \log \pi_k``.
+""")
 
 # ╔═╡ 23c82154-d294-11ef-0945-c9c94fc2a44d
 md"""
@@ -385,6 +413,11 @@ where we defined ``\beta_{kj} \triangleq \beta_k - \beta_j`` and similarly for `
 	   
 	   )
 
+# ╔═╡ 117f3f65-a9bd-4b25-93e2-42ac1e576b6d
+keyconcept("",
+md""" If the class-conditional distributions are Gaussian with equal covariance matrices across classes (i.e., ``\Sigma_k = \Sigma``), then   the discriminant functions are hyperplanes in feature space.
+""")
+
 # ╔═╡ a8adaf31-bee2-40e9-8d9b-bb9f1ad996ca
 md"""
 Now assume that the class-conditional feature distributions are modeled with class-dependent covariance matrices, i.e.,
@@ -417,7 +450,7 @@ N_bond
 # ╔═╡ 4481b38d-dc67-4c1f-ac0b-b348f0aea461
 md"""
 
-### Implementation
+## Implementation Issues
 
 We can fit a Bernouilly distribution to [`y` (see definition)](#y), this is simple:
 """
@@ -488,41 +521,8 @@ Admittedly, the probabilistic approach can be challenging to grasp at first, but
 
 """
 
-# ╔═╡ 23c8698e-d294-11ef-2ae8-83bebd89d6c0
-md"""
-## Recap Generative Classification
-
-Gaussian-Categorical Model specification:  
-
-```math
-p(x,\mathcal{C}_k|\,\theta) = \pi_k \cdot \mathcal{N}(x|\mu_k,\Sigma)
-```
-
-"""
-
-# ╔═╡ 23c87654-d294-11ef-3aaf-595b207054a5
-md"""
-If the class-conditional distributions are Gaussian with equal covariance matrices across classes (``\Sigma_k = \Sigma``), then   the discriminant functions are hyperplanes in feature space.
-
-"""
-
-# ╔═╡ 23c88284-d294-11ef-113b-f57800a10e5d
-md"""
-ML estimation for ``\{\pi_k,\mu_k,\Sigma\}`` in the GCM model breaks down to simple density estimation for Gaussian and multinomial/categorical distributions.
-
-"""
-
-# ╔═╡ 23c88ec8-d294-11ef-3e0d-8de1377a14bf
-md"""
-Posterior class probability is a softmax function
-
-```math
- p(\mathcal{C}_k|x,\theta ) \propto \exp\{\beta_k^T x + \gamma_k\}
-```
-
-where ``\beta _k= \Sigma^{-1} \mu_k`` and ``\gamma_k=- \frac{1}{2} \mu_k^T \Sigma^{-1} \mu_k  + \log \pi_k``.
-
-"""
+# ╔═╡ 45f1f80d-18fc-465c-aaf3-54bbcd8bc95e
+TODO("Add key concepts slide here")
 
 # ╔═╡ ca11db2d-aa15-4bf1-b949-529c7487d11d
 exercises(header_level=1)
@@ -640,12 +640,7 @@ Substituting this into the right-most form of (4.57) we obtain (4.65), with ``w`
 
 # ╔═╡ e65e0e33-3e4f-4765-84ea-a4fb5d43269e
 md"""
-# Appendix
-"""
-
-# ╔═╡ 86f217fc-379c-46a0-a720-de956d456b2a
-md"""
-## Code
+# Code
 """
 
 # ╔═╡ a4463d74-04ea-428a-b5a5-504d96432a0a
@@ -798,7 +793,7 @@ apple_marker = @htl """<svg style="vertical-align: -.15em;" xmlns="http://www.w3
 
 # ╔═╡ 90b862a5-d5bc-4122-a942-f01062daa86a
 md"""
-## Posterior class probability of ``x_∙`` (prediction)
+### Posterior class probability of ``x_∙`` (prediction)
 
 Now we can answer the question from the challenge, and calculate the probability that ``x_∙`` is an apple $apple_marker.
 """
@@ -827,7 +822,7 @@ md"""
 
 ##### Problem
 
-  - Based on the observed data, what is the **probability that the test fruit is an apple $apple_marker, and not a peach $peach_marker?**
+  - Based on the observed data, what is the probability that the test fruit is an apple $apple_marker, and not a peach $peach_marker?
 
 ##### Solution
 
@@ -2131,6 +2126,7 @@ version = "1.9.2+0"
 # ╟─23c74748-d294-11ef-2170-bf45b6379e4d
 # ╟─23c75dc8-d294-11ef-3c57-614e75f06d8f
 # ╟─23c763ce-d294-11ef-015b-736be1a5e9d6
+# ╟─20cd1582-d7f7-448c-8685-607f7cc1dc9c
 # ╟─23c7779a-d294-11ef-2e2c-6ba6cadb1381
 # ╟─ffc80e65-a454-4b45-a9b7-76b01c7e96c0
 # ╟─2e1ccf78-6097-4097-8bc8-1f1ec2d9c3ff
@@ -2139,16 +2135,19 @@ version = "1.9.2+0"
 # ╟─23c798ce-d294-11ef-0190-f342f30e2266
 # ╟─23c7a54c-d294-11ef-0252-ef7a043e995c
 # ╟─23c7ab20-d294-11ef-1926-afae49e79923
+# ╟─14362031-7977-4a0c-b329-23da9b5b2f62
 # ╟─23c7baa4-d294-11ef-22c1-31b0d86f5586
 # ╟─84353cd1-e4fb-4689-9e90-d8995cbe2e9b
 # ╟─23c7c920-d294-11ef-1b6d-d98dd54dcbe3
 # ╟─2f2cb20f-ff7c-4b7f-8aa0-f5b3addb9299
+# ╟─866d8e7a-2b33-4635-84c0-6cbf900b523b
 # ╟─23c82154-d294-11ef-0945-c9c94fc2a44d
 # ╟─23c7e4a0-d294-11ef-16e9-6f96a41baf97
 # ╟─23c7f170-d294-11ef-1340-fbdf4ce5fd44
 # ╟─5c746070-19a9-464b-aedc-401d016dfdb6
 # ╟─8d78f9d3-7ba8-46b0-8d6f-231e681caa49
 # ╟─25e18c78-9cac-4faa-bb7c-ac036d0eac90
+# ╟─117f3f65-a9bd-4b25-93e2-42ac1e576b6d
 # ╟─a8adaf31-bee2-40e9-8d9b-bb9f1ad996ca
 # ╟─b01a4a56-bed2-4a06-991a-831adc84aa3e
 # ╟─1a890e4b-b8a9-4a6e-b1f3-17863e1416d7
@@ -2165,7 +2164,7 @@ version = "1.9.2+0"
 # ╠═ba9fa93f-093c-4783-988f-27f4ba228e88
 # ╠═46d2d5e9-bb6b-409a-acdc-cdffd1a6f797
 # ╟─e91effb4-b3ac-4d7a-b93f-33a78a125110
-# ╟─90b862a5-d5bc-4122-a942-f01062daa86a
+# ╠═90b862a5-d5bc-4122-a942-f01062daa86a
 # ╠═33d5d6e7-1208-4c5b-b651-429b3b6ad50b
 # ╟─723e09fc-ec63-4c47-844c-d821515ce0f4
 # ╟─9973e8e5-4744-4ff6-9494-1c93503f11c1
@@ -2173,10 +2172,7 @@ version = "1.9.2+0"
 # ╟─845f19c4-c3c5-4368-a48a-a7b57687ddf9
 # ╟─21602809-d98b-43d7-8c41-80dc8de6da57
 # ╟─23c85d90-d294-11ef-375e-7101d4d3cbfa
-# ╟─23c8698e-d294-11ef-2ae8-83bebd89d6c0
-# ╟─23c87654-d294-11ef-3aaf-595b207054a5
-# ╟─23c88284-d294-11ef-113b-f57800a10e5d
-# ╟─23c88ec8-d294-11ef-3e0d-8de1377a14bf
+# ╠═45f1f80d-18fc-465c-aaf3-54bbcd8bc95e
 # ╟─ca11db2d-aa15-4bf1-b949-529c7487d11d
 # ╟─24a08e5c-c2c1-4f1f-a2c1-998b30147e61
 # ╟─66172ab6-7df8-4068-a748-b33b3f345d6d
@@ -2188,7 +2184,6 @@ version = "1.9.2+0"
 # ╠═f1575443-c9fb-4674-bbce-bf3a5a6d5a8d
 # ╠═26853cdc-0644-4f44-b6db-b5624a4a8689
 # ╠═50cbe27e-009f-4df1-b80a-cf1e73fc525e
-# ╟─86f217fc-379c-46a0-a720-de956d456b2a
 # ╟─a4463d74-04ea-428a-b5a5-504d96432a0a
 # ╠═3842654e-6dd7-427c-bb77-8b35a2f324fb
 # ╠═c91ed138-9885-43ce-a00e-1ba6e996f1aa

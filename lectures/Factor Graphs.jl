@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.17
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/ffg-example-1.png?raw=true"
@@ -488,6 +488,16 @@ If the factor graph for the whole model has no cycles, i.e., the FFG is a tree, 
 However, if the graph contains cycles, one can conceptually view the graph as an infinite tree by “unrolling” the cycles. In this loopy setting, SP-based inference is not guaranteed to yield exact marginals. Nevertheless, in practice, if we run the SP algorithm for a limited number of iterations (i.e., a finite unrolling), we often obtain high-quality approximate marginals that are sufficient for many inference tasks.
 """
 
+# ╔═╡ 7009cdc8-892c-499e-b932-b828fa300b6c
+keyconcept("",
+md"""
+For a node ``f(y,x_1,\ldots,x_n)`` with incoming messages ``\overrightarrow{\mu}_{X_1}(x_1)``, ``\overrightarrow{\mu}_{X_2}(x_2)``, ``\ldots``,``\overrightarrow{\mu}_{X_n}(x_n)``, the outgoing message is given by the **sum-product rule**: 
+
+```math
+\overrightarrow{\mu}_{Y}(y)= \sum_{x_1,\ldots,x_n} \overrightarrow{\mu}_{X_1}(x_1)\cdots \overrightarrow{\mu}_{X_n}(x_n) \cdot f(y,x_1,\ldots,x_n)
+```
+""")
+
 # ╔═╡ 91f81188-727c-4754-9a07-e754eef8bbe0
 md"""
 ## Example: Sum-Product Messages for the Equality Node
@@ -706,9 +716,9 @@ Notice how the samples of the functions ``f_w`` lie closer together as we get mo
 
 # ╔═╡ 4a10044c-e044-43e1-bd44-847f56019061
 keyconcept(
-	"RxInfer does Bayesian ML",
+	"",
 	md"""
-	In RxInfer, you need to specify the model and provide the observations. Inference is executed automatically by the "infer( )" function. 
+	“In `RxInfer`, once the model is specified and the observations are provided, Bayesian inference is carried out automatically via the `infer()` function.”
 	"""
 )
 
@@ -731,10 +741,11 @@ Although RxInfer is still under active development, my prediction is that within
 
 """
 
+# ╔═╡ fa5bdb1c-4412-48cc-950c-9ed92b4c9f76
+TODO("key concepts slide")
+
 # ╔═╡ 25492eea-e649-43f9-b71f-ac6d1a80d0ee
-md"""
-# Exercises
-"""
+exercises(header_level=1)
 
 # ╔═╡ a5cd774f-57ad-4cb5-86c0-35987aa6e221
 md"""
@@ -901,7 +912,7 @@ i.e., ``\overrightarrow{\mu}_{Z}`` is the convolution of the messages ``\overrig
 
 # ╔═╡ 965a8a1a-d294-11ef-1d2f-65abf76665e8
 md"""
-# OPTIONAL SLIDES
+# Optional Slides
 
 """
 
@@ -1138,7 +1149,7 @@ Text("Manual result: p(x|y1,y2) = \n\t𝒩($(m), $(v))")
 
 # ╔═╡ 89da2fc0-a7c8-4a9d-82d9-622a311d010d
 md"""
-# Appendix
+# Code
 """
 
 # ╔═╡ 981b08cc-7fb4-4880-8e8a-0b60a5dd72a2
@@ -3274,6 +3285,7 @@ version = "1.9.2+0"
 # ╟─96575dd4-d294-11ef-31d6-b39b4c4bdea1
 # ╟─5cc2016e-0383-448c-bd33-5b3a687b7436
 # ╟─f65f5d0e-2583-4b88-b9f2-5fee15257c05
+# ╟─7009cdc8-892c-499e-b932-b828fa300b6c
 # ╟─91f81188-727c-4754-9a07-e754eef8bbe0
 # ╟─0633afea-5e92-4bad-8402-d159c534af81
 # ╟─f11564db-aafc-4df9-b494-4e5ced9bfcfe
@@ -3309,6 +3321,7 @@ version = "1.9.2+0"
 # ╟─4a10044c-e044-43e1-bd44-847f56019061
 # ╠═92f7bcfd-00a4-4cb7-a3eb-c1e101fdbcf6
 # ╟─965a6c20-d294-11ef-1c91-4bd237afbd20
+# ╠═fa5bdb1c-4412-48cc-950c-9ed92b4c9f76
 # ╟─25492eea-e649-43f9-b71f-ac6d1a80d0ee
 # ╟─a5cd774f-57ad-4cb5-86c0-35987aa6e221
 # ╟─b6de3f00-d3b8-44d8-b72a-48cd5628b607
