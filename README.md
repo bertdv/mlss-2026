@@ -1,5 +1,5 @@
-# BMLIP *2025-2026 edition*
-
+# 5SSD0 Course Homepage, *2025-2026 edition*
+### Bayesian Machine Learning and Information Processing (at [TU Eindhoven](https://www.tue.nl/en/))
 
 > [!WARNING]
 > This site is currently under construction. This is the class for 12 Nov 2025 - 29 Jan 2026 (2nd quarter).
