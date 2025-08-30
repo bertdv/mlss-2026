@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.15
+# v0.20.17
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/scientific-inquiry-loop.png?raw=true"
@@ -25,11 +25,11 @@ PlutoUI.TableOfContents()
 md"""
 ## Preliminaries
 
-Goal
+##### Goal
 
   * Top-level overview of machine learning
 
-Materials
+##### Materials
 
   * Mandatory  
 
@@ -50,13 +50,17 @@ Machine Learning relates to **building models from data and using these models i
 
 # ╔═╡ 3cec06e6-d294-11ef-3359-5740f25965da
 md"""
-**Problem**: Suppose we want to develop an algorithm for a complex process about which we have little knowledge (so hand-programming is not possible).
+##### Problem
+
+ - Suppose we want to develop an algorithm for a complex process about which we have little knowledge (so hand-programming is not possible).
 
 """
 
 # ╔═╡ 3cec1032-d294-11ef-1b9d-237c491b2eb2
 md"""
-**Solution**: Get the computer to develop the algorithm by itself by showing it examples of the behavior that we want.
+##### Solution
+
+ - Get the computer to develop the algorithm by itself by showing it examples of the behavior that we want.
 
 """
 
@@ -74,29 +78,37 @@ This field is known in various scientific communities with slight variations und
 
 # ╔═╡ 3cec3062-d294-11ef-3dd6-bfc5588bdf1f
 md"""
-## Machine Learning and the Scientific Inquiry Loop
+## Machine Learning and the Scientific Method
+
+
+The **scientific method** (or scientific inquiry loop) is a systematic approach for building models of the world. It comprises three stages:
+
+  1.	**Hypothesis formulation / Experimental ("Trial") design** – a trial is designed and executed, based on an analysis of the uncertainties in the current model.
+
+  2.	**Observation / Data collection** – the world’s response to the trial is measured in the form of new observations.
+
+  3.	**Analysis / Model updating** – the model is revised in light of the observations.
+
+The cycle repeats, incrementally improving the model and our understanding. In an engineering context, the model can be used for various applications, such as predicting the future, or recognizing observations as objects.
 
 ![](https://github.com/bmlip/course/blob/v2/assets/figures/scientific-inquiry-loop.png?raw=true)
 
-Machine learning technology uses the scientific inquiry loop to develop models and use these models in applications.
+
+Machine learning can be viewed analogously, as the process of constructing models of the world. While one may debate whether the experimental design stage is part of the machine learning field, the model updating stage, driven by observations, clearly is. This explains why machine learning methods are applied so widely across the sciences and engineering disciplines.
+
+In this course, we will revisit this scientific inquiry loop and progressively annotate it with the mathematical formulas that underlie each stage of the scientific method.
 
 """
 
-# ╔═╡ fa1d5123-db02-4fda-93d2-3e5e2efed515
-html"""
-<style>
-pluto-output img {
-	background: white;
-	border-radius: 3px;
-}
-</style>
-"""
+# ╔═╡ a3ae8443-0100-41f7-a91a-c7d128064b88
+keyconcept("",
+"Machine learning is about building models of the environment and is therefore an integral part of the scientific inquiry loop. Consequently, we see machine learning applied across the sciences, engineering, and society at large.")
 
 # ╔═╡ 3cec43d4-d294-11ef-0a9f-43eb506527a6
 md"""
 ## Machine Learning is Difficult
 
-Modeling (Learning) Problems
+##### Modeling (Learning) Problems
 
   * Is there any regularity in the data anyway?
   * What is our prior knowledge and how to express it mathematically?
@@ -108,7 +120,7 @@ Modeling (Learning) Problems
 
 # ╔═╡ 3cec5b96-d294-11ef-39e0-15e93768d2b1
 md"""
-Quality of Observed Data
+##### Quality of Observed Data
 
   * Not enough data
   * Too much data?
@@ -118,192 +130,202 @@ Quality of Observed Data
 
 # ╔═╡ 3cec86cc-d294-11ef-267d-7743fd241c64
 md"""
-## A Machine Learning Taxonomy
+# A Machine Learning Taxonomy
+
+Machine learning methods can be grouped, in broad terms, into four categories:
+
+ - Supervised learning
+
+ - Unsupervised learning
+
+ - Trial design / decision-making
+
+ - Other frameworks
+   - Other stuff, like preference learning, learning to rank, etc., can often be (re-)formulated as special cases of either a supervised, unsupervised, or trial design problem.
+
+We will briefly introduce these categories below and, in the forthcoming lectures, expand on how each can be framed within the Bayesian machine learning perspective.
 
 ![](https://github.com/bmlip/course/blob/v2/assets/figures/ml-taxonomy.png?raw=true)
 
-**Supervised Learning**: Given examples of inputs and corresponding
 
-desired outputs, predict outputs on future inputs. Essentially, supervised learning relates to learning functions. [Functions describe the world, at least, that's what this guy says.](https://youtu.be/BWZTlfrneD8?si=8Oa4XLlkgaQZpW1H)
+"""
 
-Examples: classification, regression, time series prediction
+# ╔═╡ a66c3b31-0f1f-41ff-b19c-0926ea1c2ff5
+keyconcept("",
+"The three major paradigms of machine learning are supervised learning, unsupervised learning, and trial design. Most other applications can be reframed within one of these three frameworks." )
+
+# ╔═╡ 6f95adeb-d0a9-47fd-900a-0e55d497bab6
+md"""
+## Supervised Learning
+"""
+
+# ╔═╡ 3ced0d0c-d294-11ef-3000-7b63362a2351
+md"""
+
+In **supervised learning**, we are given observations of desired input–output behavior,
+
+```math
+D = \{(x_1, y_1), \dots, (x_N, y_N)\},
+```
+
+where ``x_n`` are inputs and ``y_n`` are the corresponding outputs. The goal is to estimate the conditional probability distribution ``p(y_n | x_n)``, i.e., to capture how ``y_n`` depends on ``x_n``. The term "supervised" reflects the fact that the correct outputs ``y_n`` are provided in the training dataset ``D``.
+
+Generally, we distinguish between **classification** and **regression** as two different supervised learning problems. 
+
+"""
+
+# ╔═╡ e1122eab-a25b-4441-a053-b0121b334731
+md"""
+#### Classification
+
+In a classification problem, the target variable ``y`` is a *discrete-valued* vector representing class labels.  
+
+The special case ``y \in \{\text{true},\text{false}\}`` is called **detection**. 
+
+
+![](https://github.com/bmlip/course/blob/v2/assets/figures/Bishop-Figure4.5b.png?raw=true)
 
 """
 
 # ╔═╡ 40fddaa0-cb9d-4873-b2f6-3fd2a742ecd2
 md"""
-IDEE: herhalen in andere lectures
-""" |> TODO
-
-# ╔═╡ 3cec9250-d294-11ef-01ac-9d94676a65a3
-md"""
-**Unsupervised Learning**: (a.k.a. **density estimation**). Given only inputs, automatically discover representations, features, structure, etc.
-
-  * Examples: clustering, outlier detection, compression
-
-"""
-
-# ╔═╡ 3cecbc46-d294-11ef-24cb-2d9e41fb35d9
-md"""
-**Trial Design**: (a.k.a. experimental design, active learning). Learn to make actions that optimize some performance criterion about the expected future. 
-
-  * Examples: playing games like chess, self-driving cars, robotics.
-  * Two major approaches include **reinforcement learning** and **active inference**
-
-      * **Reinforcement Learning**: Given an observed sequence of input signals and (occasionally observed) rewards for those inputs, *learn* to select actions that maximize *expected* future rewards.
-      * **Active inference**: Given an observed sequence of input signals and a prior probability distribution about future observations, *learn* to select actions
-
-that minimize *expected* prediction errors (i.e., minimize actual minus predicted sensation).    
-
-"""
-
-# ╔═╡ 3cecdb48-d294-11ef-20a1-1df2731ac57c
-md"""
-Other stuff, like **preference learning**, **learning to rank**, etc., can often be (re-)formulated as special cases of either a supervised, unsupervised or trial design problem.
-
-"""
-
-# ╔═╡ 3ced0d0c-d294-11ef-3000-7b63362a2351
-md"""
-## Supervised Learning
-
-Given observations of desired input-output behavior ``D=\{(x_1,y_1),\dots,(x_N,y_N)\}`` (with ``x_i`` inputs and ``y_i`` outputs), the goal is to estimate the conditional distribution ``p(y|x)`` (i.e., how does ``y`` depend on ``x``?).
-
-#### Classification
-
-![](https://github.com/bmlip/course/blob/v2/assets/figures/Bishop-Figure4.5b.png?raw=true)
-
-The target variable ``y`` is a *discrete-valued* vector representing class labels 
-
-The special case ``y \in \{\text{true},\text{false}\}`` is called **detection**. 
-
-"""
-
-# ╔═╡ 69555c82-a593-4fe5-97e2-8c6898253991
-md"""
-IDEE: genereren in code (Bayesian multinomial regression) (mss een mini)
-
-IDEE: klikken om data toe te voegen, en dan runt de classificatie live (2 klasses mag ook)
-
-IDEE: idem voor gressie
+Replace the image, and insert here resulting heatmap plot from Generative classification lecture.
 """ |> TODO
 
 # ╔═╡ 3ced29ae-d294-11ef-158b-09fcdaa47d1c
 md"""
 #### Regression
 
+Regression, also called **curve fitting**, is the supervised learning task of estimating the conditional distribution ``p(y_n | x_n)``, where  ``x_n`` are input variables and ``y_n`` represent __continuous__ output variables. 
+
 ![](https://github.com/bmlip/course/blob/v2/assets/figures/Bishop-Figure1.2.png?raw=true)
 
-Same problem statement as classification but now the target variable is a *real-valued* vector.
 
-Regression is sometimes called **curve fitting**.
 
 """
 
-# ╔═╡ 3ced3fc2-d294-11ef-3fac-d5e80eacc488
+# ╔═╡ aa615113-9261-4782-8f75-27682a810e97
+TODO("Replace the image with image from regression lecture")
+
+# ╔═╡ 3cec9250-d294-11ef-01ac-9d94676a65a3
 md"""
 ## Unsupervised Learning
 
-Given data ``D=\{x_1,\ldots,x_N\}``, model the (unconditional) probability distribution ``p(x)`` (a.k.a. **density estimation**). The two primary applications are **clustering** and **compression** (a.k.a. dimensionality reduction).  
+In the unsupervised learning setting, we are given a data set
 
-#### Clustering
+```math
+D=\{x_1,\ldots,x_N\}\,.
+```
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/fig-Zoubin-clustering-example.png?raw=true)
+The task is to model the unconditional probability distribution ``p(x_n)``. The absence of target variables ``y_n`` in the dataset gives rise to the term unsupervised.
 
-Group data into clusters such that all data points in a cluster have similar properties.
+Because no targets are provided, unsupervised learning problems are generally considered more challenging than supervised ones. As in supervised learning, however, we can distinguish two main types of tasks: **clustering** (discovering structure in the data) and **compression** (learning efficient representations of the data).
 
-Clustering can be interpreted as ''unsupervised classification''.
 
 """
 
-# ╔═╡ 61741b02-f407-4a66-be00-28f92896490e
+# ╔═╡ c5bfab8f-4985-420a-b46e-b4ff6d359d3d
 md"""
-IDEE: hier ook live
-""" |> TODO
+#### Clustering
 
-# ╔═╡ 81c85536-2ac9-4c65-9c34-f4661a2a796b
-TODO("ook references van toekomstige lectures")
+If the unobserved target variables take on discrete values, the task is referred to as clustering. In this sense, clustering can be regarded as "unsupervised classification".
 
-# ╔═╡ 1684dc8b-1bfd-4a83-9ece-460c64e9bee7
-NotebookCard("https://bmlip.github.io/course/lectures/Discriminative%20Classification.html")
+![](https://github.com/bmlip/course/blob/v2/assets/figures/fig-Zoubin-clustering-example.png?raw=true)
+"""
+
+# ╔═╡ 548b831a-afc6-4b17-890e-ab6cf30114fa
+TODO("Remove clustering image and replace by image from Latent variables lecture")
 
 # ╔═╡ 3ced567c-d294-11ef-2657-df20e23a00fa
 md"""
-#### Compression / dimensionality reduction
+#### Compression 
+
+In contrast, if the unobserved target variables are continuously valued, the task is referred to as **compression**. For example, compressing an image ``x`` produces an output ``y`` that is much smaller in size than the original. The objective is to learn a mapping ``y = f(x)`` (the encoder) such that the inverse mapping ``\hat{x} = f^{-1}(y)`` reconstructs ``\hat{x}`` as close as possible (ideally identical) to the original input ``x``.
+
+Compression can be interpreted as ''unsupervised regression''.
 
 ![](https://github.com/bmlip/course/blob/v2/assets/figures/fig-compression-example.png?raw=true)
 
-Output from coder is much smaller in size than original, but if coded signal if further processed by a decoder, then the result is very close (or exactly equal) to the original.
-
-Usually, the compressed image comprises continuously valued variables. In that case, compression can be interpreted as ''unsupervised regression''.
+In this lecture series, we hage unfortunately not enough time to discuss compression in detail in a separate lecture. [Chapter 12 in Bishop (2006)](https://www.microsoft.com/en-us/research/wp-content/uploads/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf#page=579) contains a nice introduction to compression. 
 
 """
 
-# ╔═╡ d5a490a9-be04-41bf-b59b-fdeaba999073
+# ╔═╡ 0d6029ef-87ba-4881-b7af-9de2dad1ed99
 md"""
-IDEE: (deze lecture is eruit gegaan) 
-""" |> TODO
+## Trial Design
+"""
 
-# ╔═╡ 3ced6df4-d294-11ef-1091-474e512d605c
+# ╔═╡ 3cecbc46-d294-11ef-24cb-2d9e41fb35d9
 md"""
-## Trial Design and Decision-making
 
-Given the state of the world (obtained from sensory data), the agent must *learn* to produce actions (like making a movement or making a decision) that optimize some performance criterion about the expected future.
+**Trial design** concerns learning which actions (trials) to perform in order to gain information about the environment. In the broader literature, this idea appears under many related labels, including **experimental design**, **active learning**, **decision-making under uncertainty**, **sequential decision-making**, **hypothesis testing**, **policy learning**, **planning**, and **control**. The sheer number of terms (often differing only in nuance) underscores the central importance of this task within the scientific inquiry process.
 
+In trial design problems, the model is not only a description of the environment but also acts upon it, thereby influencing which data will be observed in the future. Such systems are called "agents". In addition to the labels mentioned above, the term [Agentic AI](https://en.wikipedia.org/wiki/Agentic_AI) has recently gained popularity.
+
+In the machine learning and AI community, two prominent approaches to trial design are reinforcement learning and active inference:
+
+ - **Reinforcement Learning**: Given an observed sequence of input signals and (occasionally observed) rewards for those inputs, *learn* to select actions that maximize *expected* future rewards.
+
+ - **Active inference**: Given an observed sequence of input signals and a prior probability distribution about future observations, *learn* to select actions that minimize *expected* prediction errors (i.e., minimize actual minus predicted sensation).  
+
+In the [lecture on Intelligent Agents and Active Inference](https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html), we will discuss the active inference method in more details
+
+"""
+
+# ╔═╡ 68e00fce-a627-4943-8f62-0852873a771a
+md"""
 ![](https://github.com/bmlip/course/blob/v2/assets/figures/RL-example.png?raw=true)
 
-In contrast to supervised and unsupervised learning, an agent is able to affect its data set by making actions, e.g., a robot can change its input video data stream by turning the head of its camera. 
-
-In this course, we focus on the active inference approach to trial design, see the [Intelligent Agent lesson](https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html) for details. 
-
 """
 
-# ╔═╡ 0bdc66e2-7e66-44b9-9685-0174dce20b94
+# ╔═╡ 69555c82-a593-4fe5-97e2-8c6898253991
 md"""
-IDEE: demo van active inference agent uit laatste lecture (mountain car)
+Replace the robot image above and include here the minigrid solution from the active inference lesson
 """ |> TODO
 
 # ╔═╡ 3ced839a-d294-11ef-3dd0-1f8c5ef11b75
 md"""
 ## $(HTML("<span id='some-ml-apps'>Some Machine Learning Applications</span>"))
 
-computer speech recognition, speaker recognition
+- computer speech recognition, speaker recognition
 
-face recognition, iris identification
+- face recognition, iris identification
 
-printed and handwritten text parsing
+- printed and handwritten text parsing
 
-financial prediction, outlier detection (credit-card fraud)
+- financial prediction, outlier detection (credit-card fraud)
 
-user preference modeling (amazon); modeling of human perception
+- user preference modeling (amazon); modeling of human perception
 
-modeling of the web (google)
+- modeling of the web (google)
 
-machine translation
+- machine translation
 
-medical expert systems for disease diagnosis (e.g., mammogram)
+- medical expert systems for disease diagnosis (e.g., mammogram)
 
-strategic games (chess, go, backgammon), self-driving cars
+- strategic games (chess, go, backgammon), self-driving cars
 
 In summary, **any 'knowledge-poor' but 'data-rich' problem**
 
 """
 
-# ╔═╡ f3cff8d8-1b49-4479-be78-ee632233be5c
+# ╔═╡ 438981cd-8450-4678-8b61-9cc5c0c0ebf1
+TODO("keyconcepts slide")
+
+# ╔═╡ 86a2a956-fee6-4306-b8cb-f4b977ad3dbd
 md"""
-IDEE: twee keer hetzelfde cointoss experiment, maar eentje met ML estimator (je krijgt alleen een verticale lijn) en een met bayesian (posterior wordt smaller)
+# Code
+"""
 
-je realiseert niet dat je met ML informatie bent kwijtgeraakt
-""" |> TODO
-
-# ╔═╡ 442f9293-319e-4d43-8890-64b1c5a2a118
-md"""
-IDEE: alle voorbeelden twee plots, een tweede met onzekerheidsmarges
-
-(gradient!! voor classificatie)
-
-
-""" |> TODO
+# ╔═╡ fa1d5123-db02-4fda-93d2-3e5e2efed515
+html"""
+<style>
+pluto-output img {
+	background: white;
+	border-radius: 3px;
+}
+</style>
+"""
 
 # ╔═╡ 3ced947a-d294-11ef-0403-512f2407a2d2
 md"""
@@ -325,7 +347,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "e635641d8e55b0485ecb2515c1996f4b47f0454e"
+project_hash = "bcb429f04e846701697c16c8e131f09449decb36"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -672,29 +694,30 @@ version = "17.4.0+2"
 # ╟─3cec1832-d294-11ef-1317-07fe5c4e69c2
 # ╟─3cec20f4-d294-11ef-1012-c19579a786e4
 # ╟─3cec3062-d294-11ef-3dd6-bfc5588bdf1f
-# ╟─fa1d5123-db02-4fda-93d2-3e5e2efed515
+# ╟─a3ae8443-0100-41f7-a91a-c7d128064b88
 # ╟─3cec43d4-d294-11ef-0a9f-43eb506527a6
 # ╟─3cec5b96-d294-11ef-39e0-15e93768d2b1
 # ╟─3cec86cc-d294-11ef-267d-7743fd241c64
-# ╠═40fddaa0-cb9d-4873-b2f6-3fd2a742ecd2
-# ╟─3cec9250-d294-11ef-01ac-9d94676a65a3
-# ╟─3cecbc46-d294-11ef-24cb-2d9e41fb35d9
-# ╟─3cecdb48-d294-11ef-20a1-1df2731ac57c
+# ╟─a66c3b31-0f1f-41ff-b19c-0926ea1c2ff5
+# ╟─6f95adeb-d0a9-47fd-900a-0e55d497bab6
 # ╟─3ced0d0c-d294-11ef-3000-7b63362a2351
-# ╠═69555c82-a593-4fe5-97e2-8c6898253991
+# ╟─e1122eab-a25b-4441-a053-b0121b334731
+# ╟─40fddaa0-cb9d-4873-b2f6-3fd2a742ecd2
 # ╟─3ced29ae-d294-11ef-158b-09fcdaa47d1c
-# ╟─3ced3fc2-d294-11ef-3fac-d5e80eacc488
-# ╠═61741b02-f407-4a66-be00-28f92896490e
-# ╠═81c85536-2ac9-4c65-9c34-f4661a2a796b
-# ╟─1684dc8b-1bfd-4a83-9ece-460c64e9bee7
+# ╟─aa615113-9261-4782-8f75-27682a810e97
+# ╟─3cec9250-d294-11ef-01ac-9d94676a65a3
+# ╟─c5bfab8f-4985-420a-b46e-b4ff6d359d3d
+# ╠═548b831a-afc6-4b17-890e-ab6cf30114fa
 # ╟─3ced567c-d294-11ef-2657-df20e23a00fa
-# ╠═d5a490a9-be04-41bf-b59b-fdeaba999073
-# ╟─3ced6df4-d294-11ef-1091-474e512d605c
-# ╠═0bdc66e2-7e66-44b9-9685-0174dce20b94
+# ╟─0d6029ef-87ba-4881-b7af-9de2dad1ed99
+# ╟─3cecbc46-d294-11ef-24cb-2d9e41fb35d9
+# ╟─68e00fce-a627-4943-8f62-0852873a771a
+# ╟─69555c82-a593-4fe5-97e2-8c6898253991
 # ╟─3ced839a-d294-11ef-3dd0-1f8c5ef11b75
-# ╠═f3cff8d8-1b49-4479-be78-ee632233be5c
-# ╠═442f9293-319e-4d43-8890-64b1c5a2a118
+# ╠═438981cd-8450-4678-8b61-9cc5c0c0ebf1
+# ╟─86a2a956-fee6-4306-b8cb-f4b977ad3dbd
 # ╠═a5d43e01-8f73-4c48-b565-f10eb807a9ab
+# ╠═fa1d5123-db02-4fda-93d2-3e5e2efed515
 # ╟─3ced947a-d294-11ef-0403-512f2407a2d2
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
