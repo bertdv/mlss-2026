@@ -268,7 +268,7 @@ In the machine learning and AI community, two prominent approaches to trial desi
 
  - **Active inference**: Given an observed sequence of input signals and a prior probability distribution about future observations, *learn* to select actions that minimize *expected* prediction errors (i.e., minimize actual minus predicted sensation).  
 
-In the [lecture on Intelligent Agents and Active Inference](https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html), we will discuss the active inference method in more details
+In the [lecture on Intelligent Agents and Active Inference](https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html), we will discuss the active inference method in more detail.
 
 """
 
