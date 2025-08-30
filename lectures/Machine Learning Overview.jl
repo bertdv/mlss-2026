@@ -162,7 +162,9 @@ md"""
 # ╔═╡ 3ced0d0c-d294-11ef-3000-7b63362a2351
 md"""
 
-In **supervised learning**, we are given observations of desired input–output behavior,
+**Supervised learning** is about learning functions. [Functions describe the world!!](https://youtu.be/BWZTlfrneD8?si=FNhUu7QH9O9xx2Bp)
+
+In supervised learning, we are given observations of desired input–output behavior,
 
 ```math
 D = \{(x_1, y_1), \dots, (x_N, y_N)\},
