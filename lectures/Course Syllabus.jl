@@ -152,7 +152,6 @@ You are not allowed to use books, smartphones, calculators, or bring printed or 
 
 The class homepage contains [two representative practice exams](https://github.com/bmlip/course?tab=readme-ov-file#exams--assignments) from previous terms. **It is highly recommended to practice with these previous exams when preparing for the exam.**. 
 
-The grading formula for passing this class is [posted at the course homepage](https://github.com/bmlip/course?tab=readme-ov-file#grading). 
 
 """
 
