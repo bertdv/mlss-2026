@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.15
+# v0.20.17
 
 #> [frontmatter]
 #> description = "Course Syllabus"
@@ -54,107 +54,113 @@ md"""
 
 Please bookmark the following three websites:
 
-1. The course homepage [http://bmlip.nl](https://biaslab.github.io/teaching/bmlip/) (or try [https://biaslab.github.io/teaching/bmlip](https://biaslab.github.io/teaching/bmlip/) ) contains links to all materials such as lecture notes and video lectures.
-2. The [Piazza course site](https://piazza.com/tue.nl/winter2025/5ssd0/home) will be used for Q&A and communication.
+1. The course homepage [http://bmlip.nl](http://bmlip.nl) contains links to all materials, such as lecture notes and video lectures.
+2. The [Piazza course site](https://piazza.com/tue.nl/winter2026/5ssd0/home) will be used for Q&A and communication.
 3. The [Canvas course site](https://canvas.tue.nl/courses/30024) will be sparingly used for communication (mostly by ESA staff)
 
 """
+
+# ╔═╡ 6076dc43-797f-406a-83d3-ba4507c5dd55
+TODO("Piazza and Canvas links")
 
 # ╔═╡ 0d015ab4-d294-11ef-2e53-5339062c435c
 md"""
 ## Materials
 
-All materials can be accessed from the [course homepage](https://biaslab.github.io/teaching/bmlip).
+All materials can be accessed from the [course homepage](http://bmlip.nl). The materials consist of the following resources:
 
-Materials consist of the following resources:
+##### Mandatory materials for the exam
 
-  * Mandatory
+ * Lecture notes
+ * Probabilistic Programming (PP) notes
+ * The lecture notes and probabilistic programming notes contain the mandatory materials. Some lecture notes are extended by a reading assignment, see the first cell ("Preliminaries") in the lecture notes. These reading assignments are also part of the mandatory materials.
+  
+##### Optional materials to help understand the lectures and PP notes
 
-      * Lecture notes
-      * Probabilistic Programming (PP) notes
-      * The lecture notes and probabilistic programming notes contain the mandatory materials. Some lecture notes are extended by a reading assignment, see the first cell in the lecture notes. These reading assignment are also part of the mandatory materials.
-  * Optional materials to help understand the lecture and PP notes
-
-      * video recordings of the Q2-2023 lecture series
-      * exercises
-      * Q&A at Piazza
-      * practice exams
-
+ * video recordings of the Q2-2023/24 lecture series
+ * Q&A at Piazza
+ * practice exams
+ * In the lecture notes, slides that are not required for the exam are moved to the end of the notes in the **Optional Slides** section.
 
 
-Source materials are available at github repo at [https://github.com/bmlip/course](https://github.com/bmlip/course). You do not need to bother with this site. If you spot an error in the materials, please raise the issue at Piazza.  
+Source materials are available at GitHub repo at [https://github.com/bmlip/course](https://github.com/bmlip/course). If you spot an error in the materials, please raise an issue at Piazza.  
 
 """
+
+# ╔═╡ ab61d2fe-312c-4aca-9029-e446aaf2bfa2
+keyconcept("",
+md""" All study materials are accessible at the course homepage [`http://bmlip.nl`](http://bmlip.nl).""")
 
 # ╔═╡ 0d016cf8-d294-11ef-0c84-336979a02dd7
 md"""
 ## Study Guide
 
-Slides that are not required for the exam are moved to the end of the notes and preceded by an [OPTIONAL SLIDES](#optional) header.
+1. **Please study the lecture notes BEFORE you come to class!!**
+   - Optionally, you can view the video recordings of the Q2-2023/24 lecture series for additional explanations. 
 
-<p style="color:red">Please study the lecture notes before you come to class!!</p> 
+2. Then come to the class!
+   - During the scheduled classroom meetings, I will not cover all of the material from the lecture notes in detail. Instead, I will begin with a summary of the notes and then be available to address any additional questions you may have.
+   - Pose your questions in the classroom so others can also learn from the answers and/or discussion. 
 
-Optionally, you can view the video recordings of the Q2-2023 lecture series for addional explanations. 
+3. If you still have questions after class, or later on when preparing for the exam, pose your question at the **Piazza site**!
+   - Your questions will be answered at the Piazza site by fellow students and accorded (or corrected) by the teaching staff.
 
-Then come to the class!
-
-  * During the scheduled classroom meetings, I will not teach all materials in the lecture notes.
-  * Rather, I will first discuss a summary of the lecture notes and then be available for any additional questions that you may still have.
-
-Still got any sticky issues regarding the lecture notes?
-
-  * Pose you question at the **Piazza site**!
-  * Your questions will be answered at the Piazza site by fellow students and accorded (or corrected) by the teaching staff.
-
-Each class also comes with a set of exercises. They are often a bit challenging and test more of your quantitative skills than you will need for the exam. When doing exercises, feel free to make use of Sam Roweis' cheat sheets for [Matrix identities](https://github.com/bmlip/course/blob/main/assets/files/Roweis-1999-matrix-identities.pdf) and [Gaussian identities](https://github.com/bmlip/course/blob/main/assets/files/Roweis-1999-gaussian-identities.pdf). Also accessible from the course homepage.   
+Each class is accompanied by a set of exercises (at bottom of lecture notes). These are often somewhat challenging and emphasize _quantitative skills beyond what will be required for the exam_. You may use this [**Formula Sheet**](https://github.com/bmlip/course/blob/main/assets/files/5SSD0_formula_sheet.pdf) when working on the exercises; the same sheet will also be provided during the written exam.
+ 
 
 """
+
+# ╔═╡ 646b8c08-bcd8-4c20-973a-b03583a7d472
+keyconcept("",
+"Study the materials _before_ you come to the class.")
 
 # ╔═╡ 0d017b82-d294-11ef-2d11-df36557202c9
 md"""
 ## Piazza (Q&A)
 
-We will be using Piazza for Q&A and news. The system is highly catered to getting you help fast and efficiently from both classmates and the teaching staff. 
+We will be using [Piazza](https://piazza.com/) for Q&A and course announcements. Piazza is designed to get you help quickly and efficiently, both from classmates and the teaching staff.
 
-[Sign up for Piazza](http://piazza.com/tue.nl/winter2025/5ssd0) today if you have not done so. And install the Piazza app on your phone! 
+👉 [Sign up for Piazza](http://piazza.com/tue.nl/winter2026/5ssd0) today if you haven’t already, and consider installing the Piazza app on your phone.
 
-The quicker you begin asking questions on Piazza (rather than via emails), the quicker you'll benefit from the collective knowledge of your classmates and instructors. We encourage you to ask questions when you're struggling to understand a concept—you can even do so anonymously.
+The sooner you start asking questions on Piazza (instead of sending emails), the sooner you’ll benefit from the collective knowledge of your classmates and instructors. Don’t hesitate to ask questions when something is unclear—you can even post anonymously if you prefer.
 
-We will also disseminate news and announcements via Piazza.
+All **course-related announcements** will also be disseminated via Piazza. Unless it concerns a personal matter, please post your course-related questions there (in the appropriate folder).
 
-Unless it is a personal issue, pose your course-related questions at Piazza (in the right folder). 
+We also encourage you to contribute by answering questions on Piazza:
 
-Please contribute to the class by answering questions at Piazza. 
+  - You may answer anonymously if you wish.
+  - Explaining material to others is an excellent way to deepen your own understanding.
+  - Each question has one “student answer,” which the class can edit collaboratively, and one “instructor answer” for the teaching staff.
 
-  * If so desired, you can contribute anonymously.
-  * Answering technical questions at Piazza is a great way to learn. If you really want to understand a topic, you should try to explain it to others.
-  * Every question has just a single students' answer that students can edit collectively (and a single instructors’ answer for instructors).
-
-You can use LaTeX in Piazza for math (and please do so!). 
-
-Piazza has a great ``search`` feature. Use search before putting in new questions.
+Piazza also supports **LaTeX**, please use it for math. And don’t forget to try the **search** function before posting a new question.
 
 """
+
+# ╔═╡ 74dedaac-0a3e-4b83-a081-d76cdb301d56
+keyconcept("",
+md""" Piazza is a great resource for continuing discussion outside the classroom, where you can both ask and answer questions.""")
 
 # ╔═╡ 0d018ee2-d294-11ef-3b3d-e34d0532a953
 md"""
 ## Exam Guide
 
-The course will be scored by two programming assignments and a final written exam. See the [course homepage](https://biaslab.github.io/teaching/bmlip/) for how the final score is computed.
+The course will be scored by two programming assignments and a final written exam. See the [course homepage](https://github.com/bmlip/course?tab=readme-ov-file#exams--assignments) for how the final score is computed.
 
-The written exam in multiple-choice format. 
+**The written exam is in multiple-choice format.** 
 
-You are not allowed to use books nor bring printed or handwritten formula sheets to the exam. Difficult-to-remember formulas are supplied at the exam sheet.
+You are not allowed to use books, smartphones, calculators, or bring printed or handwritten formula sheets to the exam. All difficult-to-remember formulas are included on this [Formula Sheet](https://github.com/bmlip/course/blob/main/assets/files/5SSD0_formula_sheet.pdf), which will be provided together with the exam.
 
-No smartphones at the exam.
+The class homepage contains [two representative practice exams](https://github.com/bmlip/course?tab=readme-ov-file#exams--assignments) from previous terms. **It is highly recommended to practice with these previous exams when preparing for the exam.**. 
 
-The tested material consists of the mandatory lecture + PP notes (+ mandatory reading assignments as assigned in the first cell/slide of each lecture notebook).
-
-The class homepage contains two representative practice exams from previous terms. 
-
-
+The grading formula for passing this class is [posted at the course homepage](https://github.com/bmlip/course?tab=readme-ov-file#grading). 
 
 """
+
+# ╔═╡ 31f8669b-b547-4a11-acc6-64e02e6e9dc0
+keyconcept("","The written exam will be in multiple-choice format. Two previous exams, along with their answers, are available on the course homepage.")
+
+# ╔═╡ f46ccac8-e87c-4cbe-9d2c-fdb4723c639e
+keyconcept("",md"""When working on exercises or preparing for the written exam, you may use this [Formula Sheet](https://github.com/bmlip/course/blob/main/assets/files/5SSD0_formula_sheet.pdf), which will also be provided during the exam.""" )
 
 # ╔═╡ 0d019cde-d294-11ef-0563-6b41bc2ca80f
 md"""
@@ -164,23 +170,12 @@ Check out [a recording from last year](https://youtu.be/k9DO26O6dIg?si=b8EiK12O_
 
 """
 
-# ╔═╡ 0d01a404-d294-11ef-3fe4-df9726debd05
-md"""
-#  $(HTML("<span id='optional'>OPTIONAL SLIDES</span>")) 
-
-"""
-
-# ╔═╡ 0d01b03e-d294-11ef-3b2f-53f22689075c
-md"""
-## Title
-
-The slides below the `OPTIONAL SLIDES` marker are optional for the exam.  
-
-"""
+# ╔═╡ f0a4b221-b4cd-425c-9a35-44c68c64e341
+TODO("FOns to add key concepts slide")
 
 # ╔═╡ f3b97e01-f8d2-4865-ae81-2df412f7515a
 md"""
-# Appendix
+# Code
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -198,7 +193,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.6"
 manifest_format = "2.0"
-project_hash = "e635641d8e55b0485ecb2515c1996f4b47f0454e"
+project_hash = "bcb429f04e846701697c16c8e131f09449decb36"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -541,13 +536,18 @@ version = "17.4.0+2"
 # ╟─0cffef7e-d294-11ef-3dd5-1fd862260b70
 # ╟─0d013750-d294-11ef-333c-d9eb7578fab2
 # ╟─0d0142b6-d294-11ef-0297-e5bb923ad942
+# ╠═6076dc43-797f-406a-83d3-ba4507c5dd55
 # ╟─0d015ab4-d294-11ef-2e53-5339062c435c
+# ╟─ab61d2fe-312c-4aca-9029-e446aaf2bfa2
 # ╟─0d016cf8-d294-11ef-0c84-336979a02dd7
+# ╟─646b8c08-bcd8-4c20-973a-b03583a7d472
 # ╟─0d017b82-d294-11ef-2d11-df36557202c9
+# ╟─74dedaac-0a3e-4b83-a081-d76cdb301d56
 # ╟─0d018ee2-d294-11ef-3b3d-e34d0532a953
+# ╟─31f8669b-b547-4a11-acc6-64e02e6e9dc0
+# ╟─f46ccac8-e87c-4cbe-9d2c-fdb4723c639e
 # ╟─0d019cde-d294-11ef-0563-6b41bc2ca80f
-# ╟─0d01a404-d294-11ef-3fe4-df9726debd05
-# ╟─0d01b03e-d294-11ef-3b2f-53f22689075c
+# ╠═f0a4b221-b4cd-425c-9a35-44c68c64e341
 # ╟─f3b97e01-f8d2-4865-ae81-2df412f7515a
 # ╠═f96d047f-9efa-4889-8b4e-a8d96677d072
 # ╟─00000000-0000-0000-0000-000000000001
