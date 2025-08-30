@@ -240,7 +240,7 @@ TODO("Remove clustering image and replace by image from Latent variables lecture
 md"""
 #### Compression 
 
-In contrast, if the unobserved target variables are continuously valued, the task is referred to as **compression**. For example, compressing an image ``x`` produces an output ``y`` that is much smaller in size than the original. The objective is to learn a mapping ``y = f(x)`` (the encoder) such that the inverse mapping ``\hat{x} = f^{-1}(y)`` reconstructs ``\hat{x}`` as close as possible (ideally identical) to the original input ``x``.
+In contrast, if the unobserved target variables are continuously valued, the task is referred to as **compression**. For example, compressing an image ``x`` produces an output ``y`` that is much smaller in size than the original. The objective is to learn a mapping ``y = f(x)`` (the encoder) such that the inverse mapping ``\hat{x} = g(y) \approx f^{-1}(y)`` reconstructs ``\hat{x}`` as close as possible (ideally identical) to the original input ``x``.
 
 Compression can be interpreted as ''unsupervised regression''.
 
