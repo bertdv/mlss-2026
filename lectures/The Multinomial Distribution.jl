@@ -101,7 +101,7 @@ Assume the probabilities
 
 
 ```math 
-p(x_{k}=1) = \mu_k \quad \text{with } \sum_k \mu_k  = 1 \,.
+p(x_{k}=1) = \mu_k \quad \text{with } \mu_k \geq 0 \text{ and }\sum_k \mu_k  = 1 \,.
 ```
 The data generating distribution for one-hot encoded outcome ``x = (x_{1},x_{2},\ldots,x_{K})`` (and ``\mu = (\mu_1,\mu_2,\dots,\mu_k)^T``) is then given by 
 
