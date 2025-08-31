@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.17
 
 #> [frontmatter]
 #> image = "https://i.imgur.com/fnNZUew.png"
@@ -26,11 +26,31 @@ end
 using Plots, BmlipTeachingTools
 
 # ╔═╡ 5914c0b7-5a46-4166-a4d7-e60013e37029
-title("Mini: Softmax Function")
+title("Mini: The Softmax Function")
 
-# ╔═╡ 32579f7e-8efb-48ef-8a5a-1db41e5287eb
+# ╔═╡ 829970d4-059a-4335-ad19-c6177861e2d8
+TableOfContents()
+
+# ╔═╡ f9f6868b-f906-40cf-9d6f-a72b22fc1826
 md"""
-This mini gives an interactive introduction to the **Softmax function** ([wikipedia](https://en.wikipedia.org/wiki/Softmax_function)).
+## The softmax function
+
+The **softmax** function ([wikipedia](https://en.wikipedia.org/wiki/Softmax_function)), also called the **normalized exponential** function,  is a mapping
+
+```math
+\sigma : \mathbb{R}^M \;\rightarrow\; (0,1)^M, \quad M > 1,
+```
+defined component-wise as
+|
+```math
+\sigma(x)_i \;=\; \frac{\exp(x_i)}{\sum_{j=1}^M \exp(x_j)} , \quad i = 1, \dots, M.
+```
+The output of the softmax function defines the parameter vector of a [**Categorical distribution**](https://en.wikipedia.org/wiki/Categorical_distribution), regardless of the values of ``x_i``, since all components ``\sigma(x)_i`` are strictly positive and sum to one (see also the [Multinomial Distributions lecture](https://bmlip.github.io/course/lectures/The%20Multinomial%20Distribution.html#The-Categorical-Distribution)).
+"""
+
+# ╔═╡ f9d9a189-7626-43a1-8f47-8835c9e32c5b
+md"""
+### Implementation
 """
 
 # ╔═╡ 352cc34b-a1e2-4654-93b4-d40d92909d2a
@@ -38,102 +58,120 @@ function softmax(x::Vector)::Vector
 	exp.(x) / sum(exp.(x))
 end;
 
-# ╔═╡ f9d9a189-7626-43a1-8f47-8835c9e32c5b
+# ╔═╡ 1517f96d-64a4-445f-bbea-4f3e97ddca78
 md"""
-### Make Your Vector:
+Move the sliders below to create a 3-component vector ``x = (x_1,x_2,x_3)``, where ``x_i \in [-10:.1:10]``. 
+
 """
 
 # ╔═╡ e723edf1-c7f1-4b6f-85ff-aadac9d11f02
-@bindname a Slider(0:.1:10; default=5, show_value=true)
+@bindname x_1 Slider(-10:.1:10; default=0, show_value=true)
 
 # ╔═╡ a3fdb14a-29ec-49cd-8cd2-088847ea802b
-@bindname b Slider(0:.1:10; default=5, show_value=true)
+@bindname x_2 Slider(-10:.1:10; default=0, show_value=true)
 
 # ╔═╡ 2596781d-3637-41c2-8785-84e23aca7711
-@bindname c Slider(0:.1:10; default=5, show_value=true)
+@bindname x_3 Slider(-10:.1:10; default=0, show_value=true)
 
-# ╔═╡ 0eac6b10-2987-464f-9a98-95d2a65f6888
-x = [a, b, c]
+# ╔═╡ 1bcf1a3b-a68f-413a-926a-32aded5887ae
+x = [x_1, x_2, x_3]
 
 # ╔═╡ 1fccee46-87f1-4733-ad93-8d8f8b64e7cd
 md"""
-### Result of the Softmax Function
+and display ``y = \sigma(x)``
 """
 
-# ╔═╡ 1b9ad6e6-e1bf-4592-985d-4a4242481a08
-result = softmax(x)
+# ╔═╡ 761e5cce-bc6e-4b49-b792-c0d79bcaa6ef
+y = softmax(x)
 
 # ╔═╡ dc62435b-5020-48a9-bc37-d5ee8a663b40
-bar(result; label=nothing, size=(400,150), ylim=(0,1))
+bar(y; label=nothing, ylabel="softmax(x)", size=(400,150), ylim=(0,1))
+
+# ╔═╡ 3a6380ba-54c6-43fa-b48a-b08acfcc24a5
+TODO("x-ticks should be x_1 at 1, x_2 at 2 and x_3 at 3. there should be no numerics at the x-axis.")
 
 # ╔═╡ 605030dc-5383-4d22-b750-ec14d03abecc
 let
-	extra = if string(sum(result)) != "1.0"
+	extra = if string(sum(y)) != "1.0"
 		html"<small style='opacity: .6'>(Except for some floating-point imprecision 😅)</small>"
 	else
 		""
 	end
 	md"""
-	### Properties of the Result
+	### Check the Result
 	
-	Output of the softmax function will always **sum to 1**. $(extra)
+	Check that the output of the softmax function sums to ``1``. $(extra)
 	"""
 end
 
 # ╔═╡ 4bb1040c-fa30-4cde-b308-13df21e8e539
-sum(result)
+sum(y)
 
 # ╔═╡ 2570f665-21b0-4262-b149-4e9d60e1f36a
 md"""
-And each **entry lies between 0 and 1**. Here is the lowest and highest value:
+And each **entry lies between 0 and 1**. Here are the lowest and highest values:
 """
 
 # ╔═╡ b9508dde-429d-414f-b7be-4e94f1ef8c2b
-extrema(result)
-
-# ╔═╡ a73c25d2-8293-4313-8432-9117dd37f04a
-md"""
-💡 These two properties mean that output of the softmax function is always a (discrete) **probability distribution**, since each entry is ``> 0``, and entries sum to ``1``.
-"""
+extrema(y)
 
 # ╔═╡ 13fe6c00-2e27-424f-91e8-6452d76f358e
 md"""
-#### Ordering is Maintained
+Moreover, the softmax function preserves the relative order between entries: if ``x_k > x_j``, then ``\sigma(x)_k > \sigma(x)_j``. In particular,
 
-The softmax function maintain relative order between entries. If ``x_k > x_j``, then ``\sigma(x)_k > \sigma(x)_j``.
+```math
+\arg\max(x) = \arg\max(\sigma(x)) ,
+```
+which motivates the name `softmax`: it produces a “soft” probability distribution that emphasizes the maximum entry while still assigning nonzero weight to all others.
+
 """
 
-# ╔═╡ 556ca393-68c8-42ea-ab44-2d2195ee1c76
-sortperm(x)
-
-# ╔═╡ 94ea9b8d-335b-41ad-a360-556ed4556148
-sortperm(result)
-
-# ╔═╡ f972cf68-f643-4d2d-b196-ebef6b7106d3
+# ╔═╡ a76f25fc-f1c1-4f83-97d8-bebe0a8d1405
+keyconcept("",
 md"""
-## Logistic Function
+The output of the **softmax** function defines the parameter vector of a **Categorical distribution**, regardless of the values of ``x_i``, since all components ``\sigma(x)_i`` are strictly positive and sum to one.
+""")
 
-The logistic function ([wikipedia](https://en.wikipedia.org/wiki/Logistic_function)) is a special application of the softmax function. The softmax function is a function ``\mathbb{R}^n \rightarrow \mathbb{R}^n``, the logistic function is ``\mathbb{R} \rightarrow \mathbb{R}``.
+# ╔═╡ e35e9f54-3b5e-464e-8a1d-53a314efdd7e
+md"""
+## The logistic function
 
+The **logistic** (or sigmoid) function ([wikipedia](https://en.wikipedia.org/wiki/Logistic_function)) can be seen as a special case of the softmax function for ``M=2``. 
 
-While we usually define the logistic function directly, as:
+Let's work this out. The softmax for ``M=2`` takes a vector ``x = (x_1, x_2) \in \mathbb{R}^2`` and maps it to probabilities:
 
+```math
+\sigma(x)_1 = \frac{e^{x_1}}{e^{x_1} + e^{x_2}},
+\quad
+\sigma(x)_2 = \frac{e^{x_2}}{e^{x_1} + e^{x_2}}\, .
+```
+
+If we now look only at ``\sigma(x)_1``, we can rewrite it as
+
+```math
+\sigma(x)_1 = \frac{1}{1 + e^{-(x_1 - x_2)}} ,
+```
+
+which is the logistic (sigmoid) function 
+```math
+\sigma'(a) \triangleq \frac{1}{1 + e^{-a}}
+```
+applied to the difference ``x_1 - x_2 \in \mathbb{R}``.
+"""
+
+# ╔═╡ a1c3bb09-f6c5-4a97-995e-7d9d74fe221f
+md"""
+As we also see in [Eq. B-4.89 in the Discriminative Classification lecture](https://bmlip.github.io/course/lectures/Discriminative%20Classification.html#Data-generating-distribution), the **logistic function produces the parameters for a Bernoulli distribution**. 
+"""
+
+# ╔═╡ 30ff3c54-9c8b-403f-9301-e196be51d7ee
+md"""
+### Implementation
 """
 
 # ╔═╡ 1a2a5fe9-b1fc-41b4-a034-0a664632be37
-# Regular definition:
-function logistic_function_classic(a::Real)::Real
-	1 / (1 + exp(-a))
-end;
-
-# ╔═╡ daf0833a-372d-4303-b524-d117972f4200
-md"""
-We can also define it using the softmax function:
-"""
-
-# ╔═╡ cfeb3916-3b91-4822-9ce8-9d31ee1634e4
 function logistic_function(a::Real)::Real
-	softmax([a, 0])[1]
+	1 / (1 + exp(-a))
 end;
 
 # ╔═╡ c9ecaabd-686d-4884-b75e-9e4644d371ba
@@ -146,23 +184,30 @@ plot(
 	size=(600,200),
 )
 
-# ╔═╡ 5ff9df60-e8c7-4f35-8af1-1529b45cf0f4
-TODO("Maybe: We could write a bit more about the logistic function")
+# ╔═╡ 7df3e187-9619-4bb8-bafd-4387509895bf
+TODO("Add labels to axes")
 
-# ╔═╡ 4b765b37-9c26-4592-acbf-111d176c5654
-
-
-# ╔═╡ 93436438-d57b-4a03-abb4-7a9e1509f8b3
+# ╔═╡ 87e8178a-3cac-46ad-9a42-69a78e3b6e20
 md"""
-# Use in Bayesian Machine Learning
+Choose any value in the range ``[-10:.1:10]``
 """
 
-# ╔═╡ 2459e2de-6dca-4160-b2f4-0c3da787acf7
-TODO("Write how this mini relates to Bayesisan ML")
+# ╔═╡ 25a03cb9-3e3b-4988-8a7d-5be17eb143c1
+@bindname a Slider(-10:.1:10; default=0, show_value=true)
+
+# ╔═╡ 593c3c88-e4ab-463d-b904-4ccd07bf24c2
+b = logistic_function(a)
+
+# ╔═╡ 4b765b37-9c26-4592-acbf-111d176c5654
+keyconcept("",
+md"""
+The output of the **logistic** function ``\sigma'(a)`` defines the parameter vector of a **Bernoulli distribution**, regardless of the values of ``a``, since ``\sigma'(a)`` is strictly positive and less than one.
+""")
+
 
 # ╔═╡ ed56bd39-5e77-47fd-b1a7-6e0844b79ea7
 md"""
-# Appendix
+# Code
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1317,33 +1362,35 @@ version = "1.9.2+0"
 
 # ╔═╡ Cell order:
 # ╟─5914c0b7-5a46-4166-a4d7-e60013e37029
-# ╟─32579f7e-8efb-48ef-8a5a-1db41e5287eb
-# ╠═352cc34b-a1e2-4654-93b4-d40d92909d2a
+# ╟─829970d4-059a-4335-ad19-c6177861e2d8
+# ╟─f9f6868b-f906-40cf-9d6f-a72b22fc1826
 # ╟─f9d9a189-7626-43a1-8f47-8835c9e32c5b
+# ╠═352cc34b-a1e2-4654-93b4-d40d92909d2a
+# ╟─1517f96d-64a4-445f-bbea-4f3e97ddca78
 # ╟─e723edf1-c7f1-4b6f-85ff-aadac9d11f02
 # ╟─a3fdb14a-29ec-49cd-8cd2-088847ea802b
 # ╟─2596781d-3637-41c2-8785-84e23aca7711
-# ╟─0eac6b10-2987-464f-9a98-95d2a65f6888
+# ╠═1bcf1a3b-a68f-413a-926a-32aded5887ae
 # ╟─1fccee46-87f1-4733-ad93-8d8f8b64e7cd
-# ╠═1b9ad6e6-e1bf-4592-985d-4a4242481a08
+# ╠═761e5cce-bc6e-4b49-b792-c0d79bcaa6ef
 # ╠═dc62435b-5020-48a9-bc37-d5ee8a663b40
+# ╟─3a6380ba-54c6-43fa-b48a-b08acfcc24a5
 # ╟─605030dc-5383-4d22-b750-ec14d03abecc
 # ╠═4bb1040c-fa30-4cde-b308-13df21e8e539
 # ╟─2570f665-21b0-4262-b149-4e9d60e1f36a
 # ╠═b9508dde-429d-414f-b7be-4e94f1ef8c2b
-# ╟─a73c25d2-8293-4313-8432-9117dd37f04a
 # ╟─13fe6c00-2e27-424f-91e8-6452d76f358e
-# ╠═556ca393-68c8-42ea-ab44-2d2195ee1c76
-# ╠═94ea9b8d-335b-41ad-a360-556ed4556148
-# ╟─f972cf68-f643-4d2d-b196-ebef6b7106d3
+# ╟─a76f25fc-f1c1-4f83-97d8-bebe0a8d1405
+# ╟─e35e9f54-3b5e-464e-8a1d-53a314efdd7e
+# ╟─a1c3bb09-f6c5-4a97-995e-7d9d74fe221f
+# ╟─30ff3c54-9c8b-403f-9301-e196be51d7ee
 # ╠═1a2a5fe9-b1fc-41b4-a034-0a664632be37
-# ╟─daf0833a-372d-4303-b524-d117972f4200
-# ╠═cfeb3916-3b91-4822-9ce8-9d31ee1634e4
 # ╟─c9ecaabd-686d-4884-b75e-9e4644d371ba
-# ╟─5ff9df60-e8c7-4f35-8af1-1529b45cf0f4
+# ╠═7df3e187-9619-4bb8-bafd-4387509895bf
+# ╟─87e8178a-3cac-46ad-9a42-69a78e3b6e20
+# ╠═25a03cb9-3e3b-4988-8a7d-5be17eb143c1
+# ╠═593c3c88-e4ab-463d-b904-4ccd07bf24c2
 # ╟─4b765b37-9c26-4592-acbf-111d176c5654
-# ╟─93436438-d57b-4a03-abb4-7a9e1509f8b3
-# ╟─2459e2de-6dca-4160-b2f4-0c3da787acf7
 # ╟─ed56bd39-5e77-47fd-b1a7-6e0844b79ea7
 # ╠═b4391750-7368-11f0-2e66-6b42d8f70892
 # ╟─00000000-0000-0000-0000-000000000001
