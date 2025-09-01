@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.17
+# v0.20.16
 
 #> [frontmatter]
 #> image = "https://i.imgur.com/fnNZUew.png"
@@ -33,7 +33,6 @@ TableOfContents()
 
 # ╔═╡ f9f6868b-f906-40cf-9d6f-a72b22fc1826
 md"""
-## The softmax function
 
 The **softmax** function ([wikipedia](https://en.wikipedia.org/wiki/Softmax_function)), also called the **normalized exponential** function,  is a mapping
 
@@ -41,7 +40,7 @@ The **softmax** function ([wikipedia](https://en.wikipedia.org/wiki/Softmax_func
 \sigma : \mathbb{R}^M \;\rightarrow\; (0,1)^M, \quad M > 1,
 ```
 defined component-wise as
-|
+
 ```math
 \sigma(x)_i \;=\; \frac{\exp(x_i)}{\sum_{j=1}^M \exp(x_j)} , \quad i = 1, \dots, M.
 ```
@@ -50,7 +49,7 @@ The output of the softmax function defines the parameter vector of a [**Categori
 
 # ╔═╡ f9d9a189-7626-43a1-8f47-8835c9e32c5b
 md"""
-### Implementation
+## Implementation
 """
 
 # ╔═╡ 352cc34b-a1e2-4654-93b4-d40d92909d2a
@@ -83,12 +82,6 @@ and display ``y = \sigma(x)``
 
 # ╔═╡ 761e5cce-bc6e-4b49-b792-c0d79bcaa6ef
 y = softmax(x)
-
-# ╔═╡ dc62435b-5020-48a9-bc37-d5ee8a663b40
-bar(y; label=nothing, ylabel="softmax(x)", size=(400,150), ylim=(0,1))
-
-# ╔═╡ 3a6380ba-54c6-43fa-b48a-b08acfcc24a5
-TODO("x-ticks should be x_1 at 1, x_2 at 2 and x_3 at 3. there should be no numerics at the x-axis.")
 
 # ╔═╡ 605030dc-5383-4d22-b750-ec14d03abecc
 let
@@ -174,19 +167,6 @@ function logistic_function(a::Real)::Real
 	1 / (1 + exp(-a))
 end;
 
-# ╔═╡ c9ecaabd-686d-4884-b75e-9e4644d371ba
-plot(
-	logistic_function;
-	xlim=(-8,8),
-	legend=nothing,
-	color=:black,
-	lw=3,
-	size=(600,200),
-)
-
-# ╔═╡ 7df3e187-9619-4bb8-bafd-4387509895bf
-TODO("Add labels to axes")
-
 # ╔═╡ 87e8178a-3cac-46ad-9a42-69a78e3b6e20
 md"""
 Choose any value in the range ``[-10:.1:10]``
@@ -209,6 +189,36 @@ The output of the **logistic** function ``\sigma'(a)`` defines the parameter vec
 md"""
 # Code
 """
+
+# ╔═╡ 54e515dc-c917-4231-9106-e8448400a905
+const bar_plot_opts = (
+	label=nothing, 
+	ylabel="softmax(x)", 
+	size=(400,150), 
+	ylim=(0,1),
+	xticks=(1:3,["y₁","y₂","y₃"]),
+)
+
+# ╔═╡ dc62435b-5020-48a9-bc37-d5ee8a663b40
+bar(y; bar_plot_opts...)
+
+# ╔═╡ 56a3d5ce-5944-4914-97ce-9a2f74bbe8e8
+const logi_plot_opts = (
+	legend=nothing,
+	color=:black,
+	lw=3,
+	size=(600,200),
+	xlabel="a",
+	ylabel="b",
+	left_margin=10Plots.PlotMeasures.px,
+	bottom_margin=10Plots.PlotMeasures.px,
+)
+
+# ╔═╡ c9ecaabd-686d-4884-b75e-9e4644d371ba
+let
+	plot(logistic_function; xlim=(-8,8), logi_plot_opts...)
+	scatter!([a],[b]; ms=7)
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1374,7 +1384,6 @@ version = "1.9.2+0"
 # ╟─1fccee46-87f1-4733-ad93-8d8f8b64e7cd
 # ╠═761e5cce-bc6e-4b49-b792-c0d79bcaa6ef
 # ╠═dc62435b-5020-48a9-bc37-d5ee8a663b40
-# ╟─3a6380ba-54c6-43fa-b48a-b08acfcc24a5
 # ╟─605030dc-5383-4d22-b750-ec14d03abecc
 # ╠═4bb1040c-fa30-4cde-b308-13df21e8e539
 # ╟─2570f665-21b0-4262-b149-4e9d60e1f36a
@@ -1385,13 +1394,14 @@ version = "1.9.2+0"
 # ╟─a1c3bb09-f6c5-4a97-995e-7d9d74fe221f
 # ╟─30ff3c54-9c8b-403f-9301-e196be51d7ee
 # ╠═1a2a5fe9-b1fc-41b4-a034-0a664632be37
-# ╟─c9ecaabd-686d-4884-b75e-9e4644d371ba
-# ╠═7df3e187-9619-4bb8-bafd-4387509895bf
 # ╟─87e8178a-3cac-46ad-9a42-69a78e3b6e20
-# ╠═25a03cb9-3e3b-4988-8a7d-5be17eb143c1
+# ╟─25a03cb9-3e3b-4988-8a7d-5be17eb143c1
 # ╠═593c3c88-e4ab-463d-b904-4ccd07bf24c2
+# ╠═c9ecaabd-686d-4884-b75e-9e4644d371ba
 # ╟─4b765b37-9c26-4592-acbf-111d176c5654
 # ╟─ed56bd39-5e77-47fd-b1a7-6e0844b79ea7
 # ╠═b4391750-7368-11f0-2e66-6b42d8f70892
+# ╠═54e515dc-c917-4231-9106-e8448400a905
+# ╠═56a3d5ce-5944-4914-97ce-9a2f74bbe8e8
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
