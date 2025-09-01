@@ -398,7 +398,7 @@ md"""
 
 #### Basic functions
 
-See the [Mini about Basis Functions](https://bmlip.github.io/course/lectures/minis/Basis%20Functions.html) to learn more!
+See the [Mini about Basis Functions](https://bmlip.github.io/course/minis/Basis%20Functions.html) to learn more!
 """
 
 # ╔═╡ 142f4700-ccf4-4019-b3a9-57035c458276
