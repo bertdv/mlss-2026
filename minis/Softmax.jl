@@ -33,6 +33,7 @@ TableOfContents()
 
 # ╔═╡ f9f6868b-f906-40cf-9d6f-a72b22fc1826
 md"""
+## The Softmax Function
 
 The **softmax** function ([wikipedia](https://en.wikipedia.org/wiki/Softmax_function)), also called the **normalized exponential** function,  is a mapping
 
