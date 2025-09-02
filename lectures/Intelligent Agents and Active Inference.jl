@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.17
+# v0.20.16
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/ai_agent/agent-cart-interaction2.png?raw=true"
@@ -467,8 +467,7 @@ The animation below is a recording of representative agent behavior during the V
 """
 
 # ╔═╡ 651a4081-68f1-4237-9503-d4e28969a836
-Resource("https://github.com/bmlip/course/raw/refs/heads/main/assets/ai_agent/minigrid_solved.mp4", :width => 300)
-
+Resource("https://github.com/bmlip/course/raw/refs/heads/main/assets/figures/minigrid%20loop.mp4", :autoplay => true, :loop=>true)
 
 # ╔═╡ f4509603-36be-4d24-8933-eb7a705eb933
 md"""
