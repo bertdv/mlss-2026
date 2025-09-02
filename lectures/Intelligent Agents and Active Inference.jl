@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.16
+# v0.20.17
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/ai_agent/agent-cart-interaction2.png?raw=true"
@@ -111,12 +111,30 @@ The challenge is to design an agent that autonomously navigates to the target sq
 # ╔═╡ 939e74b0-8ceb-4214-bbc0-407c8f0b2f26
 md"""
 ##### Solution 
-At the [end of this lesson](#Challenge-Revisited:-The-Door-Key-MiniGrid-Problem)
+At the [end of this lesson](#Challenge-Revisited:-The-Door-Key-MiniGrid-Problem).
 """
 
 # ╔═╡ e3d5786b-49e0-40f7-9056-13e26e09a4cf
 md"""
 # The Free Energy Principle
+"""
+
+# ╔═╡ 2f38a3c9-67d4-4c45-ad0b-e757f62d6a5e
+md"""
+## Motivation
+
+The human brain is the most complex control system we know. It processes inputs from about ``10`` million sensory neurons through roughly ``10^{11}`` (``=100`` billion) neurons, and drives action via about half a million motor neurons. None of these neurons “know” anything about Fourier transforms, dynamic programming, or backpropagation, they simply minimize variational free energy (VFE).
+
+Remarkably, this autonomous process is sufficient to create a control system that outperforms anything we have engineered with our hand-crafted theories of control and signal processing. This motivates our work on active inference agents. If nature can produce such superior systems solely through autonomous VFE minimization, perhaps this is also the right path forward in engineering. To achieve truly high-performant adaptive control in volatile environments, it may be necessary to let go of hand-crafted algorithms and build systems that function solely by VFE minimization.
+
+This lecture explores that idea.
+"""
+
+# ╔═╡ 4ed2ef1f-4d55-4f9b-b8f5-7f77b5fc62ca
+@htl """
+
+<img src="https://github.com/bmlip/course/blob/main/assets/figures/robot-from-disciplines-to-AIF.png?raw=true" alt=" " style="display: block; width: 80%; margin: 0 auto;">
+
 """
 
 # ╔═╡ 2783c686-d294-11ef-3942-c75d2b559fb3
@@ -1823,6 +1841,8 @@ version = "17.4.0+2"
 # ╟─2783b312-d294-11ef-2ebb-e5ede7a86583
 # ╟─939e74b0-8ceb-4214-bbc0-407c8f0b2f26
 # ╟─e3d5786b-49e0-40f7-9056-13e26e09a4cf
+# ╟─2f38a3c9-67d4-4c45-ad0b-e757f62d6a5e
+# ╟─4ed2ef1f-4d55-4f9b-b8f5-7f77b5fc62ca
 # ╟─2783c686-d294-11ef-3942-c75d2b559fb3
 # ╟─126c3221-34b8-4a8f-b5b5-c14ff4c6a2a1
 # ╟─29592915-cadf-4674-958b-5743a8f73a8b
