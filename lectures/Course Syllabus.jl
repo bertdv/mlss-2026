@@ -162,12 +162,14 @@ keyconcept("","The written exam will be in multiple-choice format. Two previous 
 keyconcept("",md"""When working on exercises or preparing for the written exam, you may use this [Formula Sheet](https://github.com/bmlip/course/blob/main/assets/files/5SSD0_formula_sheet.pdf), which will also be provided during the exam.""" )
 
 # ╔═╡ 0d019cde-d294-11ef-0563-6b41bc2ca80f
+TwoColumn(
 md"""
 ## Preview
-
 Check out [a recording from last year](https://youtu.be/k9DO26O6dIg?si=b8EiK12O_s76btPn) to understand what this class will be like. 
-
-"""
+""",
+md"""
+![](https://github.com/bmlip/course/blob/main/assets/figures/Professor-Terguson.png?raw=true)
+""")
 
 # ╔═╡ f0a4b221-b4cd-425c-9a35-44c68c64e341
 TODO("FOns to add key concepts slide")
