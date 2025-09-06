@@ -46,6 +46,9 @@ md"""
      * De Vries et al. (2025), [Expected Free Energy-based Planning as Variational Inference](https://arxiv.org/pdf/2504.14898)
         * On minimizing expected free energy by variational free energy minimization.
 
+     * Friston et al. (2023), [Path integrals, particular kinds, and strange things](https://doi.org/10.1016/j.plrev.2023.08.016)
+        *  The most recent formal developments of the Free Energy Principle (FEP). This paper frames FEP as a principle of least action over trajectories. 
+
      * Bert de Vries, Tim Scarfe and Keith Duggar (2023), Podcast on [Active Inference](https://youtu.be/2wnJ6E6rQsU?si=I4_k40j42_8E4igP). Machine Learning Street Talk podcast
         * Quite extensive discussion on many aspect regarding the Free Energy Principle and Active Inference, in particular relating to its implementation.
 
@@ -125,7 +128,7 @@ md"""
 
 The human brain is the most complex control system we know. It processes inputs from about ``10`` million sensory neurons through roughly ``10^{11}`` (``=100`` billion) neurons, and drives action via about half a million motor neurons. None of these neurons “know” anything about Fourier transforms, dynamic programming, or backpropagation, they simply minimize variational free energy (VFE).
 
-Remarkably, this autonomous process is sufficient to create a control system that outperforms anything we have engineered with our hand-crafted theories of control and signal processing. This motivates our work on active inference agents. If nature can produce such superior systems solely through autonomous VFE minimization, perhaps this is also the right path forward in engineering. To achieve truly high-performant adaptive control in volatile environments, it may be necessary to let go of hand-crafted algorithms and build systems that function solely by VFE minimization.
+Remarkably, this autonomous process is sufficient to create a control system that outperforms anything we have ever engineered with our hand-crafted theories of control and signal processing. As engineers, this motivates our work on active inference agents: if nature can produce such superior systems solely through autonomous VFE minimization, perhaps this is also the right path forward in engineering. To achieve truly high-performant adaptive control in volatile environments, it may be necessary to let go of hand-crafted algorithms and build systems that function solely by VFE minimization.
 
 This lecture explores that idea.
 """
@@ -141,7 +144,7 @@ This lecture explores that idea.
 md"""
 ## What Drives Intelligent Behavior?
 
-We begin with a motivating example that requires "intelligent" decision-making. Assume that you are an owl and that you're hungry. What are you going to do?
+We begin with an example that requires "intelligent" decision-making. Assume that you are an owl and that you're hungry. What are you going to do?
 
 Have a look at [Prof. Karl Friston](https://www.wired.com/story/karl-friston-free-energy-principle-artificial-intelligence/)'s answer in this  [video segment on the cost function for intelligent behavior](https://youtu.be/L0pVHbEg4Yw). (**Do watch the video!**)
 
@@ -168,7 +171,7 @@ md"""
 The Free Energy Principle (FEP) is neither a model nor a theory. Rather, it is a principle, that is, a **methodological framework** for describing the information-processing dynamics that *must* unfold in living systems to keep them within viable (i.e., livable) states over extended periods of time.
   -  Think of the processes continuously occurring in our bodies to maintain an internal temperature between approximately ``36^{\circ}\text{C}`` and ``37^{\circ}\text{C}``, regardless of the surrounding ambient temperature.
 
-The literature on the FEP is widely regarded as difficult to access. It was first formally derived as a specific case of the [Least Action Principle](#The-FEP-is-a-Least-Action-Principle-for-"Things") by Friston in his monograph [Friston (2019), A Free Energy Principle for a Particular Physics (2019)](https://arxiv.org/abs/1906.10184), and later presented in a more accessible form in [Friston et al. (2023), The Free Energy Principle Made Simpler but Not Too Simple](https://doi.org/10.1016/j.physrep.2023.07.001). For a concise and approachable introduction, the explainer by [Noumenal Labs (2025), WTF is the FEP?](https://www.noumenal.ai/post/wtf-is-the-fep-a-short-explainer-on-the-free-energy-principle) is currently the most accessible resource I am aware of.
+The literature on the FEP is widely regarded as difficult to access. It was first formally derived as a specific case of the [Least Action Principle](#The-FEP-is-a-Least-Action-Principle-for-"Things") by Friston in his monograph [Friston (2019), A Free Energy Principle for a Particular Physics (2019)](https://arxiv.org/abs/1906.10184), and more recently presented in a more accessible form in [Friston et al. (2023), Path integrals, particular kinds, and strange things](https://doi.org/10.1016/j.plrev.2023.08.016). For a concise and approachable introduction, the explainer by [Noumenal Labs (2025), WTF is the FEP?](https://www.noumenal.ai/post/wtf-is-the-fep-a-short-explainer-on-the-free-energy-principle) is currently the most accessible resource I am aware of.
 
 In this lecture, we present only a simplified account. According to the FEP, the brain is a generative model for its sensory inputs, such as visual and auditory signals, and **continuously minimizes variational free energy** (VFE) in that model to stay aligned with these observations. Crucially, VFE minimization is the *only* ongoing process, and it underlies perception, learning, attention, emotions, consciousness, intelligent decision-making, etc. 
 
@@ -199,7 +202,7 @@ Let's make the above notions more concrete. We consider an agent that interacts 
 
 ```math
 \begin{align}
-p(y,x,\theta,u) \,, \tag{P1}
+p(y,x,u,\theta) \,, \tag{P1}
 \end{align}
 ```
 
@@ -208,7 +211,7 @@ where ``y`` denotes future observations, ``x`` refers to internal (hidden) futur
 Since model (P1) is designed to predict how the future is expected to unfold, we refer to (P1) as the **predictive model**. A typical example is a rollout to the future of a state-space model,
 
 ```math
-p(y,x,\theta,u) = p(x_t) p(\theta)\underbrace{\prod_{k=t+1}^T  p(y_k|x_k,\theta) p(x_k|x_{k-1},u_k) p(u_k)}_{\text{rollout to the future}}\,.
+p(y,x,u,\theta) = p(x_t) p(\theta)\underbrace{\prod_{k=t+1}^T  p(y_k|x_k,\theta) p(x_k|x_{k-1},u_k) p(u_k)}_{\text{rollout to the future}}\,.
 ```
 
 In addition to the predictive model, we assume that the agent holds beliefs ``\hat{p}(x)`` about the *desired* future states. For example, the owl in our earlier example holds the belief that it will not be hungry in the future. We refer to ``\hat{p}(x)`` as the **goal prior**.
@@ -225,10 +228,10 @@ md"""
 
 ## The Expected Free Energy Theorem
 
-We now state the [Expected Free Energy theorem](https://arxiv.org/pdf/2504.14898#page=7). Let the variational free energy functional ``F[q]`` be defined as
+We now state the [Expected Free Energy theorem](https://arxiv.org/pdf/2504.14898#page=8). Let the variational free energy functional ``F[q]`` be defined as
 ```math
 \begin{align}
-F[q] = \mathbb{E}_{q(y,x,\theta,u)} \bigg[ \log \frac{q(y,x,\theta,u)}{\underbrace{p(y,x,\theta,u)}_{\text{predictive}} \underbrace{\hat{p}(x)}_{\text{goal}}  \underbrace{\tilde{p}(u) \tilde{p}(x) \tilde{p}(y,x)}_{\text{epistemics}}} \bigg] \,. \tag{F1}
+F[q] = \mathbb{E}_{q(y,x,u,\theta)} \bigg[ \log \frac{q(y,x,u,\theta)}{\underbrace{p(y,x,u,\theta)}_{\text{predictive}} \underbrace{\hat{p}(x)}_{\text{goal}}  \underbrace{\tilde{p}(u) \tilde{p}(x) \tilde{p}(y,x)}_{\text{epistemics}}} \bigg] \,. \tag{F1}
 \end{align}
 ```
 
@@ -247,7 +250,7 @@ Then, the variational free energy ``F[q]`` decomposes as
 
 ```math
 \begin{align}
-F[q] = \underbrace{\mathbb{E}_{q(u)}\left[ G(u)\right]}_{\substack{ \text{expected policy} \\ \text{costs}} } + \underbrace{ \mathbb{E}_{q(y,x,\theta,u)}\left[ \log \frac{q(y,x,\theta,u)}{p(y,x,\theta,u)}\right]}_{\text{complexity}} \tag{F2}\,,
+F[q] = \underbrace{\mathbb{E}_{q(u)}\left[ G(u)\right]}_{\substack{ \text{expected policy} \\ \text{costs}} } + \underbrace{ \mathbb{E}_{q(y,x,u,\theta)}\left[ \log \frac{q(y,x,u,\theta)}{p(y,x,u,\theta)}\right]}_{\text{complexity}} \tag{F2}\,,
 \end{align}
 ```
 where the function ``G(u)``, known as the **Expected Free Energy** (EFE) cost function, is given by 
@@ -268,14 +271,14 @@ details("Click for proof of the EFE Theorem",
     		
     ```math
     \begin{flalign}
-        F[q] &= E_{q(y x \theta u )}\bigg[ \log \frac{q(y x \theta u )}{p(y x \theta u)  \hat{p}(x) \tilde{p}(u) \tilde{p}(x)  \tilde{p}(yx)} \bigg] \\
+        F[q] &= E_{q(y x  u \theta)}\bigg[ \log \frac{q(y x  u \theta)}{p(y x  u \theta)  \hat{p}(x) \tilde{p}(u) \tilde{p}(x)  \tilde{p}(yx)} \bigg] \\
         &= E_{q(u)}\bigg[ \log \frac{q(u)}{p(u)} 
         + \underbrace{E_{q(yx\theta | u)}\big[ \log \frac{q(y x \theta | u)}{p(yx \theta|u)  \hat{p}(x) \tilde{p}(u) \tilde{p}(x)  \tilde{p}(yx)}\big]}_{B(u)}  
          \bigg] \; &&\text{(C1)}\\
          &= E_{q(u)}\bigg[ \log \frac{q(u)}{p(u)} 
         + \underbrace{G(u) +E_{q(yx\theta | u)} \big[\log \frac{q(yx\theta|u)}{p(yx\theta|u)}\big]}_{=B(u) \text{ if conditions (E1), (E2) and (E3) hold}}  
          \bigg] &&\text{(C2)} \\
-        &= E_{q(u)}\big[ G(u)\big]+ E_{q(yx\theta u)}\bigg[\log \frac{q(yx\theta u)}{p(yx\theta u)}\bigg]\,,   
+        &= E_{q(u)}\big[ G(u)\big]+ E_{q(yx u\theta)}\bigg[\log \frac{q(yx u \theta)}{p(yx u \theta) }\bigg]\,,   
     \end{flalign}
     ```		
     if the conditions in Eqs. ``(\mathrm{E}1)``, ``(\mathrm{E}2)``, and ``(\mathrm{E}3)`` hold.
@@ -381,7 +384,7 @@ details(md"""Click for proof of ``q^*(u)``""",
     Starting from Eq. (F2), 
     ```math
     \begin{align}
-    F[q] &=\mathbb{E}_{q(u)}\left[ G(u)\right] + \mathbb{E}_{q(y,x,\theta,u)}\left[ \log \frac{q(y,x,\theta,u)}{p(y,x,\theta,u)}\right] \tag{F2} \\  
+    F[q] &=\mathbb{E}_{q(u)}\left[ G(u)\right] + \mathbb{E}_{q(y,x,u,\theta)}\left[ \log \frac{q(y,x,u,\theta)}{p(y,x,u,\theta)}\right] \tag{F2} \\  
     &=\mathbb{E}_{q(u)}\bigg[G(u) + \underbrace{\mathbb{E}_{q(y,x,\theta|u)}\Big[ \log \frac{q(y,x,\theta|u)}{p(y,x,\theta|u)}\Big]}_{C(u)}	+ \log \frac{q(u)}{p(u)}  \bigg]	\\
     &=\mathbb{E}_{q(u)}\bigg[ \log \frac{1}{\exp(-G(u))} + \log \frac{1}{\exp(-C(u))} + \log \frac{q(u)}{\exp(-P(u))}  \Big]	\bigg]	\\
     &= 	\mathbb{E}_{q(u)}\bigg[ \log \frac{q(u)}{\exp(-G(u) - C(u) -P(u) )}\bigg]	
