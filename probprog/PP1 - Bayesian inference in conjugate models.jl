@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.4
+# v0.20.16
 
 using Markdown
 using InteractiveUtils
@@ -7,7 +7,7 @@ using InteractiveUtils
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
     #! format: off
-    quote
+    return quote
         local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
         global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
@@ -23,6 +23,7 @@ begin
 	using LaTeXStrings
 	using CSV
 	using Random
+	using Printf
 	using DataFrames
 	using LinearAlgebra
 	using SpecialFunctions
@@ -63,6 +64,14 @@ Materials:
 # ╔═╡ bac564cd-47db-4010-a397-c6ac2ced9319
 
 
+# ╔═╡ 34a1be54-4641-455d-ab3e-8d4d08aaf966
+md"""
+In this session, we will play with probability distributions and automated Bayesian inference software to solve a few basic problems.
+"""
+
+# ╔═╡ dfa63b82-3593-45b1-b13f-c47274ce724c
+NotebookCard("https://bmlip.github.io/course/minis/Distributions%20in%20Julia.html")
+
 # ╔═╡ de99bbcb-ce5b-44f1-85ef-ad26a9238509
 md"
 ## Problem: A Job Interview
@@ -78,7 +87,7 @@ md"""
 
 To start, the company wants to test the applicants' programming skills and created a set of bug detection questions. We have outcome variables $X_i$. Your answer is either right or wrong, which can be modelled with a Bernoulli likelihood function. The company assumes you have a skill level, denoted $\theta$, and the higher the skill, the more likely you are to get the question right. Since the company doesn't know anything about you, they chose an uninformative prior distribution: the Beta(1,1). We can write the generative model for answering this question as follows:
 
-$$\begin{aligned} p(X, \theta) &= p(\theta) \prod_{i=1}^{N} p(X_i \mid \theta) \\ &= \text{Beta}(\theta) \prod_{i=1}^{N} \text{Bernoulli}(X_i \mid \theta) \, , \end{aligned}$$ 
+$$\begin{aligned} p(X, \theta \, | \, \alpha, \beta) &= p(\theta \, | \, \alpha, \beta) \prod_{i=1}^{N} p(X_i \mid \theta) \\ &= \text{Beta}(\theta \, | \, \alpha, \beta) \prod_{i=1}^{N} \text{Bernoulli}(X_i \mid \theta) \, , \end{aligned}$$ 
 
 We are now going to construct this probabilistic model in RxInfer.
 """
@@ -91,8 +100,8 @@ Note that we may define random variables using a tilde symbol, which should be r
 # ╔═╡ 0cb98ad6-12b5-4644-810a-eaf0a8436084
 begin
 	priorparamspec = @htl """
-		prior shape parameter α = &nbsp; $(@bind α Slider(0.01:0.01:10, show_value=true)) ,  <br>
-		prior rate parameter β = &nbsp; &nbsp; &nbsp; $(@bind β Slider(0.01:0.01:10, show_value=true))
+		prior shape parameter α = &nbsp; $(@bind α Slider(0.01:0.01:20, show_value=true)) ,  <br>
+		prior rate parameter β = &nbsp; &nbsp; &nbsp; $(@bind β Slider(0.01:0.01:20, show_value=true))
 	"""
 end
 
@@ -111,6 +120,43 @@ end
         
     end
 end
+
+# ╔═╡ ffc0d2c1-cbb6-496b-91c1-39dc505a8df1
+plot( range(.001, step=0.01, stop=0.999), x -> pdf(Beta(α,β), x), color="red", label="", xlabel="θ", ylabel="p(θ)", size=(600,300))
+
+# ╔═╡ c6d8d802-ee4b-4eac-84cb-a1769d2ab175
+Foldable("Exercise",
+			md"""
+			What would a prior distribution look like where you believe that applicants will get many questions right? Provide your answer by changing α and β.
+			"""
+		)
+
+# ╔═╡ 928f748d-60eb-45bb-bc8d-0a99b3f11b01
+md"""
+Show feedback: $(@bind show_solution1 CheckBox())
+"""
+
+# ╔═╡ 0735f44e-2b14-41f8-a7fd-ab18b20a6d87
+
+let
+	yes = cdf(Beta(α,β), 0.5) < 0.4
+
+	if show_solution1
+		if yes
+			correct()
+		else
+			hint("For which values of α,β is the probability for θ > 0.5 high?")
+		end
+	end
+end
+
+# ╔═╡ 90210954-a4b0-4e98-b00e-667479bfe60d
+md"""
+Want to play more with making prior distributions? Check this out:
+"""
+
+# ╔═╡ 5163221b-9572-4cfe-950a-ac435ba57c19
+NotebookCard("https://bmlip.github.io/course/minis/prior%20playground.html")
 
 # ╔═╡ 2cd6a20d-80bb-4aaf-8017-c657ed1315bc
 md"Let's come up with some score outcomes:"
@@ -167,14 +213,38 @@ Xspec
 # ╔═╡ 6671664b-1efc-437e-8690-bd8d4c9a7277
 priorparamspec
 
-# ╔═╡ c6d8d802-ee4b-4eac-84cb-a1769d2ab175
+# ╔═╡ 4fd197db-cac8-4a39-a9eb-9399f945a4e1
 Foldable("Exercise",
-md"""
-What would be your likelihood-based message if your data was $X = [0 \ \ 0 \ \ 0]$?
-""")
+			md"""
+				Can you make the prior and posterior distribution look similar?
+			"""
+		)
 
-# ╔═╡ 0735f44e-2b14-41f8-a7fd-ab18b20a6d87
-answer_box(md"""Beta(α=1,β=4)"""; invite="Solution")
+# ╔═╡ a8da905e-16df-4fc0-a4ef-ff10cbd60a85
+md"""
+Show feedback: $(@bind show_solution2 CheckBox())
+"""
+
+# ╔═╡ 9d9542b3-cadf-4ada-95a9-d1873061df8d
+let
+	div = kldivergence(Beta(α,β), resultsBB.posteriors[:θ])
+
+	if show_solution2
+		if div < 0.1
+			correct()
+		else
+			str = @sprintf("%.2f", kldivergence(resultsBB.posteriors[:θ], Beta(α,β)))
+			@htl """
+			<div style="display: grid; place-items: center">
+			<div style=" display: inline-block; width: max-content; padding: 2em; border: 4px solid #88888833; border-radius: 1em; font-family: system-ui;">
+			<strong>Kullback-Leibler Divergence: $(str)</strong>
+			</div>
+			</div>
+				$(NotebookCard("https://bmlip.github.io/course/minis/KL%20Divergence.html"))
+			"""
+		end
+	end
+end
 
 # ╔═╡ aa1528c5-1c46-4c45-a8e8-8a899e8124c8
 md"""
@@ -414,6 +484,7 @@ LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 ReactiveMP = "a194aa59-28ba-4574-a09c-4a745416d6e3"
 RxInfer = "86711068-29c9-4ff7-b620-ae75d7495b3d"
@@ -440,7 +511,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.3"
 manifest_format = "2.0"
-project_hash = "24af115c68cfa9943a96cecf8c68c7cffa6003b9"
+project_hash = "d12ad3b58ce6318b902391079690669768253f3a"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "60665b326b75db6517939d0e1875850bc4a54368"
@@ -2893,11 +2964,19 @@ version = "1.9.2+0"
 # ╠═10bdf484-848d-44a1-af9b-64c0c11395f7
 # ╠═87f097af-e23e-4d22-b242-a85182ab15a7
 # ╟─bac564cd-47db-4010-a397-c6ac2ced9319
+# ╠═34a1be54-4641-455d-ab3e-8d4d08aaf966
+# ╟─dfa63b82-3593-45b1-b13f-c47274ce724c
 # ╟─de99bbcb-ce5b-44f1-85ef-ad26a9238509
 # ╟─f05721c1-e085-4c7d-92c8-292aa17c8040
 # ╠═35d8e213-09ef-4419-a5b8-ac9a1b4e3c1f
 # ╟─5cf8f6fe-31cc-4226-89dd-6e8fe6527442
 # ╟─0cb98ad6-12b5-4644-810a-eaf0a8436084
+# ╟─ffc0d2c1-cbb6-496b-91c1-39dc505a8df1
+# ╟─c6d8d802-ee4b-4eac-84cb-a1769d2ab175
+# ╟─928f748d-60eb-45bb-bc8d-0a99b3f11b01
+# ╟─0735f44e-2b14-41f8-a7fd-ab18b20a6d87
+# ╟─90210954-a4b0-4e98-b00e-667479bfe60d
+# ╟─5163221b-9572-4cfe-950a-ac435ba57c19
 # ╟─2cd6a20d-80bb-4aaf-8017-c657ed1315bc
 # ╟─388981ac-ee33-46b1-8162-1f51e479b5d7
 # ╟─613e50b4-535e-4420-8ecd-c1ddc89c262e
@@ -2907,8 +2986,9 @@ version = "1.9.2+0"
 # ╟─c72aabb2-779f-421c-b828-277c3b4d1233
 # ╟─b34f2fce-3944-4c9c-bd8b-f48aca983979
 # ╟─6671664b-1efc-437e-8690-bd8d4c9a7277
-# ╟─c6d8d802-ee4b-4eac-84cb-a1769d2ab175
-# ╟─0735f44e-2b14-41f8-a7fd-ab18b20a6d87
+# ╟─4fd197db-cac8-4a39-a9eb-9399f945a4e1
+# ╟─a8da905e-16df-4fc0-a4ef-ff10cbd60a85
+# ╟─9d9542b3-cadf-4ada-95a9-d1873061df8d
 # ╟─aa1528c5-1c46-4c45-a8e8-8a899e8124c8
 # ╟─4a0d19ef-1756-4d14-a787-0b31763577f5
 # ╟─0a536620-fc4a-41c6-8f34-7015b400c910
@@ -2940,7 +3020,7 @@ version = "1.9.2+0"
 # ╠═ac33150f-57b1-4cfb-8176-80750c981019
 # ╟─43799ac6-6a21-4852-8077-5e8b7e5489fa
 # ╠═9b7c71cb-ea6f-4472-b783-21c22b9a23b7
-# ╠═50d10285-67c9-487e-8c19-a10d8d663fc5
+# ╟─50d10285-67c9-487e-8c19-a10d8d663fc5
 # ╟─be5ebcb7-1981-4771-9c42-967fc576ce5e
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
