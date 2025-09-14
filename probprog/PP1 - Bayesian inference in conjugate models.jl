@@ -30,10 +30,7 @@ begin
 	using Distributions
 	using RxInfer
 	using Plots; default(label="", linewidth=4, margin=10Plots.pt)
-
 	import CairoMakie: tricontourf
-	import ReactiveMP: @call_rule, prod
-	import BayesBase: ClosedProd
 end
 
 # ╔═╡ 779f3ea6-36dd-11f0-0323-613cd06c6f3c
@@ -58,12 +55,6 @@ Materials:
     - [Differences between Julia and Matlab / Python](https://docs.julialang.org/en/v1/manual/noteworthy-differences/index.html).
 "
 
-# ╔═╡ 87f097af-e23e-4d22-b242-a85182ab15a7
-
-
-# ╔═╡ bac564cd-47db-4010-a397-c6ac2ced9319
-
-
 # ╔═╡ 34a1be54-4641-455d-ab3e-8d4d08aaf966
 md"""
 In this session, we will play with probability distributions and automated Bayesian inference software to solve a few basic problems.
@@ -73,10 +64,10 @@ In this session, we will play with probability distributions and automated Bayes
 NotebookCard("https://bmlip.github.io/course/minis/Distributions%20in%20Julia.html")
 
 # ╔═╡ de99bbcb-ce5b-44f1-85ef-ad26a9238509
-md"
-## Problem: A Job Interview
+challenge_statement(" Problem: A Job Interview")
 
-Suppose you have graduated and applied for a job at a tech company. The company wants a talented and skilled employee, but measuring a person's skill is tricky; even a highly-skilled person makes mistakes and - vice versa - people with few skills can get lucky. They decide to approach this objectively and construct a statistical model of responses. 
+# ╔═╡ 4dfba22d-1d61-4325-90a0-52afed1787ee
+md"Suppose you have graduated and applied for a job at a tech company. The company wants a talented and skilled employee, but measuring a person's skill is tricky; even a highly-skilled person makes mistakes and - vice versa - people with few skills can get lucky. They decide to approach this objectively and construct a statistical model of responses. 
 
 In this session, we will look at estimating parameters in various distributions under the guise of assessing skills based on different types of interview questions. We will practice message passing on factor graphs using a probabilistic programming language developed at the TU/e: [RxInfer.jl](https://rxinfer.com/).
 "
@@ -99,7 +90,7 @@ Note that we may define random variables using a tilde symbol, which should be r
 
 # ╔═╡ 0cb98ad6-12b5-4644-810a-eaf0a8436084
 begin
-	priorparamspec = @htl """
+	priorparamspecBB = @htl """
 		prior shape parameter α = &nbsp; $(@bind α Slider(0.01:0.01:20, show_value=true)) ,  <br>
 		prior rate parameter β = &nbsp; &nbsp; &nbsp; $(@bind β Slider(0.01:0.01:20, show_value=true))
 	"""
@@ -211,7 +202,7 @@ end
 Xspec
 
 # ╔═╡ 6671664b-1efc-437e-8690-bd8d4c9a7277
-priorparamspec
+priorparamspecBB
 
 # ╔═╡ 4fd197db-cac8-4a39-a9eb-9399f945a4e1
 Foldable("Exercise",
@@ -399,7 +390,23 @@ end
 md"""The interview conductor cannot stop immediately after you have responded. From previous interviews, the company knows that the conductor in front of you is typically off by roughly $2$ seconds. That translates to a likelihood variance of $\sigma^2 = 4$. """
 
 # ╔═╡ abe4105c-c42b-4d97-bc15-ef9741c23fcf
-σ = 2.0;
+begin
+	likvarspec = @htl """
+	likelihood variance σ² = &nbsp; $(@bind σ2 Slider(0.01:0.01:6, default=4.0, show_value=true))
+	"""
+end
+
+# ╔═╡ f72b729f-0195-4369-929c-e1eb93d7df55
+Foldable("Exercise",
+			md"""
+				What is wrong with the modelling assumption here?
+			"""
+		)
+
+# ╔═╡ ed3ed8a4-6704-4c44-907e-40d056e787b9
+hide_solution(md"""
+A Gaussian distribution will extend to negative response times as well, which is impossible.
+""")
 
 # ╔═╡ d2ca1a6d-4f96-4e90-9868-9db407ffd1b5
 md"Your response times on the questions are:"
@@ -417,22 +424,24 @@ The company designed the questions such that they think it may take the average 
 
 # ╔═╡ 75abee86-a43c-4a53-8edb-cf943f4e570c
 begin
-m0 = 60;
-v0 = 20;
+	priorparamspecNN = @htl """
+		prior mean m₀ = &nbsp; $(@bind m0 Slider(40:1.0:80, default=60, show_value=true)) ,  <br>
+		prior variance v₀ = &nbsp; &nbsp; &nbsp; $(@bind v0 Slider(0.1:.1:30, default=20, show_value=true))
+	"""
 end
 
 # ╔═╡ 5d308e05-cf04-4289-ab75-7677a71839d4
 resultsNN = infer(
-    model = normal_normal(m0=m0, v0=v0, σ=σ, N=length(Z)),
+    model = normal_normal(m0=m0, v0=v0, σ=σ2, N=length(Z)),
     data  = (Z = Z,),
 )
 
 # ╔═╡ ac33150f-57b1-4cfb-8176-80750c981019
 begin
-posteriorNN = resultsNN.posteriors[:θ]
-μNN = mean(posteriorNN)
-σNN = var(posteriorNN)
-"mean = $μNN, variance = $σNN"
+	posteriorNN = resultsNN.posteriors[:θ]
+	μNN = mean(posteriorNN)
+	σNN = var(posteriorNN)
+	"mean = $μNN, variance = $σNN"
 end
 
 # ╔═╡ 43799ac6-6a21-4852-8077-5e8b7e5489fa
@@ -441,40 +450,50 @@ md"""Ah! It seems that you are a bit faster than the average participant.
 Let's visualize the prior message, the total likelihood message and the posterior again. First, we want to get the likelihood message:
 """
 
-# ╔═╡ 9b7c71cb-ea6f-4472-b783-21c22b9a23b7
-begin
-	messageNN = @call_rule NormalMeanVariance(:μ, Marginalisation) (m_out=PointMass(X[1]), m_v=PointMass(1.5^2))
-	for i in 2:length(Z)
-	    messageNN_i = @call_rule NormalMeanVariance(:μ, Marginalisation) (m_out=PointMass(Z[i]), m_v=PointMass(1.5^2))
-	    messageNN = prod(ClosedProd(), messageNN, messageNN_i)
-	end
-	mean_var(messageNN)
-end
-
 # ╔═╡ 50d10285-67c9-487e-8c19-a10d8d663fc5
 begin
 	# Range of values to plot pdf for
-	μ_range = range(50.0, step=0.1, stop=65.0)
+	μ_range = range(50.0, step=0.05, stop=65.0)
 	
 	# Prior
 	plot( μ_range, x -> pdf(Normal(m0, sqrt(v0)), x), color="red", label="Prior", xlabel="θ", ylabel="p(θ)")
 	
-	# Likelihood
-	plot!(μ_range, x -> pdf(messageNN, x), color="blue", label="Likelihood")
-	
 	# Posterior
-	plot!(μ_range, x -> pdf(posteriorNN, x), color="purple", linestyle=:dash, label="Posterior", size=(800,300))
+	plot!(μ_range, x -> pdf(posteriorNN, x), color="blue", linestyle=:dash, label="Posterior", size=(800,300))
 end
+
+# ╔═╡ 5c315bdb-7375-459e-a9e2-0d180271ed78
+likvarspec
+
+# ╔═╡ ff70f05f-7259-4d56-9a33-19ebd3483c63
+priorparamspecNN
 
 # ╔═╡ be5ebcb7-1981-4771-9c42-967fc576ce5e
 md"""
 The prior is quite wide, indicating the company has a lot of uncertainty about participants' response speeds. The likelihood is sharply peaked, even after only 4 questions. Note that the posterior is a weighted average of the prior- and likelihood-based messages. In this case, it is closer to the likelihood because the likelihood variance, $4$, is much smaller than the prior variance $20$. 
 """
 
+# ╔═╡ 7e6ac0f6-710e-4388-acc2-b2b255a961ca
+Foldable("Exercise",
+			md"""
+				Can you make the posterior be wider than the prior distribution?
+			"""
+		)
+
+# ╔═╡ 02156dca-2fcb-4654-80a0-3666a7807ea3
+hide_solution(md"""
+This is not possible, because every observation will strictly decrease the variance of the distribution. This can be seen in the formula for the posterior variance of the Gaussian distribution:
+			  
+$\begin{aligned}
+  	v_{1} = \frac{1}{1/v_0 + 1/σ^2}
+\end{aligned}$
+			  
+$(NotebookCard("https://bmlip.github.io/course/lectures/The%20Gaussian%20Distribution.html#Inference"))
+""")
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-BayesBase = "b4ee3484-f114-42fe-b91c-797d54a0c67e"
 BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
@@ -486,12 +505,10 @@ Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
-ReactiveMP = "a194aa59-28ba-4574-a09c-4a745416d6e3"
 RxInfer = "86711068-29c9-4ff7-b620-ae75d7495b3d"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [compat]
-BayesBase = "~1.5.7"
 BmlipTeachingTools = "~1.2.1"
 CSV = "~0.10.15"
 CairoMakie = "~0.15.6"
@@ -500,7 +517,6 @@ Distributions = "~0.25.120"
 LaTeXStrings = "~1.4.0"
 Plots = "~1.40.19"
 PlutoUI = "~0.7.70"
-ReactiveMP = "~5.5.9"
 RxInfer = "~4.5.1"
 SpecialFunctions = "~2.5.1"
 """
@@ -511,7 +527,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.3"
 manifest_format = "2.0"
-project_hash = "d12ad3b58ce6318b902391079690669768253f3a"
+project_hash = "5191782cc019b1a3f9e628d19ee040de086ece93"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "60665b326b75db6517939d0e1875850bc4a54368"
@@ -2962,11 +2978,10 @@ version = "1.9.2+0"
 # ╔═╡ Cell order:
 # ╟─779f3ea6-36dd-11f0-0323-613cd06c6f3c
 # ╠═10bdf484-848d-44a1-af9b-64c0c11395f7
-# ╠═87f097af-e23e-4d22-b242-a85182ab15a7
-# ╟─bac564cd-47db-4010-a397-c6ac2ced9319
 # ╠═34a1be54-4641-455d-ab3e-8d4d08aaf966
 # ╟─dfa63b82-3593-45b1-b13f-c47274ce724c
 # ╟─de99bbcb-ce5b-44f1-85ef-ad26a9238509
+# ╟─4dfba22d-1d61-4325-90a0-52afed1787ee
 # ╟─f05721c1-e085-4c7d-92c8-292aa17c8040
 # ╠═35d8e213-09ef-4419-a5b8-ac9a1b4e3c1f
 # ╟─5cf8f6fe-31cc-4226-89dd-6e8fe6527442
@@ -3011,16 +3026,21 @@ version = "1.9.2+0"
 # ╟─ac1321cb-764a-48d3-8ac4-9cedfe34d370
 # ╠═12d5f6d1-f214-448e-9c2e-da691b997d60
 # ╟─09c40ed2-a06d-4565-8ba9-2e7a855327d8
-# ╠═abe4105c-c42b-4d97-bc15-ef9741c23fcf
+# ╟─abe4105c-c42b-4d97-bc15-ef9741c23fcf
+# ╟─f72b729f-0195-4369-929c-e1eb93d7df55
+# ╟─ed3ed8a4-6704-4c44-907e-40d056e787b9
 # ╟─d2ca1a6d-4f96-4e90-9868-9db407ffd1b5
 # ╠═9c1da54d-edad-499a-91ae-88483b5d5a72
 # ╟─63000198-bdda-4c18-bf0c-dd6a9018405d
 # ╠═75abee86-a43c-4a53-8edb-cf943f4e570c
 # ╠═5d308e05-cf04-4289-ab75-7677a71839d4
-# ╠═ac33150f-57b1-4cfb-8176-80750c981019
+# ╟─ac33150f-57b1-4cfb-8176-80750c981019
 # ╟─43799ac6-6a21-4852-8077-5e8b7e5489fa
-# ╠═9b7c71cb-ea6f-4472-b783-21c22b9a23b7
 # ╟─50d10285-67c9-487e-8c19-a10d8d663fc5
+# ╟─5c315bdb-7375-459e-a9e2-0d180271ed78
+# ╟─ff70f05f-7259-4d56-9a33-19ebd3483c63
 # ╟─be5ebcb7-1981-4771-9c42-967fc576ce5e
+# ╟─7e6ac0f6-710e-4388-acc2-b2b255a961ca
+# ╟─02156dca-2fcb-4654-80a0-3666a7807ea3
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
