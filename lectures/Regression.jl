@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.17
+# v0.20.16
 
 #> [frontmatter]
 #> image = "https://i.imgur.com/azbCpRW.png"
@@ -843,7 +843,7 @@ D = let
 	xs = rand(deterministic_randomness(19), Uniform(0,1), N)
 
 	ys_exact = secret_function.(xs)
-	ys = ys_exact .+ rand(deterministic_randomness(37), MvNormal(zeros(N), σ_data_noise²*I))
+	ys = ys_exact .+ rand(deterministic_randomness(37), Normal(0.0, sqrt(σ_data_noise²)), N)
 
 	collect(zip(xs, ys))
 end
