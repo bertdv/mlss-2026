@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.17
+# v0.20.18
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/ai_agent/agent-cart-interaction2.png?raw=true"
@@ -528,8 +528,8 @@ From an engineering perspective, what is gained by moving from DT to AIF agents?
 - **Robustness by realization as a reactive message passing process!**
   - In contrast to decision-theoretic (DT) agents, an active inference (AIF) agent can be fully realized as a reactive variational message passing (RMP) process, since variational free energy (VFE) minimization is the only ongoing process. RMP is an event-driven, fully distributed process—both in time and space—that exhibits robustness to fluctuating computational resources. It “lands softly” when resources such as power, data, or time become limited. As a result, an AIF agent continues to function during power dips, handles missing or noisy observations gracefully, and can be interrupted at any time during decision-making without catastrophic failure, making it naturally suited for real-world, resource-constrained environments.
 
-- **Easy to code!** 
-  - Since VFE minimization can be automated by a toolbox, the engineer’s primary task is to specify the generative model and priors, which typically fits within a single page of code. 
+- **Easy to code** 
+  - Since VFE minimization can be automated by a toolbox, the engineer’s main task is to specify the generative model and priors, typically achievable within a single page of code. However, because a professional-level automated VFE minimization toolbox is not (yet) available, this “easy-to-code” feature has not (yet) been realized.
 
 - **Other advantages**
   - Additional advantages include the potential for scalability, particularly in real-time applications. Realizing this potential will require further research into efficient, real-time message passing capabilities that are difficult to match in frameworks that cannot be implemented as reactive message passing processes.
@@ -630,7 +630,7 @@ RxInfer = "~4.5.1"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.6"
+julia_version = "1.11.5"
 manifest_format = "2.0"
 project_hash = "0dc7c39b2f794078a8a747fa66a5835ffec15ddd"
 

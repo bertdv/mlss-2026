@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.17
+# v0.20.18
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/fig-Bishop-A5-Old-Faithfull.png?raw=true"
@@ -205,7 +205,7 @@ md"""
 
 Eq. B-9.12 reveals the link to the name Gaussian *mixture model*. The priors ``\pi_k`` for the ``k``-th class are also called **mixture coefficients**. 
 
-Be aware that Eq. B-9.12 is not the generative model for the GMM! The generative model is the joint distribution ``p(x,z)`` over all variables, including the latent variables. 
+Be aware that Eq. B-9.12 is not the generative model for the GMM! The generative model is the joint distribution ``p(x,z,\pi,\mu,\Sigma)`` over all variables, including the latent variables. 
 """
 
 # ╔═╡ 26c5d734-d294-11ef-20a3-afd2c3324323
@@ -1867,7 +1867,7 @@ StatsPlots = "~0.15.7"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.6"
+julia_version = "1.11.5"
 manifest_format = "2.0"
 project_hash = "4c0ce3036329e6241b14b587412fef79c57a1869"
 
@@ -3408,7 +3408,7 @@ version = "1.9.2+0"
 # ╟─06170e31-e865-4178-8af0-41d82df95d71
 # ╟─bbdca8c2-022f-42be-bcf7-80d86f7f269c
 # ╟─26c8068a-d294-11ef-3983-a1be55128b3f
-# ╠═86f29be7-87bb-426c-9135-25fb45d70f80
+# ╟─86f29be7-87bb-426c-9135-25fb45d70f80
 # ╟─56bea391-b812-4fc4-8f27-fcb4cb984cf4
 # ╟─5a94e2a4-7134-462e-9dc5-56083769049f
 # ╟─747a7e1e-b921-4882-b00a-1b00bef8433d
