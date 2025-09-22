@@ -78,7 +78,11 @@ md"""
 
 To start, the company wants to test the applicants' programming skills and created a set of bug detection questions. We have outcome variables $X_i$. Your answer is either right or wrong, which can be modelled with a Bernoulli likelihood function. The company assumes you have a skill level, denoted $\theta$, and the higher the skill, the more likely you are to get the question right. Since the company doesn't know anything about you, they chose an uninformative prior distribution: the Beta(1,1). We can write the generative model for answering this question as follows:
 
-$$\begin{aligned} p(X, \theta \, | \, \alpha, \beta) &= p(\theta \, | \, \alpha, \beta) \prod_{i=1}^{N} p(X_i \mid \theta) \\ &= \text{Beta}(\theta \, | \, \alpha, \beta) \prod_{i=1}^{N} \text{Bernoulli}(X_i \mid \theta) \, , \end{aligned}$$ 
+```math 
+\begin{align}
+p(X, \theta \, | \, \alpha, \beta) &= p(\theta \, | \, \alpha, \beta) \prod_{i=1}^{N} p(X_i \mid \theta) \\ &= \text{Beta}(\theta \, | \, \alpha, \beta) \prod_{i=1}^{N} \text{Bernoulli}(X_i \mid \theta) \, , 
+\end{align}
+```
 
 We are now going to construct this probabilistic model in RxInfer.
 """
@@ -257,11 +261,15 @@ Every point on that triangle is 3D vector that sums to 1. Since the triangle is 
 md"""
 Let's look at the generative model:
 
-$$p(X_1, X_2, \theta) = p(X_1 \mid \theta) p(X_2 \mid \theta) p(\theta) \, .$$ 
+```math
+p(X_1, X_2, \theta) = p(X_1 \mid \theta) p(X_2 \mid \theta) p(\theta) \, .
+```
 
 It's the same as before. The only difference is the parameterization of the distributions:
 
-$$\begin{aligned} p(X_1 \mid \theta) =&\ \text{Categorical}(X_1 \mid \theta) \\ p(X_2 \mid \theta) =&\ \text{Categorical}(X_2 \mid \theta) \\ p(\theta) =&\ \text{Dirichlet}(\theta \mid \alpha) \, , \end{aligned}$$
+```math
+\begin{align} p(X_1 \mid \theta) =&\ \text{Categorical}(X_1 \mid \theta) \\ p(X_2 \mid \theta) =&\ \text{Categorical}(X_2 \mid \theta) \\ p(\theta) =&\ \text{Dirichlet}(\theta \mid \alpha) \, , \end{align}
+```
 
 where $\alpha$ are the concentration parameters of the Dirichlet. This model can be written directly in RxInfer:
 """
@@ -361,55 +369,8 @@ end
 md"""
 ### 3. Continuous-valued score
 
-Suppose the company wants to know how fast applicants respond to questions. The interview conductor also has a stopwatch and measures your response time per question. Each applicant is assumed to have some underlying response speed $\theta$. Each measurement $X_i$ is a noisy observation of that response speed, where the noise is assumed to be symmetric, i.e., the applicant might a bit as faster as often as they are a bit slower than usual. The Gaussian, or Normal, distribution is a symmetric continuous-valued distribution and will characterize the assumption well. The likelihood is therefore:
-
-$$p(X \mid \theta) = \mathcal{N}(X \mid \theta, \sigma^2) \, ,$$ 
-
-where $\sigma$ is the standard deviation. The conjugate prior to the mean in a Gaussian likelihood is another Gaussian distribution: 
-
-$$p(\theta) = \mathcal{N}(\theta \mid m_0, v_0)$$ 
-
-with $m_0, v_0$ as prior mean and variance. 
+Suppose the company wants to know how fast applicants respond to questions. The interview conductor has a stopwatch and measures response times per question.
 """
-
-# ╔═╡ 12d5f6d1-f214-448e-9c2e-da691b997d60
-@model function normal_normal(Z, m0, v0, σ, N)
-    
-    # Prior distribution
-    θ ~ Normal(mean = m0, variance = v0)
-    
-    # Likelihood
-    for i = 1:N
-
-        Z[i] ~ Normal(mean = θ, variance = σ^2)
-        
-    end    
-end
-
-# ╔═╡ 09c40ed2-a06d-4565-8ba9-2e7a855327d8
-md"""The interview conductor cannot stop immediately after you have responded. From previous interviews, the company knows that the conductor in front of you is typically off by roughly $2$ seconds. That translates to a likelihood variance of $\sigma^2 = 4$. """
-
-# ╔═╡ abe4105c-c42b-4d97-bc15-ef9741c23fcf
-begin
-	likvarspec = @htl """
-	likelihood variance σ² = &nbsp; $(@bind σ2 Slider(0.01:0.01:6, default=4.0, show_value=true))
-	"""
-end
-
-# ╔═╡ f72b729f-0195-4369-929c-e1eb93d7df55
-Foldable("Exercise",
-			md"""
-				What is wrong with the modelling assumption here?
-			"""
-		)
-
-# ╔═╡ ed3ed8a4-6704-4c44-907e-40d056e787b9
-hide_solution(md"""
-A Gaussian distribution will extend to negative response times as well, which is impossible.
-""")
-
-# ╔═╡ d2ca1a6d-4f96-4e90-9868-9db407ffd1b5
-md"Your response times on the questions are:"
 
 # ╔═╡ 9c1da54d-edad-499a-91ae-88483b5d5a72
 Z = [ 52.390036995147426
@@ -417,9 +378,33 @@ Z = [ 52.390036995147426
       50.92640384934159
       39.548361884989717]; 
 
-# ╔═╡ 63000198-bdda-4c18-bf0c-dd6a9018405d
+# ╔═╡ 174aedea-93e2-4e21-aac1-21a4c27cede9
 md"""
-The company designed the questions such that they think it may take the average participant 60 seconds to respond, $\pm$ 20 seconds. That translates to the following values for the prior parameters:
+Each applicant is assumed to have some underlying response speed $\theta$. Each measurement $X_i$ is a noisy observation of that response speed, where the noise is assumed to be symmetric, i.e., the applicant might a bit as faster as often as they are a bit slower than usual. The Gaussian, or Normal, distribution is a symmetric continuous-valued distribution and will characterize the assumption well. The likelihood is therefore:
+
+```math
+p(X \mid \theta) = \mathcal{N}(X \mid \theta, \sigma^2) \, ,
+```
+
+where $\sigma$ is the standard deviation. Think of this as the accuracy with which the interviewer measures your score; sometimes the interviews stops the watch immediately after your answer and sometimes they are distracted and react late. We've given you a slider below with which you can try out different values.
+"""
+
+# ╔═╡ abe4105c-c42b-4d97-bc15-ef9741c23fcf
+begin
+	likvarspec = @htl """
+	likelihood variance σ² = &nbsp; $(@bind σ2 Slider(0.01:0.01:2, default=0.5, show_value=true))
+	"""
+end
+
+# ╔═╡ caf8ede0-a410-4b4a-81dd-4342b8a2385a
+md"""
+The conjugate prior to the mean in a Gaussian likelihood is another Gaussian distribution: 
+
+```math
+p(\theta) = \mathcal{N}(\theta \mid m_0, v_0)
+```
+
+with $m_0, v_0$ as prior mean and variance. The company designed the questions such that they think it may take the average participant 60 seconds to respond, $\pm$ 20 seconds. That translates to the following values for the prior parameters:
 """
 
 # ╔═╡ 75abee86-a43c-4a53-8edb-cf943f4e570c
@@ -430,37 +415,46 @@ begin
 	"""
 end
 
-# ╔═╡ 5d308e05-cf04-4289-ab75-7677a71839d4
-resultsNN = infer(
-    model = normal_normal(m0=m0, v0=v0, σ=σ2, N=length(Z)),
-    data  = (Z = Z,),
-)
-
-# ╔═╡ ac33150f-57b1-4cfb-8176-80750c981019
-begin
-	posteriorNN = resultsNN.posteriors[:θ]
-	μNN = mean(posteriorNN)
-	σNN = var(posteriorNN)
-	"mean = $μNN, variance = $σNN"
-end
-
-# ╔═╡ 43799ac6-6a21-4852-8077-5e8b7e5489fa
-md"""Ah! It seems that you are a bit faster than the average participant.
-
-Let's visualize the prior message, the total likelihood message and the posterior again. First, we want to get the likelihood message:
+# ╔═╡ 71b7e9cb-a6ce-4982-b00c-b98dcd08888f
+md"""
+But feel free to change these to what you think is reasonable.
 """
 
-# ╔═╡ 50d10285-67c9-487e-8c19-a10d8d663fc5
-begin
-	# Range of values to plot pdf for
-	μ_range = range(50.0, step=0.05, stop=65.0)
-	
-	# Prior
-	plot( μ_range, x -> pdf(Normal(m0, sqrt(v0)), x), color="red", label="Prior", xlabel="θ", ylabel="p(θ)")
-	
-	# Posterior
-	plot!(μ_range, x -> pdf(posteriorNN, x), color="blue", linestyle=:dash, label="Posterior", size=(800,300))
+# ╔═╡ 7cc095a9-fbf3-4402-bba6-f25fdb1347b1
+exercise_statement("Model specification")
+
+# ╔═╡ 27991fcd-6754-42fe-8e47-d52187065afb
+md"""
+Can you specify a model in RxInfer code for the continuous-valued score case, described above?
+"""
+
+# ╔═╡ 12d5f6d1-f214-448e-9c2e-da691b997d60
+@model function normal_normal()
+    
+    ### YOUR CODE HERE
+        
 end
+
+# ╔═╡ 66b2711a-f4b9-43fe-8f0f-112d1365bbbe
+md"""
+We will also need a `infer` procedure. Can you define and execute one below? Please use the format:
+> ```julia
+> results = infer(
+> 	...
+> )
+> ```
+"""
+
+# ╔═╡ 0bb66b2a-5d41-4f6b-b245-0360274b9296
+### YOUR CODE HERE
+
+# ╔═╡ 5fa37c24-c90e-4e21-921e-03422943f225
+md"""
+To visualization the prior and posterior distribution, uncomment the line below.
+"""
+
+# ╔═╡ 6d7f9ad2-8dc4-450d-afb6-c55deaeed564
+### visualize_results(results)
 
 # ╔═╡ 5c315bdb-7375-459e-a9e2-0d180271ed78
 likvarspec
@@ -468,15 +462,10 @@ likvarspec
 # ╔═╡ ff70f05f-7259-4d56-9a33-19ebd3483c63
 priorparamspecNN
 
-# ╔═╡ be5ebcb7-1981-4771-9c42-967fc576ce5e
-md"""
-The prior is quite wide, indicating the company has a lot of uncertainty about participants' response speeds. The likelihood is sharply peaked, even after only 4 questions. Note that the posterior is a weighted average of the prior- and likelihood-based messages. In this case, it is closer to the likelihood because the likelihood variance, $4$, is much smaller than the prior variance $20$. 
-"""
-
 # ╔═╡ 7e6ac0f6-710e-4388-acc2-b2b255a961ca
-Foldable("Exercise",
+Foldable("Bonus Exercise",
 			md"""
-				Can you make the posterior be wider than the prior distribution?
+			 Your posterior is probably narrower than your prior distribution. Thought exercise: can you make the posterior be wider than the prior distribution?
 			"""
 		)
 
@@ -490,6 +479,25 @@ $\begin{aligned}
 			  
 $(NotebookCard("https://bmlip.github.io/course/lectures/The%20Gaussian%20Distribution.html#Inference"))
 """)
+
+# ╔═╡ 5ef49dcd-16ff-4183-a28b-061572d98b98
+md"""
+## Under the hood
+"""
+
+# ╔═╡ d8218c14-e005-4e34-a468-44ebb790ef11
+function visualize_results(results)
+
+	# Range of values to plot pdf for
+	μ_range = range(50.0, step=0.05, stop=65.0)
+	
+	# Prior
+	plot( μ_range, x -> pdf(Normal(m0, sqrt(v0)), x), color="red", label="Prior", xlabel="θ", ylabel="p(θ)")
+	
+	# Posterior
+	plot!(μ_range, x -> pdf(results.posteriors[:θ], x), color="blue", linestyle=:dash, label="Posterior", size=(800,300))
+	
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -507,18 +515,6 @@ Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 RxInfer = "86711068-29c9-4ff7-b620-ae75d7495b3d"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
-
-[compat]
-BmlipTeachingTools = "~1.2.1"
-CSV = "~0.10.15"
-CairoMakie = "~0.15.6"
-DataFrames = "~1.7.0"
-Distributions = "~0.25.120"
-LaTeXStrings = "~1.4.0"
-Plots = "~1.40.19"
-PlutoUI = "~0.7.70"
-RxInfer = "~4.5.1"
-SpecialFunctions = "~2.5.1"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -527,7 +523,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.3"
 manifest_format = "2.0"
-project_hash = "5191782cc019b1a3f9e628d19ee040de086ece93"
+project_hash = "5448b6b45e34882fa566775e89ebb9f80ed1a0b6"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "60665b326b75db6517939d0e1875850bc4a54368"
@@ -779,6 +775,23 @@ weakdeps = ["SparseArrays"]
     [deps.ChainRulesCore.extensions]
     ChainRulesCoreSparseArraysExt = "SparseArrays"
 
+[[deps.ChunkCodecCore]]
+git-tree-sha1 = "e4a8d39a846ef288256a2cb94a60eb95c78e300a"
+uuid = "0b6fb165-00bc-4d37-ab8b-79f91016dbe1"
+version = "0.5.3"
+
+[[deps.ChunkCodecLibZlib]]
+deps = ["ChunkCodecCore", "Zlib_jll"]
+git-tree-sha1 = "5866bf08bebfb3743e40c17ce805fbf03f85dbf4"
+uuid = "4c0bbee4-addc-4d73-81a0-b6caacae83c8"
+version = "0.2.1"
+
+[[deps.ChunkCodecLibZstd]]
+deps = ["ChunkCodecCore", "Zstd_jll"]
+git-tree-sha1 = "6225e84baab33a74d6b16186c4465c46cb6b035a"
+uuid = "55437552-ac27-4d47-9aa3-63184e8fd398"
+version = "0.2.1"
+
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
 git-tree-sha1 = "962834c22b66e32aa10f7611c08c8ca4e20749a9"
@@ -899,9 +912,9 @@ version = "1.16.0"
 
 [[deps.DataFrames]]
 deps = ["Compat", "DataAPI", "DataStructures", "Future", "InlineStrings", "InvertedIndices", "IteratorInterfaceExtensions", "LinearAlgebra", "Markdown", "Missings", "PooledArrays", "PrecompileTools", "PrettyTables", "Printf", "Random", "Reexport", "SentinelArrays", "SortingAlgorithms", "Statistics", "TableTraits", "Tables", "Unicode"]
-git-tree-sha1 = "fb61b4812c49343d7ef0b533ba982c46021938a6"
+git-tree-sha1 = "a37ac0840a1196cd00317b57e39d6586bf0fd6f6"
 uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-version = "1.7.0"
+version = "1.7.1"
 
 [[deps.DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -957,9 +970,9 @@ version = "1.15.1"
 
 [[deps.DifferentiationInterface]]
 deps = ["ADTypes", "LinearAlgebra"]
-git-tree-sha1 = "38989b1532a3c6e2341d52b77c5475c42c3318a8"
+git-tree-sha1 = "16946a4d305607c3a4af54ff35d56f0e9444ed0e"
 uuid = "a0c0ee7d-e4b9-4e03-894e-1c5f64a51d63"
-version = "0.7.6"
+version = "0.7.7"
 
     [deps.DifferentiationInterface.extensions]
     DifferentiationInterfaceChainRulesCoreExt = "ChainRulesCore"
@@ -1318,9 +1331,9 @@ version = "2.84.3+0"
 
 [[deps.GraphPPL]]
 deps = ["BitSetTuples", "DataStructures", "Dictionaries", "MacroTools", "MetaGraphsNext", "NamedTupleTools", "Static", "StaticArrays", "TupleTools", "Unrolled"]
-git-tree-sha1 = "efc643a7065bdba366fc4e50dbc20661194b7806"
+git-tree-sha1 = "7d0b00e78b8d57d20c6edf13def7780c1cadcc45"
 uuid = "b3f8163a-e979-4e85-b43e-1f63d8c8b42c"
-version = "4.6.2"
+version = "4.6.3"
 
     [deps.GraphPPL.extensions]
     GraphPPLDistributionsExt = "Distributions"
@@ -1353,9 +1366,9 @@ version = "1.13.1"
 
 [[deps.GridLayoutBase]]
 deps = ["GeometryBasics", "InteractiveUtils", "Observables"]
-git-tree-sha1 = "dc6bed05c15523624909b3953686c5f5ffa10adc"
+git-tree-sha1 = "93d5c27c8de51687a2c70ec0716e6e76f298416f"
 uuid = "3955a311-db13-416c-9275-1d80ed98e5e9"
-version = "0.11.1"
+version = "0.11.2"
 
 [[deps.Grisu]]
 git-tree-sha1 = "53bb909d1151e57e2484c3d1b53e19552b887fb2"
@@ -1466,9 +1479,9 @@ uuid = "d25df0c9-e2be-5dd7-82c8-3ad0b3e990b9"
 version = "0.1.5"
 
 [[deps.InlineStrings]]
-git-tree-sha1 = "8594fac023c5ce1ef78260f24d1ad18b4327b420"
+git-tree-sha1 = "8f3d257792a522b4601c24a577954b0a8cd7334d"
 uuid = "842dd82b-1e85-43dc-bf29-5d0ee9dffc48"
-version = "1.4.4"
+version = "1.4.5"
 
     [deps.InlineStrings.extensions]
     ArrowTypesExt = "ArrowTypes"
@@ -1490,10 +1503,10 @@ uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 version = "1.11.0"
 
 [[deps.Interpolations]]
-deps = ["Adapt", "AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "Requires", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
-git-tree-sha1 = "f2905febca224eade352a573e129ef43aa593354"
+deps = ["Adapt", "AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
+git-tree-sha1 = "65d505fa4c0d7072990d659ef3fc086eb6da8208"
 uuid = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
-version = "0.16.1"
+version = "0.16.2"
 weakdeps = ["ForwardDiff", "Unitful"]
 
     [deps.Interpolations.extensions]
@@ -1572,10 +1585,10 @@ uuid = "82899510-4779-5014-852e-03e436cf321d"
 version = "1.0.0"
 
 [[deps.JLD2]]
-deps = ["FileIO", "MacroTools", "Mmap", "OrderedCollections", "PrecompileTools", "ScopedValues", "TranscodingStreams"]
-git-tree-sha1 = "d97791feefda45729613fafeccc4fbef3f539151"
+deps = ["ChunkCodecLibZlib", "ChunkCodecLibZstd", "FileIO", "MacroTools", "Mmap", "OrderedCollections", "PrecompileTools", "ScopedValues"]
+git-tree-sha1 = "da485e1e36e9c6d4403aa7b6d1db6806a66aa05a"
 uuid = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
-version = "0.5.15"
+version = "0.6.0"
 weakdeps = ["UnPack"]
 
     [deps.JLD2.extensions]
@@ -1856,9 +1869,9 @@ version = "0.3.2"
 
 [[deps.MetaGraphsNext]]
 deps = ["Graphs", "JLD2", "SimpleTraits"]
-git-tree-sha1 = "1e3b196ecbbf221d4d3696ea9de4288bea4c39f9"
+git-tree-sha1 = "c3f7e597f1cf5fe04e68e7907af47f055cad211c"
 uuid = "fa8bd995-216d-47f1-8a91-f3b68fbeb377"
-version = "0.7.3"
+version = "0.7.4"
 
 [[deps.Missings]]
 deps = ["DataAPI"]
@@ -2104,9 +2117,9 @@ version = "0.4.5"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "fcfec547342405c7a8529ea896f98c0ffcc4931d"
+git-tree-sha1 = "8329a3a4f75e178c11c1ce2342778bcbbbfa7e3c"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.70"
+version = "0.7.71"
 
 [[deps.PolyaGammaHybridSamplers]]
 deps = ["Distributions", "Random", "SpecialFunctions", "StatsFuns"]
@@ -2156,9 +2169,9 @@ version = "1.11.0"
 
 [[deps.ProgressMeter]]
 deps = ["Distributed", "Printf"]
-git-tree-sha1 = "13c5103482a8ed1536a54c08d0e742ae3dca2d42"
+git-tree-sha1 = "fbb92c6c56b34e1a2c4c36058f68f332bec840e7"
 uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
-version = "1.10.4"
+version = "1.11.0"
 
 [[deps.PtrArrays]]
 git-tree-sha1 = "1d36ef11a9aaf1e8b74dacc6a731dd1de8fd493d"
@@ -2302,9 +2315,9 @@ version = "0.2.1"
 
 [[deps.RxInfer]]
 deps = ["BayesBase", "DataStructures", "Dates", "Distributions", "DomainSets", "ExponentialFamily", "FastCholesky", "GraphPPL", "HTTP", "JSON", "LinearAlgebra", "Logging", "MacroTools", "Optim", "Preferences", "ProgressMeter", "Random", "ReactiveMP", "Reexport", "Rocket", "Static", "Statistics", "TupleTools", "UUIDs"]
-git-tree-sha1 = "92a21ab59bf6f1e4ffc29ce9a839a7af95412ca7"
+git-tree-sha1 = "426fe222f706f6bc7e5908153aefc2630f824bed"
 uuid = "86711068-29c9-4ff7-b620-ae75d7495b3d"
-version = "4.5.1"
+version = "4.5.2"
 
     [deps.RxInfer.extensions]
     PrettyTablesExt = "PrettyTables"
@@ -2326,9 +2339,9 @@ version = "3.7.1"
 
 [[deps.ScopedValues]]
 deps = ["HashArrayMappedTries", "Logging"]
-git-tree-sha1 = "7f44eef6b1d284465fafc66baf4d9bdcc239a15b"
+git-tree-sha1 = "c3b2323466378a2ba15bea4b2f73b081e022f473"
 uuid = "7e506255-f358-4e82-b7e4-beb19740aa63"
-version = "1.4.0"
+version = "1.5.0"
 
 [[deps.Scratch]]
 deps = ["Dates"]
@@ -2437,9 +2450,9 @@ version = "1.2.0"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
-git-tree-sha1 = "cbea8a6bd7bed51b1619658dec70035e07b8502f"
+git-tree-sha1 = "b8693004b385c842357406e3af647701fe783f98"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.9.14"
+version = "1.9.15"
 weakdeps = ["ChainRulesCore", "Statistics"]
 
     [deps.StaticArrays.extensions]
@@ -2559,9 +2572,9 @@ version = "1.11.0"
 
 [[deps.TiffImages]]
 deps = ["ColorTypes", "DataStructures", "DocStringExtensions", "FileIO", "FixedPointNumbers", "IndirectArrays", "Inflate", "Mmap", "OffsetArrays", "PkgVersion", "PrecompileTools", "ProgressMeter", "SIMD", "UUIDs"]
-git-tree-sha1 = "02aca429c9885d1109e58f400c333521c13d48a0"
+git-tree-sha1 = "98b9352a24cb6a2066f9ababcc6802de9aed8ad8"
 uuid = "731e570b-9d59-4bfa-96dc-6df516fadf69"
-version = "0.11.4"
+version = "0.11.6"
 
 [[deps.TinyHugeNumbers]]
 git-tree-sha1 = "83c6abf376718345a85c071b249ef6692a8936d4"
@@ -2978,8 +2991,8 @@ version = "1.9.2+0"
 # ╔═╡ Cell order:
 # ╟─779f3ea6-36dd-11f0-0323-613cd06c6f3c
 # ╠═10bdf484-848d-44a1-af9b-64c0c11395f7
-# ╠═34a1be54-4641-455d-ab3e-8d4d08aaf966
-# ╟─dfa63b82-3593-45b1-b13f-c47274ce724c
+# ╟─34a1be54-4641-455d-ab3e-8d4d08aaf966
+# ╠═dfa63b82-3593-45b1-b13f-c47274ce724c
 # ╟─de99bbcb-ce5b-44f1-85ef-ad26a9238509
 # ╟─4dfba22d-1d61-4325-90a0-52afed1787ee
 # ╟─f05721c1-e085-4c7d-92c8-292aa17c8040
@@ -3024,23 +3037,24 @@ version = "1.9.2+0"
 # ╠═2f0932a8-7f5e-41f8-aea6-882a147aadf3
 # ╟─28d63bb9-af87-4b97-a650-d58d95c4b74c
 # ╟─ac1321cb-764a-48d3-8ac4-9cedfe34d370
-# ╠═12d5f6d1-f214-448e-9c2e-da691b997d60
-# ╟─09c40ed2-a06d-4565-8ba9-2e7a855327d8
-# ╟─abe4105c-c42b-4d97-bc15-ef9741c23fcf
-# ╟─f72b729f-0195-4369-929c-e1eb93d7df55
-# ╟─ed3ed8a4-6704-4c44-907e-40d056e787b9
-# ╟─d2ca1a6d-4f96-4e90-9868-9db407ffd1b5
 # ╠═9c1da54d-edad-499a-91ae-88483b5d5a72
-# ╟─63000198-bdda-4c18-bf0c-dd6a9018405d
-# ╠═75abee86-a43c-4a53-8edb-cf943f4e570c
-# ╠═5d308e05-cf04-4289-ab75-7677a71839d4
-# ╟─ac33150f-57b1-4cfb-8176-80750c981019
-# ╟─43799ac6-6a21-4852-8077-5e8b7e5489fa
-# ╟─50d10285-67c9-487e-8c19-a10d8d663fc5
+# ╟─174aedea-93e2-4e21-aac1-21a4c27cede9
+# ╟─abe4105c-c42b-4d97-bc15-ef9741c23fcf
+# ╟─caf8ede0-a410-4b4a-81dd-4342b8a2385a
+# ╟─75abee86-a43c-4a53-8edb-cf943f4e570c
+# ╟─71b7e9cb-a6ce-4982-b00c-b98dcd08888f
+# ╟─7cc095a9-fbf3-4402-bba6-f25fdb1347b1
+# ╟─27991fcd-6754-42fe-8e47-d52187065afb
+# ╠═12d5f6d1-f214-448e-9c2e-da691b997d60
+# ╟─66b2711a-f4b9-43fe-8f0f-112d1365bbbe
+# ╠═0bb66b2a-5d41-4f6b-b245-0360274b9296
+# ╟─5fa37c24-c90e-4e21-921e-03422943f225
+# ╠═6d7f9ad2-8dc4-450d-afb6-c55deaeed564
 # ╟─5c315bdb-7375-459e-a9e2-0d180271ed78
 # ╟─ff70f05f-7259-4d56-9a33-19ebd3483c63
-# ╟─be5ebcb7-1981-4771-9c42-967fc576ce5e
 # ╟─7e6ac0f6-710e-4388-acc2-b2b255a961ca
 # ╟─02156dca-2fcb-4654-80a0-3666a7807ea3
+# ╟─5ef49dcd-16ff-4183-a28b-061572d98b98
+# ╠═d8218c14-e005-4e34-a468-44ebb790ef11
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
