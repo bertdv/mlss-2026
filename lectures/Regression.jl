@@ -327,7 +327,7 @@ md"""
 p(y_\bullet \,|\, x_\bullet, D) &= \int p(y_\bullet \,|\, x_\bullet, w) p(w\,|\,D)\,\mathrm{d}w \\
 &= \int \mathcal{N}(y_\bullet \,|\, w^T x_\bullet, \beta^{-1}) \mathcal{N}(w\,|\,m_N,S_N)\,\mathrm{d}w \\
 &= \int \mathcal{N}(y_\bullet \,|\, z, \beta^{-1}) \underbrace{\mathcal{N}(z\,|\,x_\bullet^T m_N,x_\bullet^T S_N x_\bullet)\,\mathrm{d}z}_{=\mathcal{N}(w\,|\,m_N,S_N)\,\mathrm{d}w} \quad \text{(sub. }z=x_\bullet^T w \text{)} \\
-&= \int \underbrace{\underbrace{\mathcal{N}(z \,|\, y_\bullet, \beta^{-1})}_{\text{switch }z \text{ and }y_\bullet} \mathcal{N}(z\,|\,x_\bullet^T m_N,x_\bullet^T S_N x_\bullet)}_{\text{Use Gaussian product formula SRG-6}}\,\mathrm{d}z  \\
+&= \int \underbrace{\underbrace{\mathcal{N}(z \,|\, y_\bullet, \beta^{-1})}_{\text{switch }z \text{ and }y_\bullet} \mathcal{N}(z\,|\,x_\bullet^T m_N,x_\bullet^T S_N x_\bullet)}_{\text{Use Gaussian product formula}}\,\mathrm{d}z  \\
 &= \int \mathcal{N}\left(y_\bullet\,|\, m_N^T x_\bullet, \sigma_N^2(x_\bullet) \right) \underbrace{\mathcal{N}\left(z\,|\, \cdot, \cdot\right)}_{\text{integrate this out}} \mathrm{d}z\\
 &= \mathcal{N}\left(y_\bullet\,|\, m_N^T x_\bullet, \sigma_N^2(x_\bullet) \right)
 \end{align*}
