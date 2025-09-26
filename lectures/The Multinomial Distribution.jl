@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.17
+# v0.20.19
 
 #> [frontmatter]
 #> description = "Bayesian and maximum likelihood density estimation for discretely valued data sets."
@@ -352,7 +352,12 @@ where we get ``\lambda`` from the constraint
 """
 
 # ╔═╡ 63cc56b7-588a-43c3-8327-ad6367608601
-TODO("Insert key concepts slide here")
+md"""
+# Summary
+"""
+
+# ╔═╡ acdc5bfa-7188-4a37-80e6-5026ecd1a813
+keyconceptsummary()
 
 # ╔═╡ 204bec3f-6fde-48c1-b2b6-9f88d484c130
 exercises(header_level=1)
@@ -490,16 +495,16 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
 
 [compat]
-BmlipTeachingTools = "~1.1.0"
+BmlipTeachingTools = "~1.3.0"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.6"
+julia_version = "1.11.7"
 manifest_format = "2.0"
-project_hash = "bcb429f04e846701697c16c8e131f09449decb36"
+project_hash = "b7efcb24dc9658fc1256a61465754e7dca0e0d6d"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -521,9 +526,9 @@ version = "1.11.0"
 
 [[deps.BmlipTeachingTools]]
 deps = ["HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoTeachingTools", "PlutoUI", "Reexport"]
-git-tree-sha1 = "17747c9318a7e81cd8ca4ee3d414d96e7d8bba3e"
+git-tree-sha1 = "faf181102fc31264fe0ac927c62f5fa04ed7da9b"
 uuid = "656a7065-6f73-6c65-7465-6e646e617262"
-version = "1.1.0"
+version = "1.3.0"
 
 [[deps.ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
@@ -567,6 +572,12 @@ git-tree-sha1 = "9c68794ef81b08086aeb32eeaf33531668d5f5fc"
 uuid = "1fa38f19-a742-5d3f-a2b9-30dd87b9d5f8"
 version = "1.3.7"
 
+[[deps.Ghostscript_jll]]
+deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Zlib_jll"]
+git-tree-sha1 = "38044a04637976140074d0b0621c1edf0eb531fd"
+uuid = "61579ee1-b43e-5ca0-a5da-69d92c66a64b"
+version = "9.55.1+0"
+
 [[deps.Hyperscript]]
 deps = ["Test"]
 git-tree-sha1 = "179267cfa5e712760cd43dcae385d7ea90cc25a4"
@@ -590,11 +601,23 @@ deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 version = "1.11.0"
 
+[[deps.JLLWrappers]]
+deps = ["Artifacts", "Preferences"]
+git-tree-sha1 = "0533e564aae234aff59ab625543145446d8b6ec2"
+uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
+version = "1.7.1"
+
 [[deps.JSON]]
 deps = ["Dates", "Mmap", "Parsers", "Unicode"]
 git-tree-sha1 = "31e996f0a15c7b280ba9f76636b3ff9e2ae58c9a"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.4"
+
+[[deps.JpegTurbo_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "4255f0032eafd6451d707a51d5f0248b8a165e4d"
+uuid = "aacddb02-875f-59d6-b918-886e6ef4fbf8"
+version = "3.1.3+0"
 
 [[deps.LaTeXStrings]]
 git-tree-sha1 = "dda21b8cbd6a6c40d9d02a73230f9d70fed6918c"
@@ -602,10 +625,10 @@ uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 version = "1.4.0"
 
 [[deps.Latexify]]
-deps = ["Format", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdown", "OrderedCollections", "Requires"]
-git-tree-sha1 = "52e1296ebbde0db845b356abbbe67fb82a0a116c"
+deps = ["Format", "Ghostscript_jll", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdown", "OrderedCollections", "Requires"]
+git-tree-sha1 = "44f93c47f9cd6c7e431f2f2091fcba8f01cd7e8f"
 uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
-version = "0.16.9"
+version = "0.16.10"
 
     [deps.Latexify.extensions]
     DataFramesExt = "DataFrames"
@@ -718,15 +741,15 @@ version = "1.11.0"
 
 [[deps.PlutoTeachingTools]]
 deps = ["Downloads", "HypertextLiteral", "Latexify", "Markdown", "PlutoUI"]
-git-tree-sha1 = "85778cdf2bed372008e6646c64340460764a5b85"
+git-tree-sha1 = "dacc8be63916b078b592806acd13bb5e5137d7e9"
 uuid = "661c6b06-c737-4d37-b85c-46df65de6f69"
-version = "0.4.5"
+version = "0.4.6"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "fcfec547342405c7a8529ea896f98c0ffcc4931d"
+git-tree-sha1 = "8329a3a4f75e178c11c1ce2342778bcbbbfa7e3c"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.70"
+version = "0.7.71"
 
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
@@ -859,7 +882,8 @@ version = "17.4.0+2"
 # ╟─d844bcfa-d294-11ef-0874-b154f3ed810b
 # ╟─d844d564-d294-11ef-0454-416352d43524
 # ╟─d844fa76-d294-11ef-172a-85e68842c252
-# ╠═63cc56b7-588a-43c3-8327-ad6367608601
+# ╟─63cc56b7-588a-43c3-8327-ad6367608601
+# ╟─acdc5bfa-7188-4a37-80e6-5026ecd1a813
 # ╟─204bec3f-6fde-48c1-b2b6-9f88d484c130
 # ╟─62b42d1d-be91-4740-bac6-b4527494959d
 # ╟─01c4c590-fece-49a5-8979-6e0d54f7850a
