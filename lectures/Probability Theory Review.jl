@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.17
+# v0.20.18
 
 #> [frontmatter]
 #> description = "Review of probability theory as a foundation for rational reasoning and Bayesian inference."
@@ -886,6 +886,13 @@ In this case, knowledge about the future influences our state of knowledge about
 # ╔═╡ ea803646-b18e-4f13-ab6a-fc5080d44e92
 challenge_solution("Disease Diagnosis",header_level=1)
 
+# ╔═╡ 9b85a92b-c56b-48a3-97c1-6b1882e33a22
+@htl """
+<label style="font-weight: bold;">
+Show solution? $(@bind(show_disease_diagnosis_solution, CheckBox(default=false)))
+</label>
+"""
+
 # ╔═╡ ef264651-854e-4374-8ea8-5476c85150c4
 md"# Moments and Transformations"
 
@@ -1458,9 +1465,10 @@ let
 end
 
 # ╔═╡ 2156f96e-eebe-4190-8ce9-c76825c6da71
-@mdx """
+if show_disease_diagnosis_solution
+	@mdx("""
+ <div style="border-left: 4px solid rgba(100,100,100,0.2);padding-left: 1em;">
 
-##### Solution 
 
 - The given information is ``p(D=1)=$(n(prevalence))``, ``p(T=1|D=1)=$(n(sensitivity))`` and ``p(T=0|D=0)=$(n(specificity))``. We are asked to derive ``p( D=1 | T=1)``. We just follow the sum and product rules to derive the requested probability:
 
@@ -1479,7 +1487,8 @@ Note that ``p(\\text{sick}|\\text{positive test}) = $(n(result))`` while ``p(\\t
 
 Many people have trouble distinguishing ``p(A|B)`` from ``p(B|A)`` in their heads. This has led to major negative consequences. For instance, unfounded convictions in the legal arena and numerous unfounded conclusions in the pursuit of scientific results. See [Ioannidis (2005)](https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0020124) and [Clayton (2021)](https://aubreyclayton.com/bernoulli).
 
-"""
+""")
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1503,7 +1512,7 @@ Plots = "~1.40.19"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.6"
+julia_version = "1.11.7"
 manifest_format = "2.0"
 project_hash = "1e5b5386f4ac7813e9fbfe6b3093b4a62c85f96a"
 
@@ -2826,6 +2835,7 @@ version = "1.9.2+0"
 # ╟─fae6f2ce-ac8f-4ea6-b2cf-38b30a7e20d4
 # ╟─ea803646-b18e-4f13-ab6a-fc5080d44e92
 # ╟─3e1d6d00-d294-11ef-1081-e11b8397eb91
+# ╟─9b85a92b-c56b-48a3-97c1-6b1882e33a22
 # ╟─2156f96e-eebe-4190-8ce9-c76825c6da71
 # ╟─ef264651-854e-4374-8ea8-5476c85150c4
 # ╟─3e1e4dda-d294-11ef-33b7-4bbe3300ca22
