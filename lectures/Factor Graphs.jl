@@ -651,7 +651,7 @@ And we have now transformed our polynomial model on ``\mathbb{R}`` to a linear m
 # ╔═╡ 480165f9-33d9-4db1-bf05-8d99f0d9fb3e
 md"""
 ### Generate the Data Set
-For details, see [the Appendix](#Appendix).
+For details, see [the Appendix](#Code).
 
 """
 
