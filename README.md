@@ -114,7 +114,7 @@ You can access all lecture materials online through the links below:
          <tr>
             <td>26-Nov-2025 <em>(Wed)</em></td>
             <td>🟢 Introduction to Julia</td>
-            <td><a href="http://nbviewer.jupyter.org/github/bertdv/BMLIP/blob/master/lessons/notebooks/Julia-Programming.ipynb">W0</a></td>
+            <td><a href="https://bmlip.github.io/course/probprog/PP0%20-%20Introduction%20Bayesian%20Machine%20Learning.html">W0</a></td>
             <td></td>
             <td></td>
          </tr>
@@ -183,7 +183,7 @@ You can access all lecture materials online through the links below:
          <tr>
             <td>17-Dec-2025 <em>(Wed)</em></td>
             <td>🟢 Probabilistic Programming 2 - Bayesian regression & classification</td>
-            <td><a href="http://nbviewer.jupyter.org/github/bertdv/BMLIP/blob/master/lessons/notebooks/probprog/Probabilistic-Programming-2.ipynb">W2</a></td>
+            <td><a href="https://bmlip.github.io/course/probprog/PP2%20-%20Bayesian%20regression%20and%20classification.html">W2</a></td>
             <td></td>
             <td><a href="https://youtu.be/TKvI5uUYY8A">W2.1</a>, <a href="https://youtu.be/WCtInHz5-zA">W2.2</a></td>
          </tr>
@@ -242,7 +242,7 @@ You can access all lecture materials online through the links below:
          <tr>
             <td>16-Jan-2026 <em>(Fri)</em></td>
             <td>🟢 Probabilistic Programming 4 - Bayesian filters & smoothers</td>
-            <td><a href="http://nbviewer.jupyter.org/github/bertdv/BMLIP/blob/master/lessons/notebooks/probprog/Probabilistic-Programming-4.ipynb">W4</a></td>
+            <td><a href="https://bmlip.github.io/course/probprog/PP4%20-%20Bayesian%20filtering%20and%20smoothing.html">W4</a></td>
             <td></td>
             <td><a href="https://youtu.be/Yp2vhndnjng">W4.1</a>, <a href="https://youtu.be/qnWofDRh5eo">W4.2</a></td>
          </tr>
