@@ -2,6 +2,7 @@
 # v0.20.19
 
 #> [frontmatter]
+#> image = "https://imgur.com/TGISnuj.png"
 #> description = "Can you teach a computer to tell apples from peaches? Discover generative classification!"
 #> 
 #>     [[frontmatter.author]]

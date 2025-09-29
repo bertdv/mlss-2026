@@ -2,7 +2,9 @@
 # v0.20.19
 
 #> [frontmatter]
-#> image = "https://github.com/bmlip/course/blob/v2/assets/figures/fig-Bishop-A5-Old-Faithfull.png?raw=true"
+#> image = "https://imgur.com/oS96z4w.png"
+#> language = "en-US"
+#> title = "Latent Variable Models and Variational Bayes"
 #> description = "Introduction to latent variable models and variational inference via free energy minimization."
 #> 
 #>     [[frontmatter.author]]
@@ -1093,14 +1095,19 @@ In words, the FE decomposes into a sum of (expected) energies for the nodes minu
 
 """
 
-# ╔═╡ 26c8e172-d294-11ef-2a9e-89e0f4cbf475
+# ╔═╡ f17c9d8a-9291-4110-bcf4-c582d23f986b
 md"""
 ## Variational Message Passing
 
 Let us now consider the local free energy that is associated with edge corresponding to ``x_j``. 
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/VMP-two-nodes.png?raw=true)
+"""
 
+# ╔═╡ 90fbe618-fc81-480b-b685-69cd97e5b8ed
+Resource("https://github.com/bmlip/course/blob/v2/assets/figures/VMP-two-nodes.png?raw=true", :style => "background: white; border-radius: 1em;")
+
+# ╔═╡ 32f0bbb4-dfc7-431e-9a3d-80162439edac
+md"""
 Apparently (see previous slide), there are three contributions to the free energy for ``x_j``:
 
   * one entropy term for the edge ``x_j``
@@ -3445,7 +3452,9 @@ version = "1.9.2+0"
 # ╟─7a3c0ff7-0b32-4954-ae28-b644f4d966ef
 # ╟─26c8b682-d294-11ef-1331-2bcf8baec73f
 # ╟─26c8c7fa-d294-11ef-0444-6555ecf5c721
-# ╟─26c8e172-d294-11ef-2a9e-89e0f4cbf475
+# ╟─f17c9d8a-9291-4110-bcf4-c582d23f986b
+# ╟─90fbe618-fc81-480b-b685-69cd97e5b8ed
+# ╟─32f0bbb4-dfc7-431e-9a3d-80162439edac
 # ╟─26c9121e-d294-11ef-18e6-ed8105503adc
 # ╟─55570464-89c8-4d9b-b667-dfa64ac62294
 # ╠═df171940-eb54-48e2-a2b8-1a8162cabf3e

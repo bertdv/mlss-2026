@@ -33,6 +33,9 @@ using Plots, LinearAlgebra, LaTeXStrings
 # ╔═╡ 2cb7d369-e7fd-4d66-8321-66a9197a26bd
 using RxInfer, Random
 
+# ╔═╡ 387f55ba-0fa4-4171-a405-3b1fb4e6b586
+using StableRNGs
+
 # ╔═╡ 96547560-d294-11ef-0fa7-6b6489f7baba
 title("Factor Graphs")
 
@@ -292,12 +295,8 @@ In an FFG, we visualize a delta node by a small black box,
 
 """
 
-# ╔═╡ adfc41d1-956a-43ba-94d3-3ed6c71475ca
-@htl """
-
-<img src="https://github.com/bmlip/course/blob/v2/assets/figures/ffg-observation-y-3.png?raw=true" alt=" " style="display: block; width: 70%; margin: 0 auto;">
-
-"""
+# ╔═╡ 9862f675-87e6-4bba-a07d-9e51839819c7
+Resource("https://github.com/bmlip/course/blob/v2/assets/figures/ffg-observation-y-3.png?raw=true", :width => 500, :style => "background: white; padding: 1em; border-radius: 1em;")
 
 # ╔═╡ 3d54facb-e655-4d8d-b565-bffc4fdf0a95
 md"""
@@ -353,10 +352,10 @@ Note that, if each variable ``x_i`` can take on ``10`` values, then computing th
 md"""
 We draw here the FFG for the factorized distribution:
 
-![](https://github.com/bertdv/BMLIP/blob/master/lessons/notebooks/figures/ffg-message-passing.png?raw=true)
-
-
 """
+
+# ╔═╡ f46473f8-e749-431d-8350-751115f0aaf0
+Resource("https://github.com/bmlip/course/blob/v4/assets/figures/ffg-message-passing.png?raw=true", :style => "background: #eee; padding: 1em; border-radius: 1em;")
 
 # ╔═╡ cb3df230-6c7e-41b9-ba13-3c5f8a7fbb62
 md"""
@@ -622,12 +621,8 @@ The left figure shows the factor graph for this model for one observation ``(x,y
 
 """
 
-# ╔═╡ 14b87cc5-ddb0-4b8f-89e2-0c1cc50588aa
-@htl """
-
-<img src="https://github.com/bmlip/course/blob/v2/assets/figures/ffg-bayesian-linear-regression.png?raw=true" alt=" " style="display: block; width: 70%; margin: 0 auto;">
-
-"""
+# ╔═╡ 284a9dd5-1e26-4fd3-bb58-6e7ac0a0872f
+Resource("https://github.com/bmlip/course/blob/v2/assets/figures/ffg-bayesian-linear-regression.png?raw=true", :width=>500, :style => "background: white; padding: 1em; border-radius: 1em;")
 
 # ╔═╡ 42dd67e6-eb0f-4368-9947-47de229f7be1
 md"""
@@ -1158,7 +1153,7 @@ md"""
 """
 
 # ╔═╡ 981b08cc-7fb4-4880-8e8a-0b60a5dd72a2
-stable_rand(args...; seed=nothing) = rand(MersenneTwister(543432 + hash(seed)), args...)
+stable_rand(args...; seed=nothing) = rand(StableRNG(543432 + hash(seed)), args...)
 
 # ╔═╡ 997235c1-08bd-4dbc-b1bc-cb10a3b83da4
 md"""
@@ -1266,12 +1261,14 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 RxInfer = "86711068-29c9-4ff7-b620-ae75d7495b3d"
+StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
 
 [compat]
 BmlipTeachingTools = "~1.3.0"
 LaTeXStrings = "~1.4.0"
 Plots = "~1.40.13"
 RxInfer = "~4.4.2"
+StableRNGs = "~1.0.3"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -1280,7 +1277,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.7"
 manifest_format = "2.0"
-project_hash = "48c7b1c1c8e8701113c8a9249127f3d7a11f6d0c"
+project_hash = "c86003c16b7a2d8d15f010735adf321c7ec328b7"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "27cecae79e5cc9935255f90c53bb831cc3c870d7"
@@ -3301,7 +3298,7 @@ version = "1.9.2+0"
 # ╟─9656d850-d294-11ef-21a1-474b07ea7729
 # ╟─9658329c-d294-11ef-0d03-45e6872c4985
 # ╟─f0181b53-a604-489f-a89e-db6fc58571dd
-# ╟─adfc41d1-956a-43ba-94d3-3ed6c71475ca
+# ╟─9862f675-87e6-4bba-a07d-9e51839819c7
 # ╟─3d54facb-e655-4d8d-b565-bffc4fdf0a95
 # ╟─ea4a720f-a644-46a0-ad35-b215780e0928
 # ╟─00c69a22-feb5-4d1e-9ab5-a136435d7d22
@@ -3309,6 +3306,7 @@ version = "1.9.2+0"
 # ╟─9656ee62-d294-11ef-38f4-7bc8031df7ee
 # ╟─9656fae2-d294-11ef-10d8-ff921d5956bd
 # ╟─b33b2aef-e672-490c-bdf4-a5f655fa4695
+# ╟─f46473f8-e749-431d-8350-751115f0aaf0
 # ╟─cb3df230-6c7e-41b9-ba13-3c5f8a7fbb62
 # ╟─96570d3e-d294-11ef-0178-c34dda717495
 # ╟─9657b088-d294-11ef-3017-e95c4c69b62b
@@ -3333,7 +3331,7 @@ version = "1.9.2+0"
 # ╟─96594d44-d294-11ef-22b8-95165fb08ce4
 # ╟─96597ce0-d294-11ef-3478-25c6bbef601e
 # ╟─965998a8-d294-11ef-1d18-85876e3656c5
-# ╟─14b87cc5-ddb0-4b8f-89e2-0c1cc50588aa
+# ╟─284a9dd5-1e26-4fd3-bb58-6e7ac0a0872f
 # ╟─42dd67e6-eb0f-4368-9947-47de229f7be1
 # ╟─480165f9-33d9-4db1-bf05-8d99f0d9fb3e
 # ╟─1c9c7994-672c-42a3-8ae7-8ce092ada9f0
@@ -3404,6 +3402,7 @@ version = "1.9.2+0"
 # ╠═965a08f4-d294-11ef-0604-1586ff37c0d4
 # ╠═981b08cc-7fb4-4880-8e8a-0b60a5dd72a2
 # ╠═2cb7d369-e7fd-4d66-8321-66a9197a26bd
+# ╠═387f55ba-0fa4-4171-a405-3b1fb4e6b586
 # ╟─997235c1-08bd-4dbc-b1bc-cb10a3b83da4
 # ╠═96ef3cfb-ca18-46d6-bcac-0122c2c85fba
 # ╠═aec4726a-954e-4e76-aae5-2dd6c979b12d
