@@ -7,7 +7,7 @@ if !isdir("pluto-slider-server-environment")
 end
 
 try
-    @assert read(`pdfunite -v`) isa String
+    @assert read(`pdfunite -v`, String) isa String
 catch
     error("pdfunite is not installed. Please install it using your package manager. This is used to merge the individual PDFs into a single PDF.")
 end
@@ -20,7 +20,6 @@ import Pkg
 
 project = mktempdir()
 cp("./pluto-slider-server-environment", project; force=true)
-@info "yo" readdir(project)
 Pkg.activate(project)
 Pkg.add(["URIs", "PlutoPDF"])
 Pkg.instantiate()
@@ -45,6 +44,13 @@ lecture_urls = [
     "https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html"
 ]
 
+prop_prog_urls = [
+    "https://bmlip.github.io/course/probprog/PP0%20-%20Introduction%20Bayesian%20Machine%20Learning.html",
+    "https://bmlip.github.io/course/probprog/PP1%20-%20Bayesian%20inference%20in%20conjugate%20models.html",
+    "https://bmlip.github.io/course/probprog/PP2%20-%20Bayesian%20regression%20and%20classification.html",
+    "https://bmlip.github.io/course/probprog/PP3%20-%20variational%20Bayesian%20inference.html",
+    "https://bmlip.github.io/course/probprog/PP4%20-%20Bayesian%20filtering%20and%20smoothing.html",
+]
 
 import PlutoPDF
 import URIs
@@ -70,17 +76,20 @@ end
 for (i,url) in enumerate(lecture_urls)
     out_path = output_path(i, url)
     
-    @info "Generating PDF" name out_path
+    @info "📄 Generating lecture PDF ($(i)/$(length(lecture_urls)))" out_path
     PlutoPDF.html_to_pdf(url, out_path; open=false, options)
 end
 
-@info "Merging PDFs"
+@info "🗂️📚 Merging lecture PDFs"
 
 files = [
     output_path(i, url) for (i, url) in enumerate(lecture_urls)
 ]
 
+output = joinpath(lectures_dir, "BMLIP Lectures.pdf")
+
+run(`pdfunite $(files) $output`)
 
 
-@info "Output" output_path
+@info "✅ Output pdf file:" output
 
