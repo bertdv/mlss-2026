@@ -185,14 +185,12 @@ In a classification problem, the target variable ``y`` is a *discrete-valued* ve
 The special case ``y \in \{\text{true},\text{false}\}`` is called **detection**. 
 
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/Bishop-Figure4.5b.png?raw=true)
+![](https://imgur.com/XSCNBN9.png)
 
 """
 
-# ╔═╡ 40fddaa0-cb9d-4873-b2f6-3fd2a742ecd2
-md"""
-Replace the image, and insert here resulting heatmap plot from Generative classification lecture.
-""" |> TODO
+# ╔═╡ b00872c2-96d0-47e7-8495-a3d6e559ea63
+NotebookCard("https://bmlip.github.io/course/lectures/Generative%20Classification.html"; link_text="Go to lecture")
 
 # ╔═╡ 3ced29ae-d294-11ef-158b-09fcdaa47d1c
 md"""
@@ -200,14 +198,12 @@ md"""
 
 Regression, also called **curve fitting**, is the supervised learning task of estimating the conditional distribution ``p(y_n | x_n)``, where  ``x_n`` are input variables and ``y_n`` represent __continuous__ output variables. 
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/Bishop-Figure1.2.png?raw=true)
-
-
+![](https://imgur.com/lKUUjWr.png)
 
 """
 
-# ╔═╡ aa615113-9261-4782-8f75-27682a810e97
-TODO("Replace the image with image from regression lecture")
+# ╔═╡ 672c35c0-c7ab-4e17-a280-867bf3cf2f27
+NotebookCard("https://bmlip.github.io/course/lectures/Regression.html"; link_text="Go to lecture")
 
 # ╔═╡ 3cec9250-d294-11ef-01ac-9d94676a65a3
 md"""
@@ -232,11 +228,11 @@ md"""
 
 If the unobserved target variables take on discrete values, the task is referred to as clustering. In this sense, clustering can be regarded as "unsupervised classification".
 
-![](https://github.com/bmlip/course/blob/v2/assets/figures/fig-Zoubin-clustering-example.png?raw=true)
+![](https://imgur.com/yIvpvD6.png)
 """
 
-# ╔═╡ 548b831a-afc6-4b17-890e-ab6cf30114fa
-TODO("Remove clustering image and replace by image from Latent variables lecture")
+# ╔═╡ bb485cc3-02e2-4cb4-9e4d-80574b8eb66c
+NotebookCard("https://bmlip.github.io/course/lectures/Latent%20Variable%20Models%20and%20VB.html"; link_text="Go to lecture")
 
 # ╔═╡ 3ced567c-d294-11ef-2657-df20e23a00fa
 md"""
@@ -274,16 +270,11 @@ In the [lecture on Intelligent Agents and Active Inference](https://bmlip.github
 
 """
 
-# ╔═╡ 68e00fce-a627-4943-8f62-0852873a771a
-md"""
-![](https://github.com/bmlip/course/blob/v2/assets/figures/RL-example.png?raw=true)
+# ╔═╡ 5971fb3c-1489-4e66-a77a-2c6e9714b8a2
+Resource("https://github.com/bmlip/course/raw/refs/heads/main/assets/figures/minigrid%20loop.mp4", :autoplay => true, :loop=>true)
 
-"""
-
-# ╔═╡ 69555c82-a593-4fe5-97e2-8c6898253991
-md"""
-Replace the robot image above and include here the minigrid solution from the active inference lesson
-""" |> TODO
+# ╔═╡ d2f07ece-5cea-4c00-8ed8-a70752e113b7
+NotebookCard("https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html"; link_text="Go to lecture")
 
 # ╔═╡ 3ced839a-d294-11ef-3dd0-1f8c5ef11b75
 md"""
@@ -727,17 +718,17 @@ version = "17.4.0+2"
 # ╟─6f95adeb-d0a9-47fd-900a-0e55d497bab6
 # ╟─3ced0d0c-d294-11ef-3000-7b63362a2351
 # ╟─e1122eab-a25b-4441-a053-b0121b334731
-# ╟─40fddaa0-cb9d-4873-b2f6-3fd2a742ecd2
+# ╟─b00872c2-96d0-47e7-8495-a3d6e559ea63
 # ╟─3ced29ae-d294-11ef-158b-09fcdaa47d1c
-# ╟─aa615113-9261-4782-8f75-27682a810e97
+# ╟─672c35c0-c7ab-4e17-a280-867bf3cf2f27
 # ╟─3cec9250-d294-11ef-01ac-9d94676a65a3
 # ╟─c5bfab8f-4985-420a-b46e-b4ff6d359d3d
-# ╠═548b831a-afc6-4b17-890e-ab6cf30114fa
+# ╠═bb485cc3-02e2-4cb4-9e4d-80574b8eb66c
 # ╟─3ced567c-d294-11ef-2657-df20e23a00fa
 # ╟─0d6029ef-87ba-4881-b7af-9de2dad1ed99
 # ╟─3cecbc46-d294-11ef-24cb-2d9e41fb35d9
-# ╟─68e00fce-a627-4943-8f62-0852873a771a
-# ╟─69555c82-a593-4fe5-97e2-8c6898253991
+# ╟─5971fb3c-1489-4e66-a77a-2c6e9714b8a2
+# ╟─d2f07ece-5cea-4c00-8ed8-a70752e113b7
 # ╟─3ced839a-d294-11ef-3dd0-1f8c5ef11b75
 # ╟─438981cd-8450-4678-8b61-9cc5c0c0ebf1
 # ╟─f47f4370-4d6f-4e36-bbef-63f806130dbe
