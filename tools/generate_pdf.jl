@@ -6,6 +6,12 @@ if !isdir("pluto-slider-server-environment")
     """)
 end
 
+try
+    @assert read(`pdfunite -v`) isa String
+catch
+    error("pdfunite is not installed. Please install it using your package manager. This is used to merge the individual PDFs into a single PDF.")
+end
+
 # if !(v"1.11.0-aaa" < VERSION < v"1.12.0")
 #     error("Our notebook package environments need to be updated with Julia 1.11. Go to julialang.org/downloads to install it.")
 # end
@@ -56,13 +62,24 @@ const options = (
     displayHeaderFooter=false,
 )
 
-for (i,url) in enumerate(lecture_urls)
-    name = URIs.unescapeuri(replace(url, "https://bmlip.github.io/course/lectures/" => ""))
-    output_path = joinpath(lectures_dir, "B$(i-1) $(name).pdf")
-    
-    @info "Generating PDF" name output_path
-    PlutoPDF.html_to_pdf(url, output_path; open=false, options)
+function output_path(i, url)
+    name = URIs.unescapeuri(replace(url, "https://bmlip.github.io/course/lectures/" => "", ".html" => ""))
+    output_path = joinpath(lectures_dir, "B$(lpad(i-1, 2, '0')) $(name).pdf")
 end
+
+for (i,url) in enumerate(lecture_urls)
+    out_path = output_path(i, url)
+    
+    @info "Generating PDF" name out_path
+    PlutoPDF.html_to_pdf(url, out_path; open=false, options)
+end
+
+@info "Merging PDFs"
+
+files = [
+    output_path(i, url) for (i, url) in enumerate(lecture_urls)
+]
+
 
 
 @info "Output" output_path
