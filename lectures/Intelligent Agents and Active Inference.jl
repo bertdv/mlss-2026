@@ -2,7 +2,8 @@
 # v0.20.19
 
 #> [frontmatter]
-#> image = "https://github.com/bmlip/course/blob/v2/assets/ai_agent/agent-cart-interaction2.png?raw=true"
+#> image = "https://imgur.com/FlRMz2f.png"
+#> language = "en-US"
 #> description = "Introduction to Active Inference and application to the design of synthetic intelligent agents"
 #> 
 #>     [[frontmatter.author]]
@@ -433,14 +434,18 @@ Similarly, the epistemic priors ``\tilde{p}(u)`` and ``\tilde{p}(y,x)`` from (E1
 
 """
 
-# ╔═╡ 07c48a8b-522b-4c26-a177-e8d0611f7b59
+# ╔═╡ 65e34124-fda2-4a60-9722-ece2f68a39d9
 md"""
 ## Realization by Reactive Message Passing
 
 An AIF agent can be efficiently realized by an autonomous reactive message passing process in a Forney-style Factor Graph (FFG) representation of (a rollout to the future of) the generative model, augmented with goal and epistemic priors.
+"""
 
-![FFG for an AIF agent](https://github.com/bmlip/course/blob/main/assets/figures/AIF-generative-model-as-FFG.png?raw=true)
+# ╔═╡ 6e14d8e3-9dc2-44fb-9fa5-c48f10cb1076
+Resource("https://github.com/bmlip/course/blob/v4/assets/figures/AIF-generative-model-as-FFG.png?raw=true", :alt => "FFG for an AIF agent", :style => "background: white; border-radius: 1em;")
 
+# ╔═╡ bece6e3d-57b2-4bf4-8bf8-d5a11ad8983f
+md"""
 In the above figure, the agent's generative (predictive) model
 ```math
 \prod_{k=1}^T p(y_k|x_k) p(x_k|x_{k-1},u_k)\,,
@@ -578,7 +583,7 @@ md"""
 # Optional Slides
 """
 
-# ╔═╡ 345fa88c-98c2-4c41-b046-0c2d868b1d36
+# ╔═╡ 8627b90a-79d8-43bf-8d53-1043f6e816ab
 md"""
 
 ## The FEP is a Least Action Principle for "Things"
@@ -587,15 +592,19 @@ Almost all of physics can be described as processes that minimize energy differe
 
 For example, Newton’s second law ``F = ma`` [can be derived from minimizing the "action"](https://vixra.org/pdf/2501.0036v1.pdf)—the time integral of the difference between kinetic and potential energy for a particle. Many branches of physics that describe motion can be formulated through similar derivations.
 
+"""
 
-![](https://github.com/bmlip/course/blob/main/assets/figures/FEP.png?raw=true)
+# ╔═╡ 58c51f5e-69a0-4802-892b-0a52462c4e55
+Resource("https://github.com/bmlip/course/blob/v4/assets/figures/FEP.png?raw=true", :style => "background: white; border-radius: 1em;")
 
+# ╔═╡ 14ef2403-cba3-4e76-91c7-4655656a632d
+md"""
 
 The Free Energy Principle (FEP) can be viewed as a kind of PLA as well—one that governs the necessary “motion” of beliefs (ie, necessary information processing) in systems that maintain their structural and functional integrity over time. All living systems fall under its scope.
 
 """
 
-# ╔═╡ 2784c270-d294-11ef-2b9b-43c9bdd56bae
+# ╔═╡ 54cc2500-f06f-4f39-95f3-8d9d09c37234
 md"""
 ## Active Inference and The Scientific Inquiry Loop
 
@@ -604,9 +613,13 @@ In the [Machine Learning Overview lecture](https://bmlip.github.io/course/lectur
 Active inference completes this “scientific loop” as a fully variational inference process. Under the FEP, all processes, including state updating, learning, and trial design (in living systems: perception, learning, and control/behavior, respectively) are driven by VFE minimization. Bayesian probability theory, together with the FEP, provides all the equations needed to run the process of scientific inquiry.
 
 The figure below illustrates this process. We do not depict the epistemic priors as an external input, since they can be computed internally by the agent itself.
+"""
 
-![](https://github.com/bmlip/course/blob/main/assets/figures/AIF-agent-loop.png?raw=true)
+# ╔═╡ b900b7d4-3a49-4651-a94b-74fdbbf094d9
+Resource("https://github.com/bmlip/course/blob/v4/assets/figures/AIF-agent-loop.png?raw=true", :style => "background: white; border-radius: 1em;")
 
+# ╔═╡ cd2dafbe-5131-4ee0-8eb7-33bd04f3133f
+md"""
 If an agent has no goal priors, then active inference reduces to an automated (Bayes-optimal) scientist: the agent’s generative model will converge to a veridical (“true”) description of the environment. With goal priors, however, an active inference agent becomes a (Bayes-optimal) engineer: its model converges to beliefs that generate purposeful behavior. For example, the goal prior “I will not get hit by a car” leads to the inference of actions that allow safe crossing of the road. In the same way, carefully structured goal priors enable the brain to develop solutions for tasks such as object recognition, locomotion, and speech generation.
 
 In short, **AIF is an automated (Bayes-optimal) engineering design loop**.
@@ -1909,7 +1922,9 @@ version = "17.4.0+2"
 # ╟─a8c88dff-b10c-4c25-8dbe-8f04ee04cffa
 # ╟─63609dc2-2413-4822-8401-2d2ba22adfce
 # ╟─5b66f8e5-4f01-4448-82e3-388bc8ea31de
-# ╟─07c48a8b-522b-4c26-a177-e8d0611f7b59
+# ╟─65e34124-fda2-4a60-9722-ece2f68a39d9
+# ╟─6e14d8e3-9dc2-44fb-9fa5-c48f10cb1076
+# ╟─bece6e3d-57b2-4bf4-8bf8-d5a11ad8983f
 # ╟─64474167-bf52-456c-9099-def288bd17bf
 # ╟─2784f45e-d294-11ef-0439-1903016c1f14
 # ╠═0b5b816b-2dd2-4fe8-8f84-4eb2d58b5d59
@@ -1926,8 +1941,12 @@ version = "17.4.0+2"
 # ╟─aed24f2d-105e-4583-b9d6-24d1886002d8
 # ╟─acefdbf6-1beb-4ce5-9106-0fc7be63dabe
 # ╟─6d697856-cc58-4d6a-afd3-c0c6bfbc0d88
-# ╟─345fa88c-98c2-4c41-b046-0c2d868b1d36
-# ╟─2784c270-d294-11ef-2b9b-43c9bdd56bae
+# ╟─8627b90a-79d8-43bf-8d53-1043f6e816ab
+# ╟─58c51f5e-69a0-4802-892b-0a52462c4e55
+# ╟─14ef2403-cba3-4e76-91c7-4655656a632d
+# ╟─54cc2500-f06f-4f39-95f3-8d9d09c37234
+# ╟─b900b7d4-3a49-4651-a94b-74fdbbf094d9
+# ╟─cd2dafbe-5131-4ee0-8eb7-33bd04f3133f
 # ╟─be0dc5c0-6340-4d47-85ae-d70e06df1676
 # ╠═97a0384a-0596-4714-a3fc-bf422aed4474
 # ╟─00000000-0000-0000-0000-000000000001
