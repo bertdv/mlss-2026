@@ -848,7 +848,12 @@ D = let
 	xs = rand(deterministic_randomness(19), Uniform(0,1), N)
 
 	ys_exact = secret_function.(xs)
-	ys = ys_exact .+ rand(deterministic_randomness(37), Normal(0.0, sqrt(σ_data_noise²)), N)
+
+	rng = deterministic_randomness(37)
+	ys = [
+		rand(rng, Normal(y, sqrt(σ_data_noise²)))
+		for y in ys_exact
+	 ]
 
 	collect(zip(xs, ys))
 end
