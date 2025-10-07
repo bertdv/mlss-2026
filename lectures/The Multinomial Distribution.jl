@@ -223,7 +223,7 @@ Let's apply what we have learned about the loaded die to compute the probability
 \begin{align*}
 p(x_{\bullet,k}=1|D)  &= \int p(x_{\bullet,k}=1|\mu)\,p(\mu|D) \,\mathrm{d}\mu \\
   &= \int_0^1 \mu_k \times  \mathcal{Dir}(\mu|\,\alpha+m) \,\mathrm{d}\mu  \\
-  &= \mathrm{E}\left[ \mu_k \right] \\
+  &= \mathrm{E}\left[ \mu_k | D\right] \\
   &= \frac{m_k + \alpha_k }{ N+ \sum_k \alpha_k}
 \end{align*}
 ```
@@ -272,7 +272,7 @@ We can obtain the maximum likelihood estimate for ``\mu_k`` based on ``N`` throw
 ``\alpha \rightarrow (1, 1, \dots, 1)``.
 
 
-Proof for yourself that 
+Prove for yourself that 
 
 ```math
 \begin{align*}
@@ -502,7 +502,7 @@ BmlipTeachingTools = "~1.3.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.7"
+julia_version = "1.11.5"
 manifest_format = "2.0"
 project_hash = "b7efcb24dc9658fc1256a61465754e7dca0e0d6d"
 
