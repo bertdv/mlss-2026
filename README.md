@@ -61,9 +61,9 @@ Bishop](http://research.microsoft.com/en-us/um/people/cmbishop/index.htm) (2006)
 --->
 
 
-### Software TODO
+### Software
 
-Please follow the [software installation instructions]() TODO ADD URL. If you encounter any problems, please contact us in class or on Piazza.
+Please follow the [software installation instructions](https://github.com/bmlip/course/blob/main/Software%20installation.md). If you encounter any problems, please contact us in class or on Piazza.
 
 
 ### <a name="lectures">Lecture notes, assignments and video recordings</a>
