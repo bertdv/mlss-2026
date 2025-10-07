@@ -170,7 +170,7 @@ In supervised learning, we are given observations of desired input–output beha
 D = \{(x_1, y_1), \dots, (x_N, y_N)\},
 ```
 
-where ``x_n`` are inputs and ``y_n`` are the corresponding outputs. The goal is to estimate the conditional probability distribution ``p(y_n | x_n)``, i.e., to capture how ``y_n`` depends on ``x_n``. The term "supervised" reflects the fact that the correct outputs ``y_n`` are provided in the training dataset ``D``.
+where ``x_n`` are inputs and ``y_n`` are the corresponding outputs. The goal is to estimate the conditional probability distribution ``p(y_n | x_n)``, i.e., to capture how ``y_n`` depends on ``x_n``. The term "supervised" reflects the fact that the correct outputs ``y_n`` are provided in the training dataset ``D``. (The reasons for using probabilities will be discussed in the [Probability Theory lecture](https://bmlip.github.io/course/lectures/Probability%20Theory%20Review.html).)
 
 Generally, we distinguish between **classification** and **regression** as two different supervised learning problems. 
 
@@ -244,7 +244,7 @@ Compression can be interpreted as ''unsupervised regression''.
 
 ![](https://github.com/bmlip/course/blob/v2/assets/figures/fig-compression-example.png?raw=true)
 
-In this lecture series, we hage unfortunately not enough time to discuss compression in detail in a separate lecture. [Chapter 12 in Bishop (2006)](https://www.microsoft.com/en-us/research/wp-content/uploads/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf#page=579) contains a nice introduction to compression. 
+In this lecture series, we unfortunately do not have enough time to discuss compression in detail in a separate lecture. [Chapter 12 in Bishop (2006)](https://www.microsoft.com/en-us/research/wp-content/uploads/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf#page=579) contains a nice introduction to compression. 
 
 """
 
@@ -256,7 +256,7 @@ md"""
 # ╔═╡ 3cecbc46-d294-11ef-24cb-2d9e41fb35d9
 md"""
 
-**Trial design** concerns learning which actions (trials) to perform in order to gain information about the environment. In the broader literature, this idea appears under many related labels, including **experimental design**, **active learning**, **decision-making under uncertainty**, **sequential decision-making**, **hypothesis testing**, **policy learning**, **planning**, and **control**. The sheer number of terms (often differing only in nuance) underscores the central importance of this task within the scientific inquiry process.
+**Trial design** concerns learning which actions (trials) to perform in order to gain information about the environment and/or to achieve certain specific goals (such as crossing a street). In the broader literature, this idea is presented under various related labels, including **experimental design**, **active learning**, **decision-making under uncertainty**, **sequential decision-making**, **hypothesis testing**, **policy learning**, **planning**, and **control**. The sheer number of terms (often differing only in nuance) underscores the central importance of this task within the scientific inquiry process.
 
 In trial design problems, the model is not only a description of the environment but also acts upon it, thereby influencing which data will be observed in the future. Such systems are called "agents". In addition to the labels mentioned above, the term [Agentic AI](https://en.wikipedia.org/wiki/Agentic_AI) has recently gained popularity.
 
@@ -266,7 +266,6 @@ In the machine learning and AI community, two prominent approaches to trial desi
 
  - **Active inference**: Given an observed sequence of input signals and a prior probability distribution about future observations, *learn* to select actions that minimize *expected* prediction errors (i.e., minimize actual minus predicted sensation).  
 
-In the [lecture on Intelligent Agents and Active Inference](https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html), we will discuss the active inference method in more detail.
 
 """
 
@@ -343,7 +342,7 @@ BmlipTeachingTools = "~1.3.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.7"
+julia_version = "1.11.5"
 manifest_format = "2.0"
 project_hash = "b7efcb24dc9658fc1256a61465754e7dca0e0d6d"
 
@@ -723,7 +722,7 @@ version = "17.4.0+2"
 # ╟─672c35c0-c7ab-4e17-a280-867bf3cf2f27
 # ╟─3cec9250-d294-11ef-01ac-9d94676a65a3
 # ╟─c5bfab8f-4985-420a-b46e-b4ff6d359d3d
-# ╠═bb485cc3-02e2-4cb4-9e4d-80574b8eb66c
+# ╟─bb485cc3-02e2-4cb4-9e4d-80574b8eb66c
 # ╟─3ced567c-d294-11ef-2657-df20e23a00fa
 # ╟─0d6029ef-87ba-4881-b7af-9de2dad1ed99
 # ╟─3cecbc46-d294-11ef-24cb-2d9e41fb35d9
@@ -733,8 +732,8 @@ version = "17.4.0+2"
 # ╟─438981cd-8450-4678-8b61-9cc5c0c0ebf1
 # ╟─f47f4370-4d6f-4e36-bbef-63f806130dbe
 # ╟─86a2a956-fee6-4306-b8cb-f4b977ad3dbd
-# ╠═a5d43e01-8f73-4c48-b565-f10eb807a9ab
-# ╠═fa1d5123-db02-4fda-93d2-3e5e2efed515
+# ╟─a5d43e01-8f73-4c48-b565-f10eb807a9ab
+# ╟─fa1d5123-db02-4fda-93d2-3e5e2efed515
 # ╟─3ced947a-d294-11ef-0403-512f2407a2d2
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
