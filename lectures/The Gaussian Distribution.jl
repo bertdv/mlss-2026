@@ -402,7 +402,7 @@ Let ``\theta =\{\mu,\Sigma\}``. Prove that the log-likelihood (LLH) function ``\
 
 ```math
 \log p(D|\theta) =
- \frac{N}{2}\log  |\Sigma|^{-1} - \frac{1}{2}\sum_n (x_n-\mu)^T \Sigma^{-1}(x_n-\mu)
+ \frac{N}{2}\log  |\Sigma|^{-1} - \frac{1}{2}\sum_n (x_n-\mu)^T \Sigma^{-1}(x_n-\mu) + \mathrm{const.}
 
 ```
 			
@@ -417,7 +417,7 @@ hide_proof(
  &= \log \prod_n \mathcal{N}(x_n|\mu, \Sigma) \\
 &= \log \prod_n (2\pi)^{-M/2} |\Sigma|^{-1/2} \exp\left\{ -\frac{1}{2}(x_n-\mu)^T \Sigma^{-1}(x_n-\mu)\right\} \\
 &= \sum_n \left( \log (2\pi)^{-M/2} + \log  |\Sigma|^{-1/2} -\frac{1}{2}(x_n-\mu)^T \Sigma^{-1}(x_n-\mu)\right) \\
-&\propto \frac{N}{2}\log  |\Sigma|^{-1} - \frac{1}{2}\sum_n (x_n-\mu)^T \Sigma^{-1}(x_n-\mu)
+&= \frac{N}{2}\log  |\Sigma|^{-1} - \frac{1}{2}\sum_n (x_n-\mu)^T \Sigma^{-1}(x_n-\mu) + \mathrm{const.}
 \end{align*}
 ```
 "	   )
@@ -446,7 +446,7 @@ md"""
 \end{align*}
 ```	
 
-Since the map ``Ax=0`` for general ``A`` can only be true if ``x=0``, it follows that setting the gradient to ``0`` leads to 
+Since the map ``Ax=0`` for invertible ``A`` can only be true if ``x=0``, it follows that setting the gradient to ``0`` leads to 
 ```math
 		\hat{\mu} = \frac{1}{N}\sum_n x_n \,.
 ```		
@@ -1008,7 +1008,7 @@ md"""
  p(x_{N+1}|D) &= \int p(x_{N+1}|\theta) p(\theta|D)\mathrm{d}\theta \\
   &= \int \mathcal{N}(x_{N+1}|\theta,\sigma^2) \mathcal{N}(\theta|\mu_N,\sigma^2_N) \mathrm{d}\theta \\
   &\stackrel{1}{=} \int \mathcal{N}(\theta|x_{N+1},\sigma^2) \mathcal{N}(\theta|\mu_N,\sigma^2_N) \mathrm{d}\theta \\
-  &\stackrel{2}{=} \int  \mathcal{N}(x_{N+1}|\mu_N, \sigma^2_N +\sigma^2 ) \mathcal{N}(\theta|\cdot,\cdot)\mathrm{d}\theta \tag{use SRG-6} \\
+  &\stackrel{2}{=} \int  \mathcal{N}(x_{N+1}|\mu_N, \sigma^2_N +\sigma^2 ) \mathcal{N}(\theta|\cdot,\cdot)\mathrm{d}\theta  \\
   &= \mathcal{N}(x_{N+1}|\mu_N, \sigma^2_N +\sigma^2 ) \underbrace{\int \mathcal{N}(\theta|\cdot,\cdot)\mathrm{d}\theta}_{=1} \\
   &=\mathcal{N}(x_{N+1}|\mu_N, \sigma^2_N +\sigma^2 )
 \end{align*}
@@ -1160,7 +1160,7 @@ p(\theta|D_t) &= p(\theta|x_t,D_{t-1}) \\
   &= p(x_t|\theta) \, p(\theta|D_{t-1}) \\
   &= \mathcal{N}(x_t|\theta,\sigma^2) \, \mathcal{N}(\theta\,|\,\mu_{t-1},\sigma_{t-1}^2) \\
   &= \mathcal{N}(\theta|x_t,\sigma^2) \, \mathcal{N}(\theta\,|\,\mu_{t-1},\sigma_{t-1}^2) \;\;\text{(note this trick)}\\
-  &= \mathcal{N}(\theta|\mu_t,\sigma_t^2) \;\;\text{(use Gaussian multiplication formula SRG-6)}
+  &\propto \mathcal{N}(\theta|\mu_t,\sigma_t^2) \;\;\text{(use Gaussian multiplication formula)}
 \end{align*}
 ```
 
@@ -1911,7 +1911,7 @@ SpecialFunctions = "~2.5.1"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.7"
+julia_version = "1.11.5"
 manifest_format = "2.0"
 project_hash = "dcdf2e19f7e094c8db089cfd44e0d51d027d511f"
 

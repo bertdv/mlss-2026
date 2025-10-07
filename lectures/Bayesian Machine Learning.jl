@@ -220,7 +220,7 @@ In the framework above, parameter estimation was executed by "perfect" Bayesian 
 
 # ╔═╡ 6a257020-d294-11ef-0490-e151934b2f42
 md"""
-No, there appears to be one remaining problem: how good really were our assumptions ``p(x|\theta)`` and ``p(\theta)`` in the model specification phase? We want to "score" the model performance.
+No, there appears to be one remaining problem: how good really were our assumptions ``p(D|\theta)`` and ``p(\theta)`` in the model specification phase? We want to "score" the model performance.
 
 """
 
@@ -256,7 +256,7 @@ Then, solve the desired inference problem for the posterior over the model ``m_k
 ```math
 \begin{align} 
 \underbrace{p(m_k|D)}_{\substack{\text{model}\\\text{posterior}}} 
-  = \underbrace{p(m_k)}_{\substack{\text{model}\\\text{prior}}}\, \underbrace{\int_\theta \underbrace{p(D|\theta,m_k)}_{\text{likelihood}} \,\underbrace{p(\theta|m_k)}_{\substack{\text{parameter} \\ \text{prior}}}\, \mathrm{d}\theta }_{\substack{\text{evidence }p(D|m_k)\\\text{= model likelihood}}}\\
+  \propto \underbrace{p(m_k)}_{\substack{\text{model}\\\text{prior}}}\, \underbrace{\int_\theta \underbrace{p(D|\theta,m_k)}_{\text{likelihood}} \,\underbrace{p(\theta|m_k)}_{\substack{\text{parameter} \\ \text{prior}}}\, \mathrm{d}\theta }_{\substack{\text{evidence }p(D|m_k)\\\text{= model likelihood}}}\\
 \end{align}
 ```
 
@@ -697,7 +697,7 @@ params = [
     (α=1.0, β=1.0)
     (α=2.0, β=3.0)
     (α=8.0, β=4.0)
-]
+];
 
 # ╔═╡ 513414c7-0a54-4767-a583-7d779f8fbc55
 let
@@ -812,7 +812,7 @@ p(D|m) &= \frac{B(n+\alpha,N-n+\beta)}{B(\alpha,\beta)} \\
 \end{align}
 ```
 
-The model evidence is a scalar. The absolute value is not important. However, you may want to compare the model evidence of this model to the evidence for another model on the same data set.  
+The model evidence is a scalar. In the absence of an alternative model, the value of the model evidence is not very useful. However, you may want to compare the model evidence of this model to the evidence for another model on the same data set.  
 
 """
 
@@ -1635,7 +1635,7 @@ StatsPlots = "~0.15.8"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.7"
+julia_version = "1.11.5"
 manifest_format = "2.0"
 project_hash = "87e2eeabbe190363d5cea4d18a8a9f305e6296b2"
 

@@ -65,6 +65,9 @@ md"""
 - Optional
 
   - Bishop pp. 12-24
+
+  - [3Blue1Brown, YouTube video on Bayes theorem (2019)](https://youtu.be/HZGCoVF3YvM?si=JaXdesPjU8B_BtrC)
+    - Nice animated tutorial on Bayes rule.
       
   - [Edwin Jaynes, Probability Theory–The Logic of Science (2003)](http://www.med.mcgill.ca/epidemiology/hanley/bios601/GaussianModel/JaynesProbabilityTheory.pdf). 
     - Brilliant book on the Bayesian view of probability theory. Just for fun, scan the annotated bibliography and references.
@@ -130,7 +133,7 @@ Boolean logic (or propositional logic) is a formal system of logic based on bina
 
 With Boolean operators (``\lor``, ``\land``, ``\implies``, etc.), we can create and evaluate compound propositions, e.g.,
 
-- Given two events ``A`` and ``B``, the **conjunction** (logical-and) ``A \land B`` is true only if both ``A`` and ``B`` are true. We write ``A \land B`` also shortly as ``AB``. 
+- Given two events ``A`` and ``B``, the **conjunction** (logical-and) ``A \land B`` is true if-and-only-if both ``A`` and ``B`` are true. We write ``A \land B`` also shortly as ``AB`` (or use a comma as in a joint probability distribution ``p(A,B)``). 
 
 - The **disjunction** (logical-or) ``A \lor B``, is true if either ``A`` or ``B`` is true or both ``A`` and ``B`` are true. We write ``A \lor B`` also as ``A + B`` (Note that the plus-sign is here not an arithmetic operator, but rather a logical operator to process truth values.)
 
@@ -143,7 +146,9 @@ Boolean logic provides the rules of inference for **deductive reasoning** and un
 md"""
 ## The Design of Probability Theory
 
-Consider the truth value of the proposition 
+In the real world, we are rarely completely certain of something. Instead of a truth value for the proposition ``A``, we can attach a **degree-of-belief** ``p(A)`` that represents how likely we think ``A`` is. 
+
+Now consider the truth value of the proposition 
 ```math
 𝐴= \texttt{``there is life on Mars''}
 ```
@@ -154,10 +159,10 @@ with
 I = \texttt{``All known life forms require water''}
 ```
 
-as background information. Now assume that a new piece of information 
+as background information. Now, assume that a new piece of information 
 
 ```math
-x = \texttt{``There is water on Mars''}
+B = \texttt{``There is water on Mars''}
 ```
 
 becomes available, how **should** our degree of belief in event ``A`` be affected *if we were rational*? 
@@ -181,7 +186,7 @@ In developing this calculus, only some very agreeable assumptions were made, inc
   - If the belief in ``A`` is greater than the belief in ``B``, and the belief in ``B`` is greater than the belief in ``C``, then the belief in ``A`` must be greater than the belief in ``C``.
 
 - Logical equivalences are preserved, e.g., 
-  - If the belief in an event can be inferred in two different ways, then the two ways must agree on the resulting belief.
+  - If the belief in an event can be inferred in two different ways, for example, either by first updating on information ``I_1`` and then ``I_2`` or the other way around, then the two ways must agree on the resulting belief.
 
 """
 
@@ -212,9 +217,9 @@ In other words: **Probability = extended logic**.
 
 # ╔═╡ dd11e93a-3dad-4e97-8642-fb70edfa6aae
 md"""
-##### some notational conventions
+##### Some notational conventions
 
-In the above sum and product rules
+In the above sum and product rules, 
   - the **conditional probability** of ``A`` given ``I``, denoted by ``p(A|I)``, indicates the degree of belief in event ``A``, given that ``I`` is true. 
 - ``p(A,B|I)`` should be read as the *joint* probabability that both ``A`` and ``B`` are true, given that ``I`` is true. 
 - Similarly, ``p(A|B,I)`` is the probability that ``A`` is true, given that both ``B`` and ``I`` are true. 
@@ -247,7 +252,7 @@ In general, nearly all interesting questions in machine learning (and informatio
 p(\texttt{whatever-we-want-to-know}\, | \,\texttt{whatever-we-do-know})
 ```
 
-where ``p(a|b)`` means the probability that ``a`` is true, given that ``b`` is true.
+where ``p(A|B)`` means the probability that ``A`` is true, given that ``B`` is true.
 
 """
 
@@ -398,6 +403,7 @@ In probability theory, events that are certainly true or certainly false are tre
 Let ``\Omega`` be the sample space, i.e., the set of all possible outcomes of an experiment. Then:
   - The true event corresponds to the entire sample space ``\Omega``.
   - It always happens, regardless of the outcome.
+    - For example, for the outcome of a throw of a dice, the sample space is ``\Omega = \{1,2,3,4,5,6\}``.
   - Its probability is
 ```math
 p(\Omega) = 1\,.
@@ -800,14 +806,14 @@ Click and drag this number to change ``\theta``: $θ_bond.
 """
 
 # ╔═╡ 922770f4-ddc8-4089-b378-f14088276b43
-exercise_statement("Which color has the ball?"; prefix="Inference ")
+exercise_statement("Which color does the ball have?"; prefix="Inference ")
 
 # ╔═╡ 3e1de32c-d294-11ef-1f63-f190c8361404
 md"""
 
 ##### Problem  
 
-- A bag contains one ball, known to be either white or black. A white ball is put in , and the bag is shaken. Next, a ball is drawn out, which proves to be white. What is now the  chance of drawing a white ball? 
+- A bag contains one ball, known to be either white or black. A white ball is put in , and the bag is shaken. Next, a ball is drawn out, which proves to be white. If we now take out another ball, what is the probability it will be white? 
 
 
 """
@@ -997,12 +1003,12 @@ exercise_statement("The PDF for the Sum of Two Variables")
 # ╔═╡ 3e1ea442-d294-11ef-1364-8dd9986325f7
 md"""
 
-Given Eqs SRG-3a and SRG-3b, you should now be able to derive the following: for any distribution of variables ``X`` and ``Y``, show that the mean and variance of the sum ``Z = X+Y`` is given by
+You should now be able to derive the following: for any distribution of variables ``X`` and ``Y``, show that the mean and variance of the sum ``Z = X+Y`` is given by
 
 ```math
 \begin{align*}
     \mu_z &= \mu_x + \mu_y \\
-    \Sigma_z &= \Sigma_x + \Sigma_{xy} + \Sigma_{yx} 
+    \Sigma_z &= \Sigma_x + \Sigma_y + \Sigma_{xy} + \Sigma_{yx} 
 \end{align*}
 ```
 where ``\Sigma_{yx} = \Sigma_{xy}^T``.
@@ -1329,7 +1335,7 @@ Note that, aside from the first boolean rewrite, everything follows straight app
 md"""
 ##### Apples and Oranges
 
-Box 1 contains 8 apples and 4 oranges. Box 2 contains 10 apples and 2 oranges. Boxes are chosen with equal probability.
+Box 1 contains 8 apples and 4 oranges. Box 2 contains 10 apples and 2 oranges. Boxes are chosen with equal probability. You pick a box and then select a fruit from that box.
 - (a) (*) What is the probability of choosing an apple?  
 - (b) (**) If an apple is chosen, what is the probability that it came from box 1?
 """
@@ -1517,7 +1523,7 @@ Plots = "~1.41.1"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.7"
+julia_version = "1.11.5"
 manifest_format = "2.0"
 project_hash = "1f7196939f818b0c3fdc3d62130af19f8745fd10"
 

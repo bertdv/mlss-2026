@@ -298,18 +298,6 @@ In an FFG, we visualize a delta node by a small black box,
 # ╔═╡ 9862f675-87e6-4bba-a07d-9e51839819c7
 Resource("https://github.com/bmlip/course/blob/v2/assets/figures/ffg-observation-y-3.png?raw=true", :width => 500, :style => "background: white; padding: 1em; border-radius: 1em;")
 
-# ╔═╡ 3d54facb-e655-4d8d-b565-bffc4fdf0a95
-md"""
-where we identify 
-```math
-\begin{align*}
-f_a(x_1,x_2,x_3) &= p(x_1,x_2|x_3) \\
-f_b(x_3,x_4,x_5) &= p(x_3,x_5|x_4) \\
-f_c(x_4) &= p(x_4)
-\end{align*}
-```
-"""
-
 # ╔═╡ ea4a720f-a644-46a0-ad35-b215780e0928
 keyconcept("",md"Any factorized probabilistic model, including a set of observations for that model, can be represented by a Terminated Forney-style factor graph.")
 
@@ -1275,7 +1263,7 @@ StableRNGs = "~1.0.3"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.7"
+julia_version = "1.11.5"
 manifest_format = "2.0"
 project_hash = "c86003c16b7a2d8d15f010735adf321c7ec328b7"
 
@@ -3299,7 +3287,6 @@ version = "1.9.2+0"
 # ╟─9658329c-d294-11ef-0d03-45e6872c4985
 # ╟─f0181b53-a604-489f-a89e-db6fc58571dd
 # ╟─9862f675-87e6-4bba-a07d-9e51839819c7
-# ╟─3d54facb-e655-4d8d-b565-bffc4fdf0a95
 # ╟─ea4a720f-a644-46a0-ad35-b215780e0928
 # ╟─00c69a22-feb5-4d1e-9ab5-a136435d7d22
 # ╟─9656e606-d294-11ef-1daa-312623552a5b
