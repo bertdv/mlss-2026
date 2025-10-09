@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.18
+# v0.20.19
 
 using Markdown
 using InteractiveUtils
@@ -109,7 +109,16 @@ end
 # ╔═╡ 9cb93465-4d29-4d93-ae75-339a7de63cec
 peak_data = data(; time=50, gain=0)
 
+# ╔═╡ 0930329b-cdcf-4b69-89bf-a6f68eaeb4fd
+peak_data
+
+# ╔═╡ f73938d6-1d40-4b4d-b760-b54dd075b7e9
+fake_scatter = Iterators.flatmap(zip(bin_positions, peak_data)) do (pos, num)
+	fill(pos, num)
+end |> collect
+
 # ╔═╡ 5c7ea08d-2601-4fde-a2a1-5654971b45ef
+begin
 bar(
 	bin_positions,
 	peak_data,
@@ -117,6 +126,8 @@ bar(
 	legend=nothing,
 	
 )
+	plot!(LinRange(-8,8,1000), x -> 50*pdf(Normal(mean(fake_scatter),std(fake_scatter)), x))
+end
 
 # ╔═╡ 73eba481-be9f-46e1-b4cb-0e8b81c4837e
 peak_results = infer(
@@ -161,7 +172,7 @@ noise_data = map(Iterators.product(1:30, 1:40)) do (y,x)
 end;
 
 # ╔═╡ 5b58173b-a82b-4aa7-b8f3-28942f4683ac
-
+sum(img_data)
 
 # ╔═╡ c9620e17-39b7-4b81-ad2c-e5d2b566f680
 function show_image(data::AbstractMatrix{<:Real})
@@ -180,6 +191,96 @@ show_image(noise_data)
 
 # ╔═╡ d1053e1c-dcbf-4ade-a1ef-21a5ce7164bf
 show_image(img_data)
+
+# ╔═╡ e37c01c2-c540-4966-9b98-a82898f47287
+star_scatter = hcat(
+	rand(MvNormal(secret_star_position, 5*diageye(2)), 1000),
+	rand(MvNormal(secret_star_position + [4, 0], 5*diageye(2)), 1000)
+)
+
+# ╔═╡ 879299ee-89d1-46b2-b70e-83dbd3064ec4
+scatter(star_scatter[1,:], star_scatter[2,:]; xlim=(0,40), ylim=(0,30), yflip=true)
+
+# ╔═╡ fd430fb0-34a3-4c40-8e82-33838ad93186
+
+
+# ╔═╡ cb740acf-2e5a-4479-af21-c605c314bc26
+scatter_cov = 5*diageye(2)
+
+# ╔═╡ 90074872-9cdf-417d-8d9c-f42c2485b49b
+secret_star_position
+
+# ╔═╡ 8a6e4f1d-272a-4058-9884-9f454063ee98
+@bind s1x Slider(0:.1:40; show_value=true)
+
+# ╔═╡ 5ddfd144-24dc-44bc-a8f6-f197611d00db
+@bind s1y Slider(0:.1:40; show_value=true)
+
+# ╔═╡ ec79ffac-77f2-4962-82d2-b0109e1bbfec
+mean_1 = [s1x, s1y]
+
+# ╔═╡ c18e07ff-8ae3-45df-8718-521e5df3bb49
+prob1 = MvNormal(mean_1, scatter_cov)
+
+# ╔═╡ 8992377b-93aa-4e82-9b5e-a547b9bf5b8d
+
+
+# ╔═╡ b3ba095e-0e1b-435b-811f-86795830ad53
+@bind s2x Slider(0:.1:40; show_value=true)
+
+# ╔═╡ b61f1608-8376-499a-9a10-9fe77eced15c
+@bind s2y Slider(0:.1:40; show_value=true)
+
+# ╔═╡ 4a966cff-b678-4ee3-8def-da5f977a88f3
+mean_2 = [s2x, s2y]
+
+# ╔═╡ 5abc6da7-d05a-4e9b-996f-6b20b232f891
+prob2 = MvNormal(mean_2, scatter_cov)
+
+# ╔═╡ accb2a7e-ebbc-47d4-8056-14735b58c89b
+function mixed_pdf(x,y)
+	0.5*pdf(prob1, [x,y]) + 0.5*pdf(prob2, [x,y])
+end
+
+# ╔═╡ a0dedbcd-1c3f-4dd0-ae31-7b028032e5f1
+let
+	scatter(star_scatter[1,:], star_scatter[2,:]; xlim=(0,40), ylim=(0,30), yflip=true)
+
+
+
+	xs = 0:40
+	ys = 0:30
+	
+	heatmap!(
+		xs, ys, 
+		mixed_pdf,
+		opacity=.3,
+	)
+end
+
+# ╔═╡ 10b4f867-7102-4b28-a54f-1e05ffa3868e
+20000 + sum(eachcol(star_scatter)) do (x,y)
+	log(mixed_pdf(x,y))
+end
+
+# ╔═╡ 4e9cd40a-555a-4bc2-a691-8ab32eecb3c6
+20000 + sum(eachcol(star_scatter)) do (x,y)
+	logpdf(fit_distr, [x,y])
+end
+
+# ╔═╡ cbc55973-a9d1-4b02-b89a-a4c8ba3b017a
+# @model function simple_gmm(Y, mixing)
+# 	mean_1 ~ MvNormal(mean_1_prior, )
+
+# 	for i in eachindex(Y)
+# 		Y[i] ~ if mixing[i]
+# 			MvNormal()
+
+# ╔═╡ 472e7d91-7a52-431f-81f7-598b7eb9bda9
+
+
+# ╔═╡ 2d777e1a-65fd-4097-8561-fecbfb8b4966
+
 
 # ╔═╡ 67f4cf3f-9247-4c43-826d-c31dcace87d2
 md"""
@@ -200,6 +301,15 @@ melkwegstelsel met verschillende hoeken tov aarde. Fit normal en je krijgt versc
 
 
 """
+
+# ╔═╡ 0baf0eeb-6e17-4a70-94c7-c2f898ec5de7
+fit_distr = fit_mle(MvNormal, star_scatter)
+
+# ╔═╡ dbda8e11-9630-431d-bbdf-63e13c9e3e99
+# ╠═╡ disabled = true
+#=╠═╡
+fit_distr = MvNormal(mean(eachcol(star_scatter)), scatter_cov)
+  ╠═╡ =#
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -2062,7 +2172,9 @@ version = "1.9.2+0"
 # ╟─48c27e96-39f7-425e-a816-b78bb7f8445d
 # ╟─fb57ccd8-06c3-4dce-9593-57c5634c5729
 # ╟─23a9ba22-5dd3-41b6-8c37-3b7b2b1b8cd9
-# ╟─5c7ea08d-2601-4fde-a2a1-5654971b45ef
+# ╠═5c7ea08d-2601-4fde-a2a1-5654971b45ef
+# ╠═0930329b-cdcf-4b69-89bf-a6f68eaeb4fd
+# ╠═f73938d6-1d40-4b4d-b760-b54dd075b7e9
 # ╠═c38e1211-f07a-49ad-8fe1-149f1fb0bdf2
 # ╠═ac7cd0cb-49a6-40b5-ac88-594f13bf1525
 # ╠═73eba481-be9f-46e1-b4cb-0e8b81c4837e
@@ -2075,8 +2187,31 @@ version = "1.9.2+0"
 # ╠═259ee98e-e6fc-4885-869e-4bc1a12fd571
 # ╠═b5aac936-0d8e-4f47-ad7d-ee9d124b6ca7
 # ╠═d1053e1c-dcbf-4ade-a1ef-21a5ce7164bf
+# ╠═879299ee-89d1-46b2-b70e-83dbd3064ec4
 # ╠═5b58173b-a82b-4aa7-b8f3-28942f4683ac
 # ╟─c9620e17-39b7-4b81-ad2c-e5d2b566f680
+# ╠═e37c01c2-c540-4966-9b98-a82898f47287
+# ╠═fd430fb0-34a3-4c40-8e82-33838ad93186
+# ╠═ec79ffac-77f2-4962-82d2-b0109e1bbfec
+# ╠═4a966cff-b678-4ee3-8def-da5f977a88f3
+# ╠═cb740acf-2e5a-4479-af21-c605c314bc26
+# ╠═c18e07ff-8ae3-45df-8718-521e5df3bb49
+# ╠═5abc6da7-d05a-4e9b-996f-6b20b232f891
+# ╠═90074872-9cdf-417d-8d9c-f42c2485b49b
+# ╠═8a6e4f1d-272a-4058-9884-9f454063ee98
+# ╠═5ddfd144-24dc-44bc-a8f6-f197611d00db
+# ╟─8992377b-93aa-4e82-9b5e-a547b9bf5b8d
+# ╠═b3ba095e-0e1b-435b-811f-86795830ad53
+# ╠═b61f1608-8376-499a-9a10-9fe77eced15c
+# ╠═accb2a7e-ebbc-47d4-8056-14735b58c89b
+# ╠═a0dedbcd-1c3f-4dd0-ae31-7b028032e5f1
+# ╠═10b4f867-7102-4b28-a54f-1e05ffa3868e
+# ╠═4e9cd40a-555a-4bc2-a691-8ab32eecb3c6
+# ╠═0baf0eeb-6e17-4a70-94c7-c2f898ec5de7
+# ╠═dbda8e11-9630-431d-bbdf-63e13c9e3e99
+# ╠═cbc55973-a9d1-4b02-b89a-a4c8ba3b017a
+# ╠═472e7d91-7a52-431f-81f7-598b7eb9bda9
+# ╠═2d777e1a-65fd-4097-8561-fecbfb8b4966
 # ╠═67f4cf3f-9247-4c43-826d-c31dcace87d2
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
