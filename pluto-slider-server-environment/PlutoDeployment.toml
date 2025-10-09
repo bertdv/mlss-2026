@@ -16,3 +16,5 @@ exclude = [
     "tools/jupyter conversion script.jl",
     "**-2024.jl",
 ]
+number_of_parallel_tasks=4
+
