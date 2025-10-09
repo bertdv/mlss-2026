@@ -17,7 +17,7 @@ Pluto was developed at MIT to teach the course [Computational Thinking](https://
 # How to install
 
 ## 1️⃣ Julia
-First, start by installing Julia. Follow the instructions on https://julialang.org/install/ . We recommend reading this page carefully, and following the instructions. 
+First, start by installing Julia. Follow the instructions on https://julialang.org/install/ . We recommend reading this page carefully. 
 
 Now you have Julia installed! Check that you know **how to start Julia**, and run `1 + 1` (should give `2`). You need at least Julia 1.10 for this course.
 
