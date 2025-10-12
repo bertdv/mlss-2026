@@ -233,7 +233,7 @@ and the gradient
 
 ```math
 \begin{align*}
-\nabla_{w}\log p(w | D) &\propto   \underbrace{S_0^{-1} (m_0-w)}_{\text{SRM-5b}} +\sum_n \underbrace{\frac{1}{\sigma(a_n)}}_{\frac{\partial \log \sigma(a_n)}{\partial \sigma(a_n)}} \cdot \underbrace{\sigma(a_n) \cdot (1-\sigma(a_n))}_{\frac{\partial \sigma(a_n)}{\partial a_n}} \cdot \underbrace{(2y_n-1)x_n}_{\frac{\partial a_n}{\partial w} \text{ (see SRM-5a)}}    \\
+\nabla_{w}\log p(w | D) &\propto   \underbrace{S_0^{-1} (m_0-w)}_{\text{SRM-5b}} +\sum_n \underbrace{\frac{1}{\sigma(a_n)}}_{\frac{\partial \log \sigma(a_n)}{\partial \sigma(a_n)}} \cdot \underbrace{\sigma(a_n) \cdot (1-\sigma(a_n))}_{\frac{\partial \sigma(a_n)}{\partial a_n}} \cdot \underbrace{(2y_n-1)x_n}_{\frac{\partial a_n}{\partial w} }    \\
 &=   S_0^{-1} (m_0-w) + \sum_n (2y_n-1) (1-\sigma(a_n)) x_n \quad \text{(gradient)}
  \end{align*}
 ```
