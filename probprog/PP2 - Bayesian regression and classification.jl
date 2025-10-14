@@ -53,7 +53,7 @@ md"""
 TableOfContents()
 
 # ╔═╡ b6d3d854-e60a-457d-973d-37ee684cd0bb
-challenge_statement("Economic Growth"; header_level=1)
+challenge_statement("Economic Growth"; header_level=1, big=true)
 
 # ╔═╡ b91916e9-9969-4193-bc54-ab1011f8e72a
 md"""
@@ -183,7 +183,7 @@ We can request the toolbox to make predictions for future outputs by providing `
 
 
 # ╔═╡ 70c9825e-6061-4ef3-8a58-a8f69e7f44ea
-challenge_statement("Medical Diagnosis"; header_level=1)
+challenge_statement("Medical Diagnosis"; header_level=1, big=true)
 
 # ╔═╡ 6ac40f48-7be3-47dd-94f5-39a833e60bcd
 md"""
@@ -2712,7 +2712,7 @@ version = "1.9.2+0"
 # ╟─c0574807-8eec-46ab-a5bf-40ef977c9040
 # ╠═75abbdc2-33cb-4204-8276-5e91cc1dfe5d
 # ╟─888c6ba4-277c-486f-8805-95c370b0a2cc
-# ╠═cdee0667-dde0-4151-8074-ea0095dd9881
+# ╟─cdee0667-dde0-4151-8074-ea0095dd9881
 # ╟─e91243b4-1b81-45b3-9b6b-ad99e2a28ef1
 # ╠═cb6bd145-95c0-4e95-bdab-c178c50a1a3d
 # ╠═38300847-a21c-4ab6-bbd0-94f40752dbf7
