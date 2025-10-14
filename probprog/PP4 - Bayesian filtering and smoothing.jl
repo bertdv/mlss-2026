@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.10
+# v0.20.19
 
 using Markdown
 using InteractiveUtils
@@ -18,8 +18,7 @@ end
 
 # ╔═╡ 8f341779-3296-41f6-9aad-1e48f2435cf5
 begin
-	using PlutoUI
-	using PlutoTeachingTools
+	using BmlipTeachingTools
 	using JLD
 	using Statistics
 	using LinearAlgebra
@@ -27,13 +26,15 @@ begin
 	using RxInfer
 	using ColorSchemes
 	using LaTeXStrings
-	using Plots
-	default(label="", grid=false, linewidth=3, margin=10Plots.pt)
+	using Plots, StatsPlots
+	Plots.default(label="", grid=false, linewidth=3, margin=10Plots.pt, size=(700,300))
 end
+
+# ╔═╡ 1c191751-3fc8-4a20-a5da-44bb7c3b3f8a
+title("Probabilistic Programming 4: Bayesian filtering & smoothing")
 
 # ╔═╡ a70bf102-5dca-11f0-0657-0d5800ca9c3f
 md"""
-# Probabilistic Programming 4: Bayesian filtering & smoothing
 
 #### Goal 
   - Learn how to setup problems for dynamical systems.
@@ -49,9 +50,14 @@ md"""
     - [Differences between Julia and Matlab / Python](https://docs.julialang.org/en/v1/manual/noteworthy-differences/index.html).
 """
 
+# ╔═╡ 21d27a9d-2fa1-46d7-b13c-36a6046c1581
+TableOfContents()
+
+# ╔═╡ 9eef8875-8b91-4a9e-940b-11f9e85371bb
+challenge_statement("Shaking buildings"; header_level=1, big=true)
+
 # ╔═╡ db294104-0449-4b8c-bd5f-7f73d3682abd
 md"""
-## Problem: shaking buildings
 
 Suppose you are contacted to estimate how resistant a building is to shaking caused by minor earthquakes. You decide to model the building as a [mass-spring-damper](https://en.wikipedia.org/wiki/Mass-spring-damper_model) system, described by:
 
@@ -59,13 +65,13 @@ Suppose you are contacted to estimate how resistant a building is to shaking cau
 m \ddot{x} + c\dot{x} + kx = w \, ,
 ```
 
-where $m$ corresponds to the mass of the building, $c$ is friction and $k$ the stiffness of the building's main supports. You don't know the external force acting upon the building and decide to model it as white noise $w$. In essence, this means you think the building will be pushed to the left as strongly on average as it will be pushed to the right. A simple discretization scheme with substituted variable $z = [x \ \dot{x}]$ and time-step $\Delta t$ yields:
+where ``m`` corresponds to the mass of the building, ``c`` is friction and ``k`` the stiffness of the building's main supports. You don't know the external force acting upon the building and decide to model it as white noise ``w``. In essence, this means you think the building will be pushed to the left as strongly on average as it will be pushed to the right. A simple discretization scheme with substituted variable ``z = [x \ \dot{x}]`` and time-step ``\Delta t`` yields:
 
 ```math
 z_{k} = \underbrace{\begin{bmatrix} 1 & \Delta t \\ \frac{-k}{m}\Delta t & \frac{-c}{m}\Delta t + 1 \end{bmatrix}}_{A} z_{k-1} + q_k \, ,
 ```
 
-where $q_k \sim \mathcal{N}(0, Q)$ with covariance matrix $Q$. 
+where ``q_k \sim \mathcal{N}(0, Q)`` with covariance matrix ``Q``. 
 
 You place a series of sensors on the building that measure the displacement:
 
@@ -73,15 +79,186 @@ You place a series of sensors on the building that measure the displacement:
 y_k = \underbrace{\begin{bmatrix} 1 & 0 \end{bmatrix}}_{C} z_k + r_k \, 
 ```
 
-where the measurement noise is white as well: $r_k \sim \mathcal{N}(0, \sigma^2)$. You have a good estimate of the variance $\sigma^2$ from previous sensor calibrations and decide to consider it a known variable.
+where the measurement noise is white as well: ``r_k \sim \mathcal{N}(0, \sigma^2)``. You have a good estimate of the variance ``\sigma^2`` from previous sensor calibrations and decide to consider it a known variable.
 """
+
+# ╔═╡ 1385c3bd-de01-4096-810e-9f374577ff4c
+md"""
+## Model specification
+
+Following the steps from the [lecture on Dynamic Systems](https://bmlip.github.io/course/lectures/Dynamic%20Models.html), we can derive the following probabilistic state-space model:
+
+```math
+p(z_k \mid z_{k-1}) = \mathcal{N}(z_k \mid A z_{k-1}, Q)\\ p(y_k \mid z_k) = \mathcal{N}(y_k \mid C z_k, \sigma^2) \, .
+```
+
+For now, we will use a simple structure for the process noise covariance matrix, e.g. ``Q = I``. If we consider a Gaussian prior distribution for the initial state
+
+```math
+p(z_0) = \mathcal{N}(m_0, S_0) \, ,
+```
+
+we obtain a complete generative model:
+
+```math
+\underbrace{p(y_{1:T}, z_{0:T})}_{\text{generative model}} = \underbrace{p(z_0)}_{\text{prior}} \, \prod_{k=1}^T \, \underbrace{p(y_k \mid z_k)}_{\text{likelihood}} \, \underbrace{p(z_k \mid z_{k-1})}_{\text{state transition}}
+```
+
+To define this model in RxInfer, we must start with the process matrices:
+"""
+
+# ╔═╡ e35328ea-3b2c-4fc0-8334-a24cdf00a66c
+# Emission matrix
+C = [1.0, 0.0]
+
+# ╔═╡ 160b8b9b-c526-455f-b27d-473221e75dfe
+# Set process noise covariance matrix
+Q = diagm(ones(2))
+
+# ╔═╡ 7a49292c-64ca-4690-8db1-55187ace724b
+md"""
+Next, we define a linear Gaussian dynamical system with only the states as unknown variables:
+"""
+
+# ╔═╡ def8153a-aced-4092-b08c-c027756936e5
+@model function LGDS(y, A,C,Q, σ, T)
+	"State estimation in linear Gaussian dynamical system"
+	
+	# Prior state
+	z_0 ~ MvNormalMeanCovariance(zeros(2), diageye(2))
+	
+	z_kmin1 = z_0
+	for k in 1:T
+		
+		# State transition
+		z[k] ~ MvNormalMeanCovariance(A * z_kmin1, Q)
+		
+		# Likelihood
+		y[k] ~ NormalMeanVariance(dot(C, z[k]), σ)
+		
+		# Update recursive aux
+		z_kmin1 = z[k]
+		
+	end
+end
+
+# ╔═╡ 97bddd3e-cc71-4882-92a0-b790bb26297d
+md"Let's extract the inferred states and visualize them."
+
+# ╔═╡ 26a31bf7-91c6-45b0-982c-cb77e0845118
+md"""
+Mmmh... the inferred states are not smooth at all. This is most likely due to our process noise covariance matrix not being calibrated. So can we improve? 
+
+
+## Improved model
+Of course, as Bayesians, we can just treat ``Q`` as an unknown random variable and infer its posterior distribution. Adjusting the model is straightforward. The probabilistic state-space model becomes:
+
+```math
+p(z_k \mid z_{k-1},Q) = \mathcal{N}(z_k \mid A z_{k-1}, Q) \qquad p(y_k \mid z_k) = \mathcal{N}(y_k \mid C z_k, \sigma^2) \, , 
+```
+
+with priors
+
+```math 
+p(Q) = \mathcal{W}^{-1}(\nu, \Lambda) \qquad p(z_0) = \mathcal{N}(m_0, S_0) \, .
+```
+
+The ``\mathcal{W}^{-1}`` represents an inverse-Wishart distribution with degrees-of-freedom ``\nu`` and scale matrix ``\Lambda``. This will give the following generative model:
+
+```math
+\underbrace{p(y_{1:T}, z_{0:T}, Q)}_{\text{generative model}} = \underbrace{p(z_0)p(Q)}_{\text{priors}} \, \prod_{k=1}^T \, \underbrace{p(y_k \mid z_k)}_{\text{likelihood}} \, \underbrace{p(z_k \mid z_{k-1},Q)}_{\text{state transition}}
+```
+
+Our model definition in ReactiveMP is only slightly larger:
+"""
+
+# ╔═╡ ab2348cc-9e4b-4b08-9e46-35b4e7067d4a
+@model function LGDS_Q(y, A,C,σ,T)
+	"State estimation in a linear Gaussian dynamical system with unknown process noise"
+	
+	# Prior state
+	z_0 ~ MvNormalMeanCovariance(zeros(2), diageye(2))
+	
+	# Process noise covariance matrix
+	Q ~ InverseWishart(10, diageye(2))
+	
+	z_kmin1 = z_0
+	for k in 1:T
+		
+		# State transition
+		z[k] ~ MvNormalMeanCovariance(A * z_kmin1, Q)
+		
+		# Likelihood
+		y[k] ~ NormalMeanVariance(dot(C, z[k]), σ^2)
+		
+		# Update recursive aux
+		z_kmin1 = z[k]
+		
+	end
+end
+
+# ╔═╡ 7fd2d571-9fdc-4a51-b506-7a7835c4c8a9
+md"""
+The variational inference procedure for estimating states and the process noise covariance matrix simultaneously requires a bit more thought, but is still very straightforward:
+"""
+
+# ╔═╡ af0d783a-38f3-4e86-91ea-357d7ec513d4
+begin
+	num_iters_bond = @bindname num_iters Slider(1:100; default=10, show_value=true)
+end
+
+# ╔═╡ 154a986d-1a57-4b74-a6dc-3e0bf1ad0f04
+# Initialize variational marginal distributions
+init = @initialization begin
+	q(z) = MvNormalMeanCovariance(zeros(2), diageye(2))
+	q(Q) = InverseWishart(10, diageye(2))
+end;
+
+# ╔═╡ 5a1ebc96-d2b4-4329-9bed-2ba5f7ec4fa6
+# Define variational distribution factorization
+constraints = @constraints begin
+	q(z_0,z,Q) = q(z_0, z)q(Q)
+end;
+
+# ╔═╡ f6d1fbe3-e21f-424b-8354-3429f943fac1
+md"Again, let's inspect the free energy to see if we have converged."
+
+# ╔═╡ ea5e2580-1b08-47ec-8372-455967b63df7
+md"Alright. That looks good. Let's extract the inferred states and visualize."
+
+# ╔═╡ f066fa05-6787-486a-b1ba-ec2b88563899
+md"""
+That's much smoother. The free energy of this model ($\mathcal{F} = 357.08$) is smaller than that of the earlier model with $Q$ set to an identity matrix ($\mathcal{F} = 434.10$). That means that the added cost of inferring the matrix $Q$ is offset by the increase in performance it provides. 
+
+The error with respect to the true states seems smaller as well, but in practice we of course can't check this.
+
+Let's inspect the inferred process noise covariance matrix:
+"""
+
+# ╔═╡ eab26918-1ce0-4617-9098-88435a2e7796
+num_iters_bond
+
+# ╔═╡ 40e84310-7924-4986-a943-8b66b67678cc
+"""
+Get a file from the BMLIP course repository. If it exists locally, we use it directly, otherwise it gets downloaded from github.
+"""
+function get_data_file(name::String)
+	# if the file exists locally...
+	p = joinpath(@__DIR__, "data", name)
+	if basename(@__DIR__) == "probprog" && isfile(p)
+		# ...then use it...
+		p
+	else
+		# ...otherwise download it from our github repo
+		Downloads.download("https://raw.githubusercontent.com/bmlip/course/refs/tags/v4/probprog/data/$(name)")
+	end
+end
+
+# ╔═╡ 8a3b5655-c7d2-4981-8f26-6d78b3f10944
+data = load(get_data_file("shaking_buildings.jld"))
 
 # ╔═╡ 0f0517b0-582b-4226-849a-87ee459269c0
 begin
-	# Load data from file
-	data = load("data/shaking_buildings.jld")
-	
-	# Data
 	states = data["states"]
 	observations = data["observations"]
 	
@@ -97,266 +274,118 @@ begin
 	Δt = data["Δt"]
 	T = length(observations)
 	time = range(1,step=Δt,length=T)
-	
+end;
+
+# ╔═╡ 7cd94c60-7523-4abe-8eab-649ada27a7b4
+
+let
 	plot(time, states[1,:], color="red", label="states", xlabel="time (sec)", ylabel="train position")
-	scatter!(time, observations, color="black", label="observations", legend=:topleft, size=(800,300))
+	scatter!(time, observations, color="black", label="observations", legend=:topleft)
 end
 
-# ╔═╡ 1385c3bd-de01-4096-810e-9f374577ff4c
-md"""
-### Model specification
-
-Following the steps from the [lecture on Dynamic Systems](https://bmlip.github.io/course/lectures/Dynamic%20Models.html), we can derive the following probabilistic state-space model:
-
-```math
-p(z_k \mid z_{k-1}) = \mathcal{N}(z_k \mid A z_{k-1}, Q)\\ p(y_k \mid z_k) = \mathcal{N}(y_k \mid C z_k, \sigma^2) \, .
-```
-
-For now, we will use a simple structure for the process noise covariance matrix, e.g. $Q = I$. If we consider a Gaussian prior distribution for the initial state
-
-```math
-p(z_0) = \mathcal{N}(m_0, S_0) \, ,
-```
-
-we obtain a complete generative model:
-
-```math
-\underbrace{p(y_{1:T}, z_{0:T})}_{\text{generative model}} = \underbrace{p(z_0)}_{\text{prior}} \, \prod_{k=1}^T \, \underbrace{p(y_k \mid z_k)}_{\text{likelihood}} \, \underbrace{p(z_k \mid z_{k-1})}_{\text{state transition}}
-```
-
-To define this model in RxInfer, we must start with the process matrices:
-"""
-
-# ╔═╡ 160b8b9b-c526-455f-b27d-473221e75dfe
-begin
-	# Transition matrix
-	A = [1 Δt; -stiffness/mass*Δt -friction/mass*Δt+1]
-	
-	# Emission matrix
-	C = [1.0, 0.0]
-	
-	# Set process noise covariance matrix
-	Q = diagm(ones(2))
-end
-
-# ╔═╡ 7a49292c-64ca-4690-8db1-55187ace724b
-md"""
-Next, we define a linear Gaussian dynamical system with only the states as unknown variables:
-"""
-
-# ╔═╡ def8153a-aced-4092-b08c-c027756936e5
-@model function LGDS(y, A,C,Q, σ, T)
-    "State estimation in linear Gaussian dynamical system"
-    
-    # Prior state
-    z_0 ~ MvNormalMeanCovariance(zeros(2), diageye(2))
-    
-    z_kmin1 = z_0
-    for k in 1:T
-        
-        # State transition
-        z[k] ~ MvNormalMeanCovariance(A * z_kmin1, Q)
-        
-        # Likelihood
-        y[k] ~ NormalMeanVariance(dot(C, z[k]), σ)
-        
-        # Update recursive aux
-        z_kmin1 = z[k]
-        
-    end
-end
+# ╔═╡ 608241ff-4374-4a09-95cb-ebdf70716098
+# Transition matrix
+A = [1 Δt; -stiffness/mass*Δt -friction/mass*Δt+1]
 
 # ╔═╡ 5403efea-05be-46a9-8c31-d762c2ea2549
 results_LGDS = infer(
-    model       = LGDS(A=A,C=C,Q=Q, σ=σ, T=T),
-    data        = (y = [observations[k] for k in 1:T],),
-    free_energy = true,
+	model		= LGDS(A=A,C=C,Q=Q, σ=σ, T=T),
+	data		= (y = [observations[k] for k in 1:T],),
+	free_energy = true,
 )
 
-# ╔═╡ 97bddd3e-cc71-4882-92a0-b790bb26297d
-md"Let's extract the inferred states and visualize them."
-
 # ╔═╡ 06b5c673-286a-4286-b45c-5dcd00af2226
-begin
+let
 	m_z_LGDS = cat(mean.(results_LGDS.posteriors[:z])...,dims=2)
 	v_z_LGDS = cat(var.( results_LGDS.posteriors[:z])...,dims=2)
 	
 	plot(time, states[1,:], color="red", label="states", xlabel="time (sec)", ylabel="train position")
 	plot!(time, m_z_LGDS[1,:], color="blue", ribbon=v_z_LGDS[1,:], label="inferred")
-	scatter!(time, observations, color="black", alpha=0.2, label="observations", legend=:bottomright, size=(800,300))
+	scatter!(time, observations, color="black", alpha=0.2, label="observations", legend=:bottomright)
 end
-
-# ╔═╡ 26a31bf7-91c6-45b0-982c-cb77e0845118
-md"""
-Mmmh... the inferred states are not smooth at all. This is most likely due to our process noise covariance matrix not being calibrated. So can we improve? 
-
----
-
-Of course, as Bayesians, we can just treat $Q$ as an unknown random variable and infer its posterior distribution. Adjusting the model is straightforward. The probabilistic state-space model becomes:
-
-```math
-p(z_k \mid z_{k-1},Q) = \mathcal{N}(z_k \mid A z_{k-1}, Q) \qquad p(y_k \mid z_k) = \mathcal{N}(y_k \mid C z_k, \sigma^2) \, , 
-```
-
-with priors
-
-```math 
-p(Q) = \mathcal{W}^{-1}(\nu, \Lambda) \qquad p(z_0) = \mathcal{N}(m_0, S_0) \, .
-```
-
-The $\mathcal{W}^{-1}$ represents an inverse-Wishart distribution with degrees-of-freedom $\nu$ and scale matrix $\Lambda$. This will give the following generative model:
-
-```math
-\underbrace{p(y_{1:T}, z_{0:T}, Q)}_{\text{generative model}} = \underbrace{p(z_0)p(Q)}_{\text{priors}} \, \prod_{k=1}^T \, \underbrace{p(y_k \mid z_k)}_{\text{likelihood}} \, \underbrace{p(z_k \mid z_{k-1},Q)}_{\text{state transition}}
-```
-
-Our model definition in ReactiveMP is only slightly larger:
-"""
-
-# ╔═╡ ab2348cc-9e4b-4b08-9e46-35b4e7067d4a
-@model function LGDS_Q(y, A,C,σ,T)
-    "State estimation in a linear Gaussian dynamical system with unknown process noise"
-    
-    # Prior state
-    z_0 ~ MvNormalMeanCovariance(zeros(2), diageye(2))
-    
-    # Process noise covariance matrix
-    Q ~ InverseWishart(10, diageye(2))
-    
-    z_kmin1 = z_0
-    for k in 1:T
-        
-        # State transition
-        z[k] ~ MvNormalMeanCovariance(A * z_kmin1, Q)
-        
-        # Likelihood
-        y[k] ~ NormalMeanVariance(dot(C, z[k]), σ^2)
-        
-        # Update recursive aux
-        z_kmin1 = z[k]
-        
-    end
-end
-
-# ╔═╡ 7fd2d571-9fdc-4a51-b506-7a7835c4c8a9
-md"""
-The variational inference procedure for estimating states and the process noise covariance matrix simultaneously requires a bit more thought, but is still very straightforward:
-"""
-
-# ╔═╡ af0d783a-38f3-4e86-91ea-357d7ec513d4
-@bind num_iters Slider(1:100, default=10)
 
 # ╔═╡ 5b5fc431-7fdc-42ac-af3c-69ce45e8ce99
-begin
-	
-	# Initialize variational marginal distributions
-	init = @initialization begin
-	    q(z) = MvNormalMeanCovariance(zeros(2), diageye(2))
-	    q(Q) = InverseWishart(10, diageye(2))
-	end
-	
-	# Define variational distribution factorization
-	constraints = @constraints begin
-	    q(z_0,z,Q) = q(z_0, z)q(Q)
-	end
-	
-	# Variational inference procedure
-	results_LGDSQ = infer(
-	    model          = LGDS_Q(A=A,C=C, σ=σ, T=T),
-	    data           = (y = [observations[k] for k in 1:T],),
-	    constraints    = constraints,
-	    iterations     = num_iters,
-	    options        = (limit_stack_depth = 100,),
-	    initialization = init,
-	    free_energy    = true,
-	    showprogress   = true,
-	)
-end
-
-# ╔═╡ f6d1fbe3-e21f-424b-8354-3429f943fac1
-md"Again, let's inspect the free energy to see if we have converged."
+# Variational inference procedure
+results_LGDSQ = infer(
+	model		  = LGDS_Q(A=A,C=C, σ=σ, T=T),
+	data		   = (y = [observations[k] for k in 1:T],),
+	constraints	= constraints,
+	iterations	 = num_iters,
+	options		= (limit_stack_depth = 100,),
+	initialization = init,
+	free_energy	= true,
+)
 
 # ╔═╡ ec24638a-a84d-47d8-a5bd-71d47c6e1abe
-plot(1:num_iters, 
-     results_LGDSQ.free_energy, 
-     color="black", 
-     xscale=:log10,
-     xlabel="Number of iterations", 
-     ylabel="Free Energy", 
-     size=(800,300))
+plot(
+	results_LGDSQ.free_energy;
+	color="black", 
+	# xscale=:log10,
+	xlabel="Number of iterations", 
+	ylabel="Free Energy", 
+)
 
-# ╔═╡ ea5e2580-1b08-47ec-8372-455967b63df7
-md"Alright. That looks good. Let's extract the inferred states and visualize."
+# ╔═╡ 0b795fe0-561b-4a05-a4ae-46bd1adf58ee
+Q_MAP = mean(last(results_LGDSQ.posteriors[:Q]))
 
 # ╔═╡ 51e3c0b3-26e3-4971-9695-f87556612d09
-begin
+let
 	m_z_LGDSQ = cat(mean.(last(results_LGDSQ.posteriors[:z]))...,dims=2)
 	v_z_LGDSQ = cat(var.(last(results_LGDSQ.posteriors[:z]))...,dims=2)
 	
 	plot(time, states[1,:], color="red", label="states", xlabel="time (sec)", ylabel="train position")
 	plot!(time, m_z_LGDSQ[1,:], color="blue", ribbon=v_z_LGDSQ[1,:], label="inferred")
-	scatter!(time, observations, color="black", alpha=0.2, label="observations", legend=:topleft, size=(800,300))
+	scatter!(time, observations, color="black", alpha=0.2, label="observations", legend=:topleft)
 end
-
-# ╔═╡ f066fa05-6787-486a-b1ba-ec2b88563899
-md"""
-That's much smoother. The free energy of this model ($\mathcal{F} = 357.08$) is smaller than that of the earlier model with $Q$ set to an identity matrix ($\mathcal{F} = 434.10$). That means that the added cost of inferring the matrix $Q$ is offset by the increase in performance it provides. 
-
-The error with respect to the true states seems smaller as well, but in practice we of course can't check this.
-
-Let's inspect the inferred process noise covariance matrix:
-"""
-
-# ╔═╡ 0b795fe0-561b-4a05-a4ae-46bd1adf58ee
-Q_MAP = mean(last(results_LGDSQ.posteriors[:Q]))
 
 # ╔═╡ 62464f26-0b55-4c09-b3d1-15bfc66df0ca
 # True data
 Q_true = data["Q"]
 
 # ╔═╡ c12609ff-9c01-4efe-92fd-dcbaf96f1dbc
-begin
+let
 	# Colorbar limits
 	clims = (minimum([Q_MAP[:]; Q_true[:]]), maximum([Q_MAP[:]; Q_true[:]]))
 	 
 	# Plot covariance matrices as heatmaps
 	p401 = heatmap(Q_MAP, axis=([], false), yflip=true, title="Estimated", clims=clims)
 	p402 = heatmap(Q_true, axis=([], false), yflip=true, title="True", clims=clims)
-	plot(p401,p402, layout=(1,2), size=(900,300))
+	
+	plot(p401,p402, layout=(1,2))
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 JLD = "4138dd39-2aa7-5051-a626-17a0bb65d9c8"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-PlutoTeachingTools = "661c6b06-c737-4d37-b85c-46df65de6f69"
-PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 RxInfer = "86711068-29c9-4ff7-b620-ae75d7495b3d"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 
 [compat]
+BmlipTeachingTools = "~1.3.0"
 ColorSchemes = "~3.29.0"
 Distributions = "~0.25.120"
 JLD = "~0.13.5"
 LaTeXStrings = "~1.4.0"
 Plots = "~1.40.14"
-PlutoTeachingTools = "~0.3.1"
-PlutoUI = "~0.7.23"
 RxInfer = "~4.5.0"
+StatsPlots = "~0.15.8"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.1"
+julia_version = "1.12.0"
 manifest_format = "2.0"
-project_hash = "1719d751e1a569b1a915eb785731f8395e3a74c0"
+project_hash = "cb39ce40bc40bbba8bffaa05b49c69a3fc9d2b2c"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "be7ae030256b8ef14a441726c4c37766b90b93a3"
@@ -372,6 +401,17 @@ version = "1.15.0"
     ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
     ConstructionBase = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
     EnzymeCore = "f151be2c-9106-41f4-ab19-57ee4f262869"
+
+[[deps.AbstractFFTs]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "d92ad398961a3ed262d8bf04a1a2b8340f915fef"
+uuid = "621f4979-c628-5d54-868e-fcf4e3e8185c"
+version = "1.5.0"
+weakdeps = ["ChainRulesCore", "Test"]
+
+    [deps.AbstractFFTs.extensions]
+    AbstractFFTsChainRulesCoreExt = "ChainRulesCore"
+    AbstractFFTsTestExt = "Test"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -405,6 +445,18 @@ deps = ["LinearAlgebra", "Random", "StaticArrays"]
 git-tree-sha1 = "d57bd3762d308bded22c3b82d033bff85f6195c6"
 uuid = "ec485272-7323-5ecc-a04f-4719b315124d"
 version = "0.4.0"
+
+[[deps.Arpack]]
+deps = ["Arpack_jll", "Libdl", "LinearAlgebra", "Logging"]
+git-tree-sha1 = "9b9b347613394885fd1c8c7729bfc60528faa436"
+uuid = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
+version = "0.5.4"
+
+[[deps.Arpack_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "OpenBLAS_jll", "Pkg"]
+git-tree-sha1 = "5ba6c757e8feccf03a1554dfaf3e26b3cfc7fd5e"
+uuid = "68821587-b530-5797-8361-c406ea357684"
+version = "3.5.1+1"
 
 [[deps.ArrayInterface]]
 deps = ["Adapt", "LinearAlgebra"]
@@ -451,6 +503,12 @@ weakdeps = ["SparseArrays"]
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 version = "1.11.0"
+
+[[deps.AxisAlgorithms]]
+deps = ["LinearAlgebra", "Random", "SparseArrays", "WoodburyMatrices"]
+git-tree-sha1 = "01b8ccb13d68535d73d2b0c23e39bd23155fb712"
+uuid = "13072b0f-2c55-5437-9ae7-d433b7a33950"
+version = "1.1.0"
 
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
@@ -509,6 +567,12 @@ git-tree-sha1 = "535c80f1c0847a4c967ea945fca21becc9de1522"
 uuid = "0b7ba130-8d10-5ba8-a3d6-c5182647fed9"
 version = "1.21.7+0"
 
+[[deps.BmlipTeachingTools]]
+deps = ["HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoTeachingTools", "PlutoUI", "Reexport"]
+git-tree-sha1 = "faf181102fc31264fe0ac927c62f5fa04ed7da9b"
+uuid = "656a7065-6f73-6c65-7465-6e646e617262"
+version = "1.3.0"
+
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "1b96ea4a01afe0ea4090c5c8039690672dd13f2e"
@@ -527,17 +591,27 @@ git-tree-sha1 = "fde3bf89aead2e723284a8ff9cdf5b551ed700e8"
 uuid = "83423d85-b0ee-5818-9007-b63ccbeb887a"
 version = "1.18.5+0"
 
+[[deps.ChainRulesCore]]
+deps = ["Compat", "LinearAlgebra"]
+git-tree-sha1 = "e4c6a16e77171a5f5e25e9646617ab1c276c5607"
+uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
+version = "1.26.0"
+weakdeps = ["SparseArrays"]
+
+    [deps.ChainRulesCore.extensions]
+    ChainRulesCoreSparseArraysExt = "SparseArrays"
+
 [[deps.CloseOpenIntervals]]
 deps = ["Static", "StaticArrayInterface"]
 git-tree-sha1 = "05ba0d07cd4fd8b7a39541e31a7b0254704ea581"
 uuid = "fb6a15b2-703c-40df-9091-08a04967cfa9"
 version = "0.1.13"
 
-[[deps.CodeTracking]]
-deps = ["InteractiveUtils", "UUIDs"]
-git-tree-sha1 = "062c5e1a5bf6ada13db96a4ae4749a4c2234f521"
-uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
-version = "1.3.9"
+[[deps.Clustering]]
+deps = ["Distances", "LinearAlgebra", "NearestNeighbors", "Printf", "Random", "SparseArrays", "Statistics", "StatsBase"]
+git-tree-sha1 = "3e22db924e2945282e70c33b75d4dde8bfa44c94"
+uuid = "aaaa29a8-35af-508c-8bc3-b662a17a0fe5"
+version = "0.15.8"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
@@ -606,7 +680,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.1+0"
+version = "1.3.0+1"
 
 [[deps.CompositeTypes]]
 git-tree-sha1 = "bce26c3dab336582805503bed209faab1c279768"
@@ -747,6 +821,17 @@ version = "0.7.1"
     Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
     Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
+[[deps.Distances]]
+deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
+git-tree-sha1 = "c7e3a542b999843086e2f29dac96a618c105be1d"
+uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+version = "0.10.12"
+weakdeps = ["ChainRulesCore", "SparseArrays"]
+
+    [deps.Distances.extensions]
+    DistancesChainRulesCoreExt = "ChainRulesCore"
+    DistancesSparseArraysExt = "SparseArrays"
+
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
@@ -836,6 +921,18 @@ deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers",
 git-tree-sha1 = "466d45dc38e15794ec7d5d63ec03d776a9aff36e"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 version = "4.4.4+1"
+
+[[deps.FFTW]]
+deps = ["AbstractFFTs", "FFTW_jll", "Libdl", "LinearAlgebra", "MKL_jll", "Preferences", "Reexport"]
+git-tree-sha1 = "97f08406df914023af55ade2f843c39e99c5d969"
+uuid = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
+version = "1.10.0"
+
+[[deps.FFTW_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "6d6219a004b8cf1e0b4dbe27a2860b8e04eba0be"
+uuid = "f5851436-0d7a-5f13-b9de-f02708fd171a"
+version = "3.3.11+0"
 
 [[deps.FastCholesky]]
 deps = ["LinearAlgebra", "PositiveFactorizations"]
@@ -1084,9 +1181,9 @@ version = "0.3.28"
 
 [[deps.Hyperscript]]
 deps = ["Test"]
-git-tree-sha1 = "8d511d5b81240fc8e6802386302675bdf47737b9"
+git-tree-sha1 = "179267cfa5e712760cd43dcae385d7ea90cc25a4"
 uuid = "47d2ed2b-36de-50cf-bf87-49c2cf4b8b91"
-version = "0.0.4"
+version = "0.0.5"
 
 [[deps.HypertextLiteral]]
 deps = ["Tricks"]
@@ -1115,10 +1212,27 @@ git-tree-sha1 = "d1b1b796e47d94588b3757fe84fbf65a5ec4a80d"
 uuid = "d25df0c9-e2be-5dd7-82c8-3ad0b3e990b9"
 version = "0.1.5"
 
+[[deps.IntelOpenMP_jll]]
+deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
+git-tree-sha1 = "ec1debd61c300961f98064cfb21287613ad7f303"
+uuid = "1d5cc7b8-4909-519e-a0f8-d0f5ad9712d0"
+version = "2025.2.0+0"
+
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 version = "1.11.0"
+
+[[deps.Interpolations]]
+deps = ["Adapt", "AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
+git-tree-sha1 = "65d505fa4c0d7072990d659ef3fc086eb6da8208"
+uuid = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+version = "0.16.2"
+weakdeps = ["ForwardDiff", "Unitful"]
+
+    [deps.Interpolations.extensions]
+    InterpolationsForwardDiffExt = "ForwardDiff"
+    InterpolationsUnitfulExt = "Unitful"
 
 [[deps.IntervalSets]]
 git-tree-sha1 = "5fbb102dcb8b1a858111ae81d56682376130517d"
@@ -1181,11 +1295,16 @@ git-tree-sha1 = "eac1206917768cb54957c65a615460d87b455fc1"
 uuid = "aacddb02-875f-59d6-b918-886e6ef4fbf8"
 version = "3.1.1+0"
 
-[[deps.JuliaInterpreter]]
-deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
-git-tree-sha1 = "6ac9e4acc417a5b534ace12690bc6973c25b862f"
-uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
-version = "0.10.3"
+[[deps.JuliaSyntaxHighlighting]]
+deps = ["StyledStrings"]
+uuid = "ac6e5ff7-fb65-4e79-a425-ec3bc9c03011"
+version = "1.12.0"
+
+[[deps.KernelDensity]]
+deps = ["Distributions", "DocStringExtensions", "FFTW", "Interpolations", "StatsBase"]
+git-tree-sha1 = "ba51324b894edaf1df3ab16e2cc6bc3280a2f1a7"
+uuid = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"
+version = "0.6.10"
 
 [[deps.LAME_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1269,24 +1388,24 @@ uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
 version = "0.6.4"
 
 [[deps.LibCURL_jll]]
-deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
+deps = ["Artifacts", "LibSSH2_jll", "Libdl", "OpenSSL_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "8.6.0+0"
+version = "8.11.1+1"
 
 [[deps.LibGit2]]
-deps = ["Base64", "LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
+deps = ["LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
 version = "1.11.0"
 
 [[deps.LibGit2_jll]]
-deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll"]
+deps = ["Artifacts", "LibSSH2_jll", "Libdl", "OpenSSL_jll"]
 uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
-version = "1.7.2+0"
+version = "1.9.0+0"
 
 [[deps.LibSSH2_jll]]
-deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
+deps = ["Artifacts", "Libdl", "OpenSSL_jll"]
 uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
-version = "1.11.0+1"
+version = "1.11.3+1"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -1337,7 +1456,7 @@ version = "7.4.0"
 [[deps.LinearAlgebra]]
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-version = "1.11.0"
+version = "1.12.0"
 
 [[deps.LogExpFunctions]]
 deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
@@ -1370,27 +1489,28 @@ deps = ["ArrayInterface", "CPUSummary", "CloseOpenIntervals", "DocStringExtensio
 git-tree-sha1 = "e5afce7eaf5b5ca0d444bcb4dc4fd78c54cbbac0"
 uuid = "bdcacae8-1622-11e9-2a5c-532679323890"
 version = "0.12.172"
+weakdeps = ["ChainRulesCore", "ForwardDiff", "SpecialFunctions"]
 
     [deps.LoopVectorization.extensions]
     ForwardDiffExt = ["ChainRulesCore", "ForwardDiff"]
     SpecialFunctionsExt = "SpecialFunctions"
-
-    [deps.LoopVectorization.weakdeps]
-    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-    ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
-    SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
-
-[[deps.LoweredCodeUtils]]
-deps = ["JuliaInterpreter"]
-git-tree-sha1 = "4b28a715796a4092fb20523ae5f459e2aaa41557"
-uuid = "6f1432cf-f94c-5a45-995e-cdbf5db27b0b"
-version = "3.3.1"
 
 [[deps.Lz4_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "191686b1ac1ea9c89fc52e996ad15d1d241d1e33"
 uuid = "5ced341a-0733-55b8-9ab6-a4889d929147"
 version = "1.10.1+0"
+
+[[deps.MIMEs]]
+git-tree-sha1 = "c64d943587f7187e751162b3b84445bbbd79f691"
+uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
+version = "1.1.0"
+
+[[deps.MKL_jll]]
+deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "oneTBB_jll"]
+git-tree-sha1 = "282cadc186e7b2ae0eeadbd7a4dffed4196ae2aa"
+uuid = "856f044c-d86e-5d09-b602-aeab76dc8ba7"
+version = "2025.2.0+0"
 
 [[deps.MPICH_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Hwloc_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "MPIPreferences", "TOML"]
@@ -1421,7 +1541,7 @@ uuid = "d125e4d3-2237-4719-b19c-fa641b8a4667"
 version = "0.1.8"
 
 [[deps.Markdown]]
-deps = ["Base64"]
+deps = ["Base64", "JuliaSyntaxHighlighting", "StyledStrings"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 version = "1.11.0"
 
@@ -1438,7 +1558,8 @@ uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
 version = "1.1.9"
 
 [[deps.MbedTLS_jll]]
-deps = ["Artifacts", "Libdl"]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "926c6af3a037c68d02596a44c22ec3595f5f760b"
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
 version = "2.28.6+0"
 
@@ -1471,7 +1592,13 @@ version = "1.11.0"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
-version = "2023.12.12"
+version = "2025.5.20"
+
+[[deps.MultivariateStats]]
+deps = ["Arpack", "Distributions", "LinearAlgebra", "SparseArrays", "Statistics", "StatsAPI", "StatsBase"]
+git-tree-sha1 = "816620e3aac93e5b5359e4fdaf23ca4525b00ddf"
+uuid = "6f286f6a-111f-5878-ab1e-185364afe411"
+version = "0.10.3"
 
 [[deps.NLSolversBase]]
 deps = ["ADTypes", "DifferentiationInterface", "Distributed", "FiniteDiff", "ForwardDiff"]
@@ -1490,9 +1617,20 @@ git-tree-sha1 = "90914795fc59df44120fe3fff6742bb0d7adb1d0"
 uuid = "d9ec5142-1e00-5aa0-9d6a-321866360f50"
 version = "0.14.3"
 
+[[deps.NearestNeighbors]]
+deps = ["Distances", "StaticArrays"]
+git-tree-sha1 = "ca7e18198a166a1f3eb92a3650d53d94ed8ca8a1"
+uuid = "b8a86587-4115-5ab1-83bc-aa920d37bbce"
+version = "0.4.22"
+
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
-version = "1.2.0"
+version = "1.3.0"
+
+[[deps.Observables]]
+git-tree-sha1 = "7438a59546cf62428fc9d1bc94729146d37a7225"
+uuid = "510215fc-4207-5dde-b226-833fc4488ee2"
+version = "0.5.5"
 
 [[deps.OffsetArrays]]
 git-tree-sha1 = "117432e406b5c023f665fa73dc26e79ec3630151"
@@ -1512,12 +1650,12 @@ version = "1.3.5+1"
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
-version = "0.3.27+1"
+version = "0.3.29+0"
 
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.1+2"
+version = "0.8.7+0"
 
 [[deps.OpenMPI_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "MPIPreferences", "TOML"]
@@ -1532,10 +1670,9 @@ uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
 version = "1.5.0"
 
 [[deps.OpenSSL_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "9216a80ff3682833ac4b733caa8c00390620ba5d"
+deps = ["Artifacts", "Libdl"]
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "3.5.0+0"
+version = "3.5.1+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl"]
@@ -1569,7 +1706,7 @@ version = "1.8.1"
 [[deps.PCRE2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
-version = "10.42.0+1"
+version = "10.44.0+1"
 
 [[deps.PDMats]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
@@ -1604,7 +1741,7 @@ version = "0.44.2+0"
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-version = "1.11.0"
+version = "1.12.0"
 weakdeps = ["REPL"]
 
     [deps.Pkg.extensions]
@@ -1642,29 +1779,17 @@ version = "1.40.14"
     ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
     Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
-[[deps.PlutoHooks]]
-deps = ["InteractiveUtils", "Markdown", "UUIDs"]
-git-tree-sha1 = "072cdf20c9b0507fdd977d7d246d90030609674b"
-uuid = "0ff47ea0-7a50-410d-8455-4348d5de0774"
-version = "0.0.5"
-
-[[deps.PlutoLinks]]
-deps = ["FileWatching", "InteractiveUtils", "Markdown", "PlutoHooks", "Revise", "UUIDs"]
-git-tree-sha1 = "8f5fa7056e6dcfb23ac5211de38e6c03f6367794"
-uuid = "0ff47ea0-7a50-410d-8455-4348d5de0420"
-version = "0.1.6"
-
 [[deps.PlutoTeachingTools]]
-deps = ["Downloads", "HypertextLiteral", "Latexify", "Markdown", "PlutoLinks", "PlutoUI"]
-git-tree-sha1 = "8252b5de1f81dc103eb0293523ddf917695adea1"
+deps = ["Downloads", "HypertextLiteral", "Latexify", "Markdown", "PlutoUI"]
+git-tree-sha1 = "dacc8be63916b078b592806acd13bb5e5137d7e9"
 uuid = "661c6b06-c737-4d37-b85c-46df65de6f69"
-version = "0.3.1"
+version = "0.4.6"
 
 [[deps.PlutoUI]]
-deps = ["AbstractPlutoDingetjes", "Base64", "Dates", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "UUIDs"]
-git-tree-sha1 = "5152abbdab6488d5eec6a01029ca6697dff4ec8f"
+deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
+git-tree-sha1 = "8329a3a4f75e178c11c1ce2342778bcbbbfa7e3c"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.23"
+version = "0.7.71"
 
 [[deps.PolyaGammaHybridSamplers]]
 deps = ["Distributions", "Random", "SpecialFunctions", "StatsFuns"]
@@ -1755,7 +1880,7 @@ version = "2.11.2"
     Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 
 [[deps.REPL]]
-deps = ["InteractiveUtils", "Markdown", "Sockets", "StyledStrings", "Unicode"]
+deps = ["InteractiveUtils", "JuliaSyntaxHighlighting", "Markdown", "Sockets", "StyledStrings", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 version = "1.11.0"
 
@@ -1763,6 +1888,16 @@ version = "1.11.0"
 deps = ["SHA"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 version = "1.11.0"
+
+[[deps.Ratios]]
+deps = ["Requires"]
+git-tree-sha1 = "1342a47bf3260ee108163042310d26f2be5ec90b"
+uuid = "c84ed2f1-dad5-54f0-aa8e-dbefe2724439"
+version = "0.4.5"
+weakdeps = ["FixedPointNumbers"]
+
+    [deps.Ratios.extensions]
+    RatiosFixedPointNumbersExt = "FixedPointNumbers"
 
 [[deps.ReactiveMP]]
 deps = ["BayesBase", "DataStructures", "DiffResults", "Distributions", "DomainIntegrals", "DomainSets", "ExponentialFamily", "FastCholesky", "FastGaussQuadrature", "FixedArguments", "ForwardDiff", "HCubature", "LazyArrays", "LinearAlgebra", "LoopVectorization", "MacroTools", "MatrixCorrectionTools", "Optim", "PolyaGammaHybridSamplers", "PositiveFactorizations", "Random", "Rocket", "SpecialFunctions", "StaticArrays", "StatsBase", "StatsFuns", "TinyHugeNumbers", "Tullio", "TupleTools", "Unrolled"]
@@ -1808,16 +1943,6 @@ deps = ["UUIDs"]
 git-tree-sha1 = "62389eeff14780bfe55195b7204c0d8738436d64"
 uuid = "ae029012-a4dd-5104-9daa-d747884805df"
 version = "1.3.1"
-
-[[deps.Revise]]
-deps = ["CodeTracking", "FileWatching", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "REPL", "Requires", "UUIDs", "Unicode"]
-git-tree-sha1 = "f6f7d30fb0d61c64d0cfe56cf085a7c9e7d5bc80"
-uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
-version = "3.8.0"
-weakdeps = ["Distributed"]
-
-    [deps.Revise.extensions]
-    DistributedExt = "Distributed"
 
 [[deps.Rmath]]
 deps = ["Random", "Rmath_jll"]
@@ -1876,6 +2001,12 @@ git-tree-sha1 = "9b81b8393e50b7d4e6d0a9f14e192294d3b7c109"
 uuid = "6c6a2e73-6563-6170-7368-637461726353"
 version = "1.3.0"
 
+[[deps.SentinelArrays]]
+deps = ["Dates", "Random"]
+git-tree-sha1 = "712fb0231ee6f9120e005ccd56297abbc053e7e0"
+uuid = "91c51154-3ec4-41a3-a24f-3f23e20d615c"
+version = "1.4.8"
+
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 version = "1.11.0"
@@ -1921,19 +2052,17 @@ version = "1.2.1"
 [[deps.SparseArrays]]
 deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-version = "1.11.0"
+version = "1.12.0"
 
 [[deps.SpecialFunctions]]
 deps = ["IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
 git-tree-sha1 = "41852b8679f78c8d8961eeadc8f62cef861a52e3"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
 version = "2.5.1"
+weakdeps = ["ChainRulesCore"]
 
     [deps.SpecialFunctions.extensions]
     SpecialFunctionsChainRulesCoreExt = "ChainRulesCore"
-
-    [deps.SpecialFunctions.weakdeps]
-    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
 
 [[deps.StableRNGs]]
 deps = ["Random"]
@@ -1963,14 +2092,11 @@ deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
 git-tree-sha1 = "0feb6b9031bd5c51f9072393eb5ab3efd31bf9e4"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
 version = "1.9.13"
+weakdeps = ["ChainRulesCore", "Statistics"]
 
     [deps.StaticArrays.extensions]
     StaticArraysChainRulesCoreExt = "ChainRulesCore"
     StaticArraysStatisticsExt = "Statistics"
-
-    [deps.StaticArrays.weakdeps]
-    ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-    Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[deps.StaticArraysCore]]
 git-tree-sha1 = "192954ef1208c7019899fbf8049e717f92959682"
@@ -2013,6 +2139,12 @@ version = "1.5.0"
     ChainRulesCore = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
     InverseFunctions = "3587e190-3f89-42d0-90ee-14403ec27112"
 
+[[deps.StatsPlots]]
+deps = ["AbstractFFTs", "Clustering", "DataStructures", "Distributions", "Interpolations", "KernelDensity", "LinearAlgebra", "MultivariateStats", "NaNMath", "Observables", "Plots", "RecipesBase", "RecipesPipeline", "Reexport", "StatsBase", "TableOperations", "Tables", "Widgets"]
+git-tree-sha1 = "88cf3587711d9ad0a55722d339a013c4c56c5bbc"
+uuid = "f3b207a7-027a-5e70-b257-86293d7955fd"
+version = "0.15.8"
+
 [[deps.StringManipulation]]
 deps = ["PrecompileTools"]
 git-tree-sha1 = "725421ae8e530ec29bcbdddbe91ff8053421d023"
@@ -2030,12 +2162,18 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
-version = "7.7.0+0"
+version = "7.8.3+2"
 
 [[deps.TOML]]
 deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 version = "1.0.3"
+
+[[deps.TableOperations]]
+deps = ["SentinelArrays", "Tables", "Test"]
+git-tree-sha1 = "e383c87cf2a1dc41fa30c093b2a19877c83e1bc1"
+uuid = "ab02a1b2-a7df-11e8-156e-fb1833f50b87"
+version = "1.2.0"
 
 [[deps.TableTraits]]
 deps = ["IteratorInterfaceExtensions"]
@@ -2082,9 +2220,9 @@ uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
 version = "0.11.3"
 
 [[deps.Tricks]]
-git-tree-sha1 = "6cae795a5a9313bbb4f60683f7263318fc7d1505"
+git-tree-sha1 = "372b90fe551c019541fafc6ff034199dc19c8436"
 uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
-version = "0.1.10"
+version = "0.1.12"
 
 [[deps.Tullio]]
 deps = ["DiffRules", "LinearAlgebra", "Requires"]
@@ -2186,6 +2324,18 @@ deps = ["Artifacts", "EpollShim_jll", "Expat_jll", "JLLWrappers", "Libdl", "Libf
 git-tree-sha1 = "53ab3e9c94f4343c68d5905565be63002e13ec8c"
 uuid = "a2964d1f-97da-50d4-b82a-358c7fce9d89"
 version = "1.23.1+1"
+
+[[deps.Widgets]]
+deps = ["Colors", "Dates", "Observables", "OrderedCollections"]
+git-tree-sha1 = "e9aeb174f95385de31e70bd15fa066a505ea82b9"
+uuid = "cc8bc4a8-27d6-5769-a93b-9d913e69aa62"
+version = "0.6.7"
+
+[[deps.WoodburyMatrices]]
+deps = ["LinearAlgebra", "SparseArrays"]
+git-tree-sha1 = "c1a7aa6219628fcd757dede0ca95e245c5cd9511"
+uuid = "efce3f68-66dc-5838-9240-27a6d6f5f9b6"
+version = "1.0.0"
 
 [[deps.XML2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Zlib_jll"]
@@ -2340,7 +2490,7 @@ version = "1.6.0+0"
 [[deps.Zlib_jll]]
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
-version = "1.2.13+1"
+version = "1.3.1+2"
 
 [[deps.Zstd_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -2381,7 +2531,7 @@ version = "0.15.2+0"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-version = "5.11.0+0"
+version = "5.13.1+1"
 
 [[deps.libdecor_jll]]
 deps = ["Artifacts", "Dbus_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pango_jll", "Wayland_jll", "xkbcommon_jll"]
@@ -2428,12 +2578,18 @@ version = "1.1.7+0"
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
-version = "1.59.0+0"
+version = "1.64.0+1"
+
+[[deps.oneTBB_jll]]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "d5a767a3bb77135a99e433afe0eb14cd7f6914c3"
+uuid = "1317d2d5-d96f-522e-a858-c73665f53c3e"
+version = "2022.0.0+0"
 
 [[deps.p7zip_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
-version = "17.4.0+2"
+version = "17.5.0+2"
 
 [[deps.x264_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -2455,11 +2611,18 @@ version = "1.9.2+0"
 """
 
 # ╔═╡ Cell order:
+# ╟─1c191751-3fc8-4a20-a5da-44bb7c3b3f8a
 # ╟─a70bf102-5dca-11f0-0657-0d5800ca9c3f
+# ╟─21d27a9d-2fa1-46d7-b13c-36a6046c1581
 # ╠═8f341779-3296-41f6-9aad-1e48f2435cf5
+# ╟─9eef8875-8b91-4a9e-940b-11f9e85371bb
 # ╟─db294104-0449-4b8c-bd5f-7f73d3682abd
+# ╠═8a3b5655-c7d2-4981-8f26-6d78b3f10944
 # ╠═0f0517b0-582b-4226-849a-87ee459269c0
+# ╟─7cd94c60-7523-4abe-8eab-649ada27a7b4
 # ╟─1385c3bd-de01-4096-810e-9f374577ff4c
+# ╠═608241ff-4374-4a09-95cb-ebdf70716098
+# ╠═e35328ea-3b2c-4fc0-8334-a24cdf00a66c
 # ╠═160b8b9b-c526-455f-b27d-473221e75dfe
 # ╟─7a49292c-64ca-4690-8db1-55187ace724b
 # ╠═def8153a-aced-4092-b08c-c027756936e5
@@ -2469,15 +2632,19 @@ version = "1.9.2+0"
 # ╟─26a31bf7-91c6-45b0-982c-cb77e0845118
 # ╠═ab2348cc-9e4b-4b08-9e46-35b4e7067d4a
 # ╟─7fd2d571-9fdc-4a51-b506-7a7835c4c8a9
-# ╠═af0d783a-38f3-4e86-91ea-357d7ec513d4
+# ╟─af0d783a-38f3-4e86-91ea-357d7ec513d4
+# ╠═154a986d-1a57-4b74-a6dc-3e0bf1ad0f04
+# ╠═5a1ebc96-d2b4-4329-9bed-2ba5f7ec4fa6
 # ╠═5b5fc431-7fdc-42ac-af3c-69ce45e8ce99
 # ╟─f6d1fbe3-e21f-424b-8354-3429f943fac1
-# ╠═ec24638a-a84d-47d8-a5bd-71d47c6e1abe
+# ╟─ec24638a-a84d-47d8-a5bd-71d47c6e1abe
 # ╟─ea5e2580-1b08-47ec-8372-455967b63df7
 # ╠═51e3c0b3-26e3-4971-9695-f87556612d09
 # ╟─f066fa05-6787-486a-b1ba-ec2b88563899
+# ╠═eab26918-1ce0-4617-9098-88435a2e7796
 # ╠═0b795fe0-561b-4a05-a4ae-46bd1adf58ee
 # ╠═62464f26-0b55-4c09-b3d1-15bfc66df0ca
 # ╠═c12609ff-9c01-4efe-92fd-dcbaf96f1dbc
+# ╟─40e84310-7924-4986-a943-8b66b67678cc
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
