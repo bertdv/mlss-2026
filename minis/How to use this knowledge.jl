@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.10
+# v0.20.19
 
 #> [frontmatter]
 #> image = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/P%C3%A4ij%C3%A4nne_and_p%C3%A4ij%C3%A4tsalo.jpg/960px-P%C3%A4ij%C3%A4nne_and_p%C3%A4ij%C3%A4tsalo.jpg"
@@ -8,11 +8,6 @@
 
 using Markdown
 using InteractiveUtils
-
-# ╔═╡ f9b0981e-ea2b-4efd-aa71-cf9ac64e8100
-md"""
-*(note to self: let's format this a bit more nicely)*
-"""
 
 # ╔═╡ 66e17d86-e7a0-11ef-2a6c-c5394ba61921
 md"""
@@ -70,15 +65,14 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.9"
+julia_version = "1.12.1"
 manifest_format = "2.0"
-project_hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+project_hash = "71853c6197a6a7f222db0f1978c7cb232b87c5ee"
 
 [deps]
 """
 
 # ╔═╡ Cell order:
-# ╟─f9b0981e-ea2b-4efd-aa71-cf9ac64e8100
 # ╟─66e17d86-e7a0-11ef-2a6c-c5394ba61921
 # ╟─3098e2c2-5b68-46a1-b87c-ccbb52139095
 # ╟─00000000-0000-0000-0000-000000000001
