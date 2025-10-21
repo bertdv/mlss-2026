@@ -21,11 +21,11 @@ import Pluto
 flatmap(args...) = vcat(map(args...)...)
 
 
-getfrom(dir) = flatmap(walkdir("lectures")) do (root, _dirs, files)
+getfrom(dir) = flatmap(walkdir(dir)) do (root, _dirs, files)
     joinpath.((root,), files)
 end
 
-all_files_recursive = [getfrom("lectures")..., getfrom("minis")...]
+all_files_recursive = [getfrom("lectures")..., getfrom("probprog")..., getfrom("minis")...]
 
 all_notebooks = filter!(Pluto.is_pluto_notebook, all_files_recursive)
 
