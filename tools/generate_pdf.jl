@@ -12,7 +12,7 @@ catch
     error("pdfunite is not installed. Please install it using your package manager. This is used to merge the individual PDFs into a single PDF.")
 end
 
-# if !(v"1.11.0-aaa" < VERSION < v"1.12.0")
+# if !(v"1.12.0-aaa" < VERSION < v"1.13.0")
 #     error("Our notebook package environments need to be updated with Julia 1.11. Go to julialang.org/downloads to install it.")
 # end
 
