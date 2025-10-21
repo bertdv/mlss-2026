@@ -656,8 +656,8 @@ The generated figure resembles Figure 10.6 in Bishop. The plots show VFEM result
 """
 
 # ╔═╡ 16d90f11-5933-4145-b219-19774eba25d6
-md"""
-Show synthetic label colors: $(@bind show_vfem_synthetic_labels CheckBox(default=false))
+@htl """
+<label>Show synthetic label colors: $(@bind show_vfem_synthetic_labels CheckBox(default=false))</label>
 """
 
 # ╔═╡ 8b887c4a-273c-40fe-83e9-5c79ac6946f8
@@ -1028,8 +1028,8 @@ We'll perform clustering on the data set from the [challenge](#challenge_hello) 
 """
 
 # ╔═╡ 64819124-865e-48b8-a916-2ce08dba0acc
-md"""
-Show class colors: $(@bind show_em_synthetic_labels CheckBox(default=false))
+@htl """
+<label>Show class colors: $(@bind show_em_synthetic_labels CheckBox(default=false))</label>
 """
 
 # ╔═╡ 87d94630-c90b-4379-91bd-88641ee7b508
