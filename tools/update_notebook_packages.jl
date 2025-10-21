@@ -8,8 +8,8 @@ if !isdir("pluto-slider-server-environment") || length(ARGS) != 1
     """)
 end
 
-if !(v"1.11.0-aaa" < VERSION < v"1.12.0")
-    error("Our notebook package environments need to be updated with Julia 1.11. Go to julialang.org/downloads to install it.")
+if !(v"1.12.0-aaa" < VERSION < v"1.13.0")
+    error("Our notebook package environments need to be updated with Julia 1.12. Go to julialang.org/downloads to install it.")
 end
 
 import Pkg
