@@ -728,9 +728,9 @@ function plotHeatmap(pts, triangleList, val) {
 
 
 plotHeatmap(
-	$(AbstractPlutoDingetjes.Display.published_to_js(to_share[1])), 
-	$(AbstractPlutoDingetjes.Display.published_to_js(to_share[2])), 
-	$(AbstractPlutoDingetjes.Display.published_to_js(vals))
+	$(identity(to_share[1])), 
+	$(identity(to_share[2])), 
+	$(identity(vals))
  )
 
 	return canvas
