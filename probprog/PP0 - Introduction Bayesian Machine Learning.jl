@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.19
+# v0.20.20
 
 using Markdown
 using InteractiveUtils
@@ -20,7 +20,10 @@ end
 begin
 	using Distributions
 	using Plots
-	using PlutoUI
+
+	# Normally you would add this to get Slider, but in this notebook, PlutoUI is reexported by our package BmlipTeachingTools so we skip the import here.
+	
+	# using PlutoUI
 end
 
 # ╔═╡ 7bba65e4-f0c0-11ea-231c-290c9a4e290a
@@ -29,19 +32,22 @@ begin
 	using CSV
 end
 
-# ╔═╡ 7e474146-f044-11ea-2c0c-cbda0c574da5
-md"
-# Probabilistic Programming 0
-### Introduction to Bayesian Machine Learning
+# ╔═╡ 53918345-9b60-4608-9cf1-d64abb83f902
+using BmlipTeachingTools
 
+# ╔═╡ 369042f4-67ce-4cac-871e-72adc503d4e3
+title("Probabilistic Programming 0: Introduction to Bayesian Machine Learning")
+
+# ╔═╡ 7e474146-f044-11ea-2c0c-cbda0c574da5
+md"""
 #### Goal:
   - Familiarize yourself with basic concepts from Bayesian inference such as priors and posteriors.
   - Familiarize yourself with working with the Julia programming language in notebooks.
 
 #### Materials:
-  - [Intro to programming in Julia](https://youtu.be/8h8rQyEpiZA?t=233).
+  - [Intro to programming in Julia (video)](https://youtu.be/8h8rQyEpiZA?t=233).
   - [Cheatsheets: how does Julia differ from Matlab / Python](https://docs.julialang.org/en/v1/manual/noteworthy-differences/index.html).
-"
+"""
 
 # ╔═╡ 59abbfe8-f0bb-11ea-267b-2126df2b62c9
 md"In 1937, one of the founders of the field of statistics, [Ronald Fisher](https://en.wikipedia.org/wiki/Ronald_Fisher), published a story of how he explained _statistical inference_ to a friend. This story, called the \"Lady Tasting Tea\", has been re-told many times in different forms. In this notebook, we will re-tell one of its modern variants and introduce you to some important concepts along the way."
@@ -64,17 +70,16 @@ In Bayesian inference, it is important to think about what kind of _prior knowle
 md"In Julia, you import libraries and software packages using the `using` command. Here we are importing a library of probability distributions called [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) and a library of plotting utilities called [Plots.jl](https://github.com/JuliaPlots/Plots.jl)."
 
 # ╔═╡ b48f2b86-2281-4804-b4ac-614457eab859
-md"Shape parameter α = "
+md"Shape parameter `α` = "
 
 # ╔═╡ 31427b48-f0be-11ea-3493-39d0617e6c14
-@bind α Slider(0:.1:100; default=50)
+@bind α Slider(0:.1:100; default=50, show_value=true)
 
 # ╔═╡ f51c794d-9753-4431-bf5a-ccf0a7a0641c
-md"Rate parameter β = "
+md"Rate parameter `β` = "
 
 # ╔═╡ 3e8a79b8-f0be-11ea-314c-333d84cea659
-# Define rate parameter
-@bind β Slider(0:.1:100; default=50)
+@bind β Slider(0:.1:100; default=50, show_value=true)
 
 # ╔═╡ 87373db4-f0bd-11ea-0b4b-0fbf22e8098d
 begin	
@@ -85,7 +90,11 @@ begin
 	pθ = Beta(α, β)
 	
 	# Visualize probability distribution function
-	plot(θ, pdf.(pθ, θ), linewidth=3, color="red", label="α = "*string(α)*", β = "*string(β), xlabel="θ", ylabel="p(θ)")
+	plot(θ, pdf.(pθ, θ);
+		 linewidth=3, color="red", 
+		 label="α = $α, β = $β", 
+		 xlabel="θ", ylabel="p(θ)",
+		)
 end
 
 # ╔═╡ 8553e0b4-f0be-11ea-2487-07aacadc4508
@@ -106,10 +115,15 @@ md"""As you can see, the Beta distribution is quite flexible and can capture you
 
 A prior distribution is a probability distribution function of an unknown parameter $p(\theta)$, that signifies how probable each value of the parameter is **before** you observe data in your experiment. It is up to you to define what that prior distribution looks like. """
 
-# ╔═╡ 23fa4662-f0c0-11ea-2df0-d9dd86ebf137
-md"""#### **Assignment**: 
+# ╔═╡ f2f67347-7d99-4e67-87db-61a302e2aa81
+exercise_statement("Prior parameters")
 
-I want you to pick values for the prior parameters $\alpha$ and $\beta$ that reflect how often you think the participants will get it right."""
+# ╔═╡ 23fa4662-f0c0-11ea-2df0-d9dd86ebf137
+md"""
+
+
+I want you to pick values for the prior parameters $\alpha$ and $\beta$ that reflect how often you think the participants will get it right.
+"""
 
 # ╔═╡ 2fc7ef3a-f0c0-11ea-3eca-ab02d7f3fcfe
 md"""## 2. Likelihood
@@ -139,19 +153,121 @@ Now we're going to start looking at some data. The data of the participants in A
 # ╔═╡ 993aaf52-f0c0-11ea-3a6a-9141a6706f7e
 md"""[CSV.jl](https://github.com/JuliaData/CSV.jl) is a library for reading in data stored in tables and [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl) manipulates table data."""
 
-# ╔═╡ e617816a-f0c0-11ea-1a5d-81f5db895c05
-# Read data from CSV file
-data = DataFrame(CSV.File("data/TastingBeerResults.csv"))
-
 # ╔═╡ ee206a84-f0c0-11ea-041d-97696dd759d6
 md"""We are going to specifically look at the "CorrectIdentify" column."""
+
+# ╔═╡ 1302fd1c-f0c1-11ea-1da6-7fd6f5e43ad0
+md"""That's a bit hard to parse, so we'll plot this using a histogram."""
+
+# ╔═╡ ea7364f4-f0ed-11ea-06e1-e1022a7d47d9
+md"""Code notes:
+- The `!` in `data[!, ..]` is specific to the DataFrames syntax.
+- The `.==` checks for each element of the array X whether it is equal."""
+
+# ╔═╡ 564cff50-f0ee-11ea-3908-afe9a2164805
+md"Let's visualize the likelihood of these observations."
+
+# ╔═╡ 6dbf5778-f0ee-11ea-36fb-214682733716
+md"""The likelihood is has quite a clear shape: there is a sharp peak just below $\theta = 0.75$. Note that the likelihood is a conditional distribution which means it is not properly normalized."""
+
+# ╔═╡ 76cc8e12-f0ee-11ea-3aa5-27934c3a44b9
+md"""
+### 3. Posterior
+
+One we have specified the prior and the likelihood, we can compute the posterior. Remember Bayes' rule:
+
+```math
+p(\theta \mid X) = \frac{p(X \mid \theta) p(\theta)}{p(X)} \, .
+```
+
+The posterior ``p(\theta \mid X)`` equals the likelihood ``p(X \mid \theta)`` times the prior ``p(\theta)`` divided by the evidence ``p(X)``. In our tasting experiment, we have a special thing going on: [conjugacy](https://en.wikipedia.org/wiki/Conjugate_prior). The Beta distribution is "conjugate" to the Bernoulli likelihood, meaning that the posterior distribution is also going to be a Beta distribution. Specifically with the Beta-Bernoulli combination, it is easy to see what conjugacy actually means. We haven't looked at the formula for the Beta distribution yet, which is:
+
+```math
+\begin{align} 
+p(\theta) =&\ \text{Beta}(\theta \mid \alpha, \beta) \\
+=&\ \frac{1}{B(\alpha, \beta)} \theta^{\alpha-1} (1-\theta)^{\beta-1} \, .
+\end{align}
+```
+
+The ``B(\alpha, \beta)`` is a function used to normalise this distribution. If you now take the product of the likelihood and the prior (ignoring the normalizing function $B$), you get something that can be simplified beautifully:
+
+```math
+\begin{align} 
+p(X \mid \theta) p(\theta) \ \propto&\ \ \theta^x (1-\theta)^{1-x} \cdot \theta^{\alpha-1} (1-\theta)^{\beta-1} \\
+=&\ \ \theta^{x+\alpha-1} (1-\theta)^{1-x+\beta-1} \quad . 
+\end{align}
+```
+
+This last line is again the formula for the Beta distribution (except for a proper normalisation) but with different parameters (``x+\alpha`` instead of ``\alpha`` and ``x+\beta`` instead of ``\beta``). This is what we mean by conjugacy: the product of the likelihood and the prior simplifies elegantly to produce a convenient form.
+
+Let's now visualise the posterior after observing the data from Amsterdam.
+"""
+
+# ╔═╡ cc76d034-f0ee-11ea-11f2-4f1a8b8cfa47
+# Shape parameter of prior distribution
+@bind α0 Slider(0:.1:100; default=50, show_value=true)
+
+# ╔═╡ d8899b9a-f0ee-11ea-3396-c51ae5beb62b
+# Rate parameter of prior distribution
+@bind β0 Slider(0:.1:100; default=50, show_value=true)
+
+# ╔═╡ 543b0024-f0ef-11ea-2775-6f0c0b586865
+md"""That looks great! We have updated our belief from thinking that roughly $0.8$ of participants would correctly guess the alcoholic beverage to being quite sure that $0.75$ of participants can correctly guess."""
+
+# ╔═╡ 5e3b0846-f0ef-11ea-2c4a-15c55ba5cd43
+md"""
+
+$(exercise_statement(""))
+
+Plug the shape parameters of your prior into the code block above and see how your posterior differs (if you had a different prior than I had). Play around with different parameters to get a feeling for how the posterior depends on the prior.
+"""
+
+# ╔═╡ 85d9fc20-f0ef-11ea-2b0a-e9f51d73d562
+md"""### Hypothesis testing
+
+Now that we have a posterior distribution, we can do some further analysis. For instance, how sure are we that participants are actually better than chance level at detecting the alcoholic beer? 
+
+This kind of statement, involving relative probabilities, can be tackled by _hypothesis testing_. In hypothesis testing, you start with a null hypothesis $H_0$, which is a particular choice for the detection parameter $\theta$. For example, in the question above, we are interested in "better than chance level". Chance level corresponds to $\theta = 0.5$. We then have an alternative hypothesis $H_1$, namely that we are interested in whether the participants can detect it better than chance, i.e. $\theta > 0.5$. 
+
+Proper hypothesis testing can be quite complicated and there could be factors / terms that are difficult, if not impossible, to compute (see [Wagemakers et al., 2010](https://www.sciencedirect.com/science/article/pii/S0010028509000826?casa_token=oOWuhv4FdwcAAAAA:HdpoBRU0adxKmCDPZF0gADbzbkPoiejfc0ZMJlTKq0DwhVVcnvM0OxS4IJV1GGKbSvb6yLCOvA)). Fortunately, in our current test we can perform some simplifications. The following quantity tells us something about the relative probability of detecting the alcoholic beverage at chance level versus better than chance level:
+
+```math
+\text{BF}_{10} = \frac{p(\theta = 0.5)}{p(\theta = 0.5 \mid X)}
+```
+
+BF stands for Bayes Factor and the subscript $10$ indicates how much more likely $H_1$ is than $H_0$."""
+
+# ╔═╡ 53d29d28-f0f0-11ea-3e2d-4bb7363f37cb
+md"""So, the alternative hypothesis _"people can correctly detect the alcoholic versus non-alcoholic Hefeweissbier better than chance level"_ is almost 200 times more likely than the null hypothesis _"people cannot distinguish between the alcoholic versus non-alcoholic Hefeweissbier"_, according to our data."""
+
+# ╔═╡ 30062e75-5e94-4b1f-835e-353cc51bee32
+md"""
+# Appendix
+"""
+
+# ╔═╡ 2dba463a-e8ce-450b-9874-d76ce75e55f7
+"""
+Get a file from the BMLIP course repository. If it exists locally, we use it directly, otherwise it gets downloaded from github.
+"""
+function get_data_file(name::String)
+	# if the file exists locally...
+	p = joinpath(@__DIR__, "data", name)
+	if basename(@__DIR__) == "probprog" && isfile(p)
+		# ...then use it...
+		p
+	else
+		# ...otherwise download it from our github repo
+		Downloads.download("https://raw.githubusercontent.com/bmlip/course/refs/tags/v4/probprog/data/$(name)")
+	end
+end
+
+# ╔═╡ e617816a-f0c0-11ea-1a5d-81f5db895c05
+# Read data from CSV file
+data = DataFrame(CSV.File(get_data_file("TastingBeerResults.csv")))
 
 # ╔═╡ 096fb72c-f0c1-11ea-3323-fdb949953348
 # Extract variable indicating correctness of guess
 X = data[!, :CorrectIdentify]
-
-# ╔═╡ 1302fd1c-f0c1-11ea-1da6-7fd6f5e43ad0
-md"""That's a bit hard to parse, so we'll plot this using a histogram."""
 
 # ╔═╡ 905abc24-f0c0-11ea-3891-85947dc03075
 begin
@@ -163,60 +279,14 @@ begin
 	histogram(X, bins=[0,1,2], label="Incorrect = "*string(F)*", Correct = "*string(S), xlabel="X", xticks=[0,1], ylabel="Number", legend=:topleft)
 end
 
-# ╔═╡ ea7364f4-f0ed-11ea-06e1-e1022a7d47d9
-md"""Code notes:
-- The `!` in `data[!, ..]` is specific to the DataFrames syntax.
-- The `.==` checks for each element of the array X whether it is equal."""
-
-# ╔═╡ 564cff50-f0ee-11ea-3908-afe9a2164805
-md"Let's visualize the likelihood of these observations."
-
 # ╔═╡ 5e3b806a-f0ee-11ea-245e-77cb9d224ff3
 begin
 	# Define the Bernoulli likelihood function
-	Bernoulli(S, F, θ) = θ^S * (1-θ)^F
+	Bernoulli_pdf(S, F, θ) = θ^S * (1-θ)^F
 
 	# Plot likelihood
-	plot(θ, Bernoulli.(S, F, θ), linewidth=3, color="black", label="", xlabel="θ", ylabel="p(X|θ)")
+	plot(θ, Bernoulli_pdf.(S, F, θ), linewidth=3, color="black", label="", xlabel="θ", ylabel="p(X|θ)")
 end
-
-# ╔═╡ 6dbf5778-f0ee-11ea-36fb-214682733716
-md"""The likelihood is has quite a clear shape: there is a sharp peak just below $\theta = 0.75$. Note that the likelihood is a conditional distribution which means it is not properly normalized."""
-
-# ╔═╡ 76cc8e12-f0ee-11ea-3aa5-27934c3a44b9
-md"""### 3. Posterior
-
-One we have specified the prior and the likelihood, we can compute the posterior. Remember Bayes' rule:
-
-```math
-p(\theta \mid X) = \frac{p(X \mid \theta) p(\theta)}{p(X)} \, .
-```
-
-The posterior \$p(\theta \mid X)\$ equals the likelihood \$p(X \mid \theta)\$ times the prior $p(\theta)$ divided by the evidence \$p(X)\$. In our tasting experiment, we have a special thing going on: [conjugacy](https://en.wikipedia.org/wiki/Conjugate_prior). The Beta distribution is "conjugate" to the Bernoulli likelihood, meaning that the posterior distribution is also going to be a Beta distribution. Specifically with the Beta-Bernoulli combination, it is easy to see what conjugacy actually means. We haven't looked at the formula for the Beta distribution yet, which is:
-
-$$\begin{align} 
-p(\theta) =&\ \text{Beta}(\theta \mid \alpha, \beta) \\
-=&\ \frac{1}{B(\alpha, \beta)} \theta^{\alpha-1} (1-\theta)^{\beta-1} \, .
-\end{align}$$
-
-The \$B(\alpha, \beta)\$ is a function used to normalise this distribution. If you now take the product of the likelihood and the prior (ignoring the normalizing function $B$), you get something that can be simplified beautifully:
-
-$$\begin{align} 
-p(X \mid \theta) p(\theta) \ \propto&\ \ \theta^x (1-\theta)^{1-x} \cdot \theta^{\alpha-1} (1-\theta)^{\beta-1} \\
-=&\ \ \theta^{x+\alpha-1} (1-\theta)^{1-x+\beta-1} \quad . 
-\end{align}$$
-
-This last line is again the formula for the Beta distribution (except for a proper normalisation) but with different parameters (\$x+\alpha\$ instead of \$\alpha\$ and \$x+\beta\$ instead of \$\beta\$). This is what we mean by conjugacy: the product of the likelihood and the prior simplifies elegantly to produce a convenient form.
-
-Let's now visualise the posterior after observing the data from Amsterdam."""
-
-# ╔═╡ cc76d034-f0ee-11ea-11f2-4f1a8b8cfa47
-# Shape parameter of prior distribution
-@bind α0 Slider(0:.1:100; default=50)
-
-# ╔═╡ d8899b9a-f0ee-11ea-3396-c51ae5beb62b
-# Rate parameter of prior distribution
-@bind β0 Slider(0:.1:100; default=50)
 
 # ╔═╡ c9f295b4-f0ee-11ea-2505-b1705a92ebd1
 begin
@@ -235,50 +305,24 @@ begin
 	plot!(θ, pdf.(pθX, θ), linewidth=3, color="blue", label="posterior")
 end
 
-# ╔═╡ 543b0024-f0ef-11ea-2775-6f0c0b586865
-md"""That looks great! We have updated our belief from thinking that roughly $0.8$ of participants would correctly guess the alcoholic beverage to being quite sure that $0.75$ of participants can correctly guess."""
-
-# ╔═╡ 5e3b0846-f0ef-11ea-2c4a-15c55ba5cd43
-md"""#### **Assignment**: 
-
-Plug the shape parameters of your prior into the code block above and see how your posterior differs (if you had a different prior than I had). Play around with different parameters to get a feeling for how the posterior depends on the prior."""
-
-# ╔═╡ 85d9fc20-f0ef-11ea-2b0a-e9f51d73d562
-md"""### Hypothesis testing
-
-Now that we have a posterior distribution, we can do some further analysis. For instance, how sure are we that participants are actually better than chance level at detecting the alcoholic beer? 
-
-This kind of statement, involving relative probabilities, can be tackled by _hypothesis testing_. In hypothesis testing, you start with a null hypothesis $H_0$, which is a particular choice for the detection parameter $\theta$. For example, in the question above, we are interested in "better than chance level". Chance level corresponds to $\theta = 0.5$. We then have an alternative hypothesis $H_1$, namely that we are interested in whether the participants can detect it better than chance, i.e. $\theta > 0.5$. 
-
-Proper hypothesis testing can be quite complicated and there could be factors / terms that are difficult, if not impossible, to compute (see [Wagemakers et al., 2010](https://www.sciencedirect.com/science/article/pii/S0010028509000826?casa_token=oOWuhv4FdwcAAAAA:HdpoBRU0adxKmCDPZF0gADbzbkPoiejfc0ZMJlTKq0DwhVVcnvM0OxS4IJV1GGKbSvb6yLCOvA)). Fortunately, in our current test we can perform some simplifications. The following quantity tells us something about the relative probability of detecting the alcoholic beverage at chance level versus better than chance level:
-
-```math
-\text{BF}_{10} = \frac{p(\theta = 0.5)}{p(\theta = 0.5 \mid X)}
-```
-
-BF stands for Bayes Factor and the subscript $10$ indicates how much more likely $H_1$ is than $H_0$."""
-
 # ╔═╡ 4a58cc90-f0f0-11ea-1afc-152c4acac936
 BF10 = pdf(pθ0, 0.5) / pdf(pθX, 0.5)
-
-# ╔═╡ 53d29d28-f0f0-11ea-3e2d-4bb7363f37cb
-md"""So, the alternative hypothesis _"people can correctly detect the alcoholic versus non-alcoholic Hefeweissbier better than chance level"_ is almost 200 times more likely than the null hypothesis _"people cannot distinguish between the alcoholic versus non-alcoholic Hefeweissbier"_, according to our data."""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
+BmlipTeachingTools = "~1.3.1"
 CSV = "~0.10.15"
 DataFrames = "~1.8.1"
 Distributions = "~0.25.122"
 Plots = "~1.41.1"
-PlutoUI = "~0.7.72"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -287,7 +331,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.12.1"
 manifest_format = "2.0"
-project_hash = "205f59925b77dafb5036efc420bd1f94c1a4151d"
+project_hash = "de97f0e80e8d726ea8b06d0747144e16194c02a8"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -317,6 +361,12 @@ version = "1.11.0"
 git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
 uuid = "d1d4a3ce-64b1-5f1a-9ba4-7e7e69966f35"
 version = "0.1.9"
+
+[[deps.BmlipTeachingTools]]
+deps = ["HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoTeachingTools", "PlutoUI", "Reexport"]
+git-tree-sha1 = "806eadb642467b05f9d930f0d127f1e6fa5130f0"
+uuid = "656a7065-6f73-6c65-7465-6e646e617262"
+version = "1.3.1"
 
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1019,6 +1069,12 @@ version = "1.41.1"
     ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
     Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
+[[deps.PlutoTeachingTools]]
+deps = ["Downloads", "HypertextLiteral", "Latexify", "Markdown", "PlutoUI"]
+git-tree-sha1 = "dacc8be63916b078b592806acd13bb5e5137d7e9"
+uuid = "661c6b06-c737-4d37-b85c-46df65de6f69"
+version = "0.4.6"
+
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
 git-tree-sha1 = "f53232a27a8c1c836d3998ae1e17d898d4df2a46"
@@ -1612,6 +1668,7 @@ version = "1.9.2+0"
 """
 
 # ╔═╡ Cell order:
+# ╟─369042f4-67ce-4cac-871e-72adc503d4e3
 # ╟─7e474146-f044-11ea-2c0c-cbda0c574da5
 # ╟─59abbfe8-f0bb-11ea-267b-2126df2b62c9
 # ╟─0e55ea72-f0bc-11ea-16dc-4d9ccba649e0
@@ -1621,14 +1678,15 @@ version = "1.9.2+0"
 # ╟─b48f2b86-2281-4804-b4ac-614457eab859
 # ╠═31427b48-f0be-11ea-3493-39d0617e6c14
 # ╟─f51c794d-9753-4431-bf5a-ccf0a7a0641c
-# ╟─3e8a79b8-f0be-11ea-314c-333d84cea659
+# ╠═3e8a79b8-f0be-11ea-314c-333d84cea659
 # ╠═87373db4-f0bd-11ea-0b4b-0fbf22e8098d
 # ╟─8553e0b4-f0be-11ea-2487-07aacadc4508
 # ╟─02c1ebd0-f0c0-11ea-1f7d-a33e7bb4c88f
+# ╟─f2f67347-7d99-4e67-87db-61a302e2aa81
 # ╟─23fa4662-f0c0-11ea-2df0-d9dd86ebf137
 # ╟─2fc7ef3a-f0c0-11ea-3eca-ab02d7f3fcfe
 # ╟─63ef008c-f0c0-11ea-3d12-070c342c851b
-# ╟─7bba65e4-f0c0-11ea-231c-290c9a4e290a
+# ╠═7bba65e4-f0c0-11ea-231c-290c9a4e290a
 # ╟─993aaf52-f0c0-11ea-3a6a-9141a6706f7e
 # ╠═e617816a-f0c0-11ea-1a5d-81f5db895c05
 # ╟─ee206a84-f0c0-11ea-041d-97696dd759d6
@@ -1648,5 +1706,8 @@ version = "1.9.2+0"
 # ╟─85d9fc20-f0ef-11ea-2b0a-e9f51d73d562
 # ╠═4a58cc90-f0f0-11ea-1afc-152c4acac936
 # ╟─53d29d28-f0f0-11ea-3e2d-4bb7363f37cb
+# ╟─30062e75-5e94-4b1f-835e-353cc51bee32
+# ╠═53918345-9b60-4608-9cf1-d64abb83f902
+# ╟─2dba463a-e8ce-450b-9874-d76ce75e55f7
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
