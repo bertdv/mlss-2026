@@ -78,6 +78,13 @@ function fix_dates!(df::DataFrame)
 	df
 end
 
+# ╔═╡ 6c45e9a8-b247-4aac-ba3e-64236d197e26
+begin 
+	date_range = @htl """
+		$(@bindname time_period RangeSlider(1:251, default=1:251))
+	"""
+end
+
 # ╔═╡ e91243b4-1b81-45b3-9b6b-ad99e2a28ef1
 md"""
 ## Model specification
@@ -88,36 +95,72 @@ We have a date $x_i \in \mathbb{R}$, referred to as a "covariate" or input varia
 \underbrace{p(\theta \mid y, x)}_{\text{posterior}} \propto\ \underbrace{p(y \mid x, \theta)}_{\text{likelihood}} \cdot \underbrace{p(\theta)}_{\text{prior}}
 ```
 
-We assume each observation $y_i$ is generated via: 
-
-```math 
-y_i = f_\theta(x_i) + e_i
-```
-
-where $e_i$ is white noise, $e_i \sim \mathcal{N}(0, \sigma^2_y)$, and the regression function $f_\theta$ is linear: $f_\theta(x) = x \theta_1 + \theta_2$. The parameters consist of a slope coefficient $\theta_1$ and an intercept $\theta_2$, which are summarized into the vector $\theta = \begin{bmatrix}\theta_1 \\ \theta_2 \end{bmatrix}$. In practice, we augment the data point $x$ with a 1, i.e., $\begin{bmatrix}x \\ 1 \end{bmatrix}$, so that we may define $f_\theta(x) = \theta^{\top}x$. 
-
 ### Likelihood
-If we integrate out the noise $e$, then we obtain a Gaussian likelihood function centered on $f_\theta(x)$ with variance $\sigma^2_Y$:
+
+We assume each observation $y_i$ is generated from a Gaussian distribution with mean $f_\theta(x)$ and variance $\sigma^2_Y$:
 
 ```math
 p(y_i \mid x_i, \theta) = \mathcal{N}(y_i \mid f_\theta(x_i),\sigma^2_y)\, \ .
 ```
 
-But this is just for a single sample and we have an entire data set. The likelihood of all $(x,y)$ is:
+In _linear_ regression, the regression function $f_\theta$ is linear: $f_\theta(x) = x \theta_1 + \theta_2$. The parameters consist of a slope coefficient $\theta_1$ and an intercept $\theta_2$, which are summarized into the vector $\theta = \begin{bmatrix}\theta_1 \\ \theta_2 \end{bmatrix}$. In practice, we augment the data point $x$ with a 1, i.e., $\begin{bmatrix}x \\ 1 \end{bmatrix}$, so that we may define $f_\theta(x) = \theta^{\top}x$. 
+
+The above is just for a single sample and we have an entire data set. We assume all observations are independent and identically distributed, which means the total likelihood of all $(x,y)$ is:
 
 ```math
 p(y \mid x, \theta) = \prod_{i=1}^{N} p(y_i \mid x_i, \theta)  
 = \prod_{i=1}^{N} \mathcal{N}(y_i \mid f_{\theta}(x_i), \sigma^2_y) \, .
 ```
+"""
 
+# ╔═╡ 64a9dc6e-f643-4a08-a4ad-a0aa3c25d264
+md"""
+For this problem set, the likelihood variance is given:
+"""
+
+# ╔═╡ c5f69f8c-1a36-4241-beb0-84aa0efc9933
+# Likelihood variance
+σ2_y = 1.9345
+
+# ╔═╡ ef992bad-1ea2-498e-9c76-3206a37ce6f6
+md"""
 ### Prior distribution
 We know that the weights are real numbers and that they can be negative. That motivates us to use a Gaussian prior:
 
 ```math
 p(\theta) = \mathcal{N}(\theta \mid \mu_\theta, \Sigma_\theta) \, .
 ```
+"""
 
-We can specify these equations almost directly in our PPL.
+# ╔═╡ 09eaf9ae-add9-4a05-a18c-a8f333b199d7
+@bindname μ_θ1 Slider(-5.:5., show_value=true, default=0.0)
+
+# ╔═╡ 649b8ed4-0ac7-4d25-865a-ceec562e811a
+@bindname μ_θ2 Slider(-5.:5., show_value=true, default=0.0)
+
+# ╔═╡ 92180b46-9680-4d08-b0c5-ec3b54136d9d
+μ_θ = [μ_θ1, μ_θ2]
+
+# ╔═╡ 2b7e6913-6f38-44ec-beeb-3aab7d2a62d7
+md"""
+Now let's define our covariance matrix:
+"""
+
+# ╔═╡ bc6b0cd4-6910-4155-b046-280ef894d5b1
+@bindname var_θ1 Slider(0.001:.01:3, show_value=true, default=.5) 
+
+# ╔═╡ e726155b-75ed-40a1-b740-eb38dc710d0e
+@bindname var_θ2 Slider(0.001:.01:3, show_value=true, default=.5) 
+
+# ╔═╡ fb198761-91f5-4617-af89-1e9b182c50c9
+@bindname cov_θ  Slider(-min(var_θ1,var_θ2):.01:max(var_θ1,var_θ2), show_value=true, default=0.0) 
+
+# ╔═╡ 652b585d-89bb-4375-9034-9536a6b65201
+Σ_θ = [var_θ1 cov_θ; cov_θ var_θ2]
+
+# ╔═╡ e38c72e4-89c1-4e59-b9d4-a9a5814bf377
+md"""
+We can now specify our model:
 """
 
 # ╔═╡ cb6bd145-95c0-4e95-bdab-c178c50a1a3d
@@ -133,14 +176,6 @@ We can specify these equations almost directly in our PPL.
     end
 end
 
-# ╔═╡ 38300847-a21c-4ab6-bbd0-94f40752dbf7
-# Prior mean
-μ_θ = zeros(2)
-
-# ╔═╡ 8b526341-24f8-4d33-a7f5-b858af1e48f6
-# Prior covariance
-Σ_θ = diagm(ones(2))
-
 # ╔═╡ 200b9df9-6cce-4642-8589-a82ff54edaf9
 md"""
 Now that we have our model, it is time to infer parameters.
@@ -155,32 +190,41 @@ function covellipse_many(distr; n_std, kwargs...)
 	p
 end
 
+# ╔═╡ 39cdce61-d0d8-401d-93bd-e0e15a192bd2
+begin
+	covellipse_many(MvNormal(μ_θ, Σ_θ),
+			fillalpha=0,
+			linecolor=:red,
+			linewidth=3,
+			xlim=(-.55,.55),
+			ylim=(-.55,.55),
+			n_std=[.15,.3,.6,1],
+			size=(400,400),
+			xlabel="θ1", ylabel="θ2", title="prior",
+	)
+end
+
 # ╔═╡ 88603703-1b2f-435e-9d71-91481a22cb4d
 md"""
 It has become quite sharply peaked in a small area of parameter space.
 
-We can extract the MAP point estimate to compute and visualize the most probable regression function $f_\theta$.
+We can calculate the posterior predictive distribution to see how well we predict training data.
 """
 
-# ╔═╡ 25287032-d3e4-4971-8e8a-27436df9a8e8
-md"""
-The slope coefficient $\theta_1$ is nearly zero and the plot shows a horizontal line. So the ISE did not experienced a decline, but also did not grow in 2009. 
-"""
+# ╔═╡ e5b0d928-a45f-4607-8312-84540c2149a2
+date_range
 
 # ╔═╡ 014eab47-f662-4090-b37f-93d2366d1f4d
 md"""
 ## Forecasting
 
-We've answered the Turkish government's question. But before they change their country's economic policy, they want to know what the future looks like if the stock market continues on this trend. In other words, they want us to make predictions for future outputs given our current regression coefficient estimates.
+The Turkish government also wants to know what the future looks like if the stock market continues on this trend. In other words, they want us to predict future outputs given our current regression coefficient estimates.
 
-We can request the toolbox to make predictions for future outputs by providing `missing` data points.
+We can make the software predict future outputs by providing `missing` data points.
 """
 
-# ╔═╡ cb1b3c47-a735-4e27-89f5-e1c4227e76b1
-
-
-# ╔═╡ fcebb948-aba2-4c08-afe5-21ad4e228bb3
-
+# ╔═╡ d9f1da54-e069-4b1b-ad79-d9a2002e62ff
+date_range
 
 # ╔═╡ 70c9825e-6061-4ef3-8a58-a8f69e7f44ea
 challenge_statement("Medical Diagnosis"; header_level=1, big=true)
@@ -274,7 +318,7 @@ Unfortunately, we cannot visualize a distribution of more than 2 dimensions. But
 
 # ╔═╡ 8a8d8175-58cd-4d98-a367-8f5dc66b5a99
 md"""
-## Predict test data
+## Classify
 
 The device should make accurate predictions for future patients. We can evaluate this with a test data set.
 """
@@ -319,31 +363,28 @@ df = DataFrame(CSV.File(get_data_file("stock_exchange.csv"))) |> fix_dates!
 # ╔═╡ cdee0667-dde0-4151-8074-ea0095dd9881
 begin
 	# Count number of samples
-	num_trn_samples = size(df,1)
+	num_trn_samples = size(time_period,1)
 	
 	# Extract columns
-	dates = df[:,1]
-	stock_val = df[:,2]
+	dates = df[time_period,1]
+	stock_val = df[time_period,2]
 	
 	# Scatter exchange levels
-	scatter(
-		df[:,1], df[:,2];
-		color="black",
-		label="", 
-		ylabel="Stock Market Level", 
-		xlabel="data",
-		size=(800,300)
+	scatter(dates, 
+			stock_val,
+			color="black",
+			label="", 
+			ylabel="Stock Market Level", 
+			xlabel="data",
+			size=(800,300)
 	)
 end
-
-# ╔═╡ c5f69f8c-1a36-4241-beb0-84aa0efc9933
-# Likelihood variance
-σ2_y = var(stock_val)
 
 # ╔═╡ f1a96db1-7ca3-4e88-8a6f-626b84242a58
 results_regression = infer(
     model       = linear_regression(μ_θ=μ_θ, Σ_θ=Σ_θ, σ2=σ2_y, N=num_trn_samples),
-    data        = (y = stock_val, X = [[i, 1.0] for i in 1:num_trn_samples]),
+    data        = (X = [[(date - dates[1]).value, 1.0] for date in dates],
+				   y = stock_val,),
 )
 
 # ╔═╡ 71fe6b04-a4e3-11f0-bd15-b54fe8fc3d4a
@@ -356,9 +397,9 @@ begin
 		fillalpha=0,
 		linecolor=:red,
 		linewidth=3,
-		xlim=(-1,1),
-		ylim=(-1,1),
-		n_std=[.3,.6,1,2,3],
+		xlim=(-.5,.5),
+		ylim=(-.5,.5),
+		n_std=[.15,.3,.6,1,2],
 	)
 	
 	p1a = covellipse_many(
@@ -394,6 +435,21 @@ begin
 	end
 end
 
+# ╔═╡ 25287032-d3e4-4971-8e8a-27436df9a8e8
+if θ_MAP[1] > 0.3
+	md"""
+	The slope coefficient $\theta_1$ is positive and the plot shows an upward line. So the ISE grew 2009, which means the country is not in a recession. 
+	"""
+elseif θ_MAP[1] < -0.3
+	md"""
+	The slope coefficient $\theta_1$ is negative and the plot shows a downward line. So the ISE shrunk and the country is in a recession.
+	"""
+else
+	md"""
+	The slope coefficient $\theta_1$ is nearly zero and the plot shows a horizontal line. So the ISE did not experience a decline but also did not grow in 2009. It is difficult to say whether the country is doing well.
+	"""
+end
+
 # ╔═╡ 2b831af6-19a0-46c6-9c50-197fdc0c49c5
 begin
 	# Visualize observations
@@ -409,34 +465,20 @@ future = DataFrame(CSV.File(get_data_file("stock_futures.csv"))) |> fix_dates!
 # ╔═╡ f1223ccc-bac6-4764-9558-8effaea669d3
 num_all_samples = num_trn_samples + length(future[!,:date])
 
-# ╔═╡ 4681f440-9844-4ef1-a58c-3d8ae43738d3
-all_X = [[i, 1.0] for i in 1:num_all_samples]
-
-# ╔═╡ 4f8d089d-97e3-43a3-93ce-396fedd2a0e4
-all_y = [stock_val..., future[!,:ISE]...]
-
 # ╔═╡ fabc8341-1eb8-45c1-b667-d7d23a8d2646
 results_all = infer(
 	model       = linear_regression(μ_θ=μ_θ, Σ_θ=Σ_θ, σ2=σ2_y, N=num_all_samples),
-	data        = (y = all_y, X = all_X,),
+	data        = (X = [[(date - dates[1]).value,1.] for date in [dates...,future.date...]],
+				   y = [stock_val..., future[!,:ISE]...],), 
 	predictvars = (y = KeepLast(),),
 )
 
-# ╔═╡ 98122bbc-8bea-4420-b110-fc08858e8098
-regression_all_estimated = mode.(results_all.predictions[:y])
-
-# ╔═╡ fc720f70-e118-42f6-abce-fce999025680
-regression_all_uncertainty = 2*std.(results_all.predictions[:y]) # 2 standard deviations
-
-# ╔═╡ 6c8f0562-f5bf-4049-893e-aa9e85f024cd
-let
-	final_prediction = regression_all_estimated[end]
-	final_uncertainty = regression_all_uncertainty[end]
-	@info("Final predicted stock value = $(round(final_prediction; sigdigits=3)) (±$(round(final_uncertainty; sigdigits=3)))")
-end
-
 # ╔═╡ cb44f1a3-2db3-425e-a850-9d970a1b3159
-let
+begin
+
+	regression_all_estimated = mode.(results_all.predictions[:y])
+	regression_all_uncertainty = 2*std.(results_all.predictions[:y]) # 2 standard deviations
+	
 	# Visualize observations
 	plot(xlabel="time", size=(800,300))
 	vline!([dates[end]]; color="green", linewidth=5, linestyle=:dash)
@@ -447,7 +489,7 @@ let
 	
 	# Overlay regression function
 	plot!(
-		[df.date..., future.date...], regression_all_estimated;
+		[dates..., future.date...], regression_all_estimated;
 		ribbon=regression_all_uncertainty, color="blue", label="regression",
 	)
 end
@@ -2712,32 +2754,38 @@ version = "1.9.2+0"
 # ╟─c0574807-8eec-46ab-a5bf-40ef977c9040
 # ╠═75abbdc2-33cb-4204-8276-5e91cc1dfe5d
 # ╟─888c6ba4-277c-486f-8805-95c370b0a2cc
-# ╟─cdee0667-dde0-4151-8074-ea0095dd9881
+# ╟─6c45e9a8-b247-4aac-ba3e-64236d197e26
+# ╠═cdee0667-dde0-4151-8074-ea0095dd9881
 # ╟─e91243b4-1b81-45b3-9b6b-ad99e2a28ef1
+# ╟─64a9dc6e-f643-4a08-a4ad-a0aa3c25d264
+# ╟─c5f69f8c-1a36-4241-beb0-84aa0efc9933
+# ╟─ef992bad-1ea2-498e-9c76-3206a37ce6f6
+# ╟─09eaf9ae-add9-4a05-a18c-a8f333b199d7
+# ╟─649b8ed4-0ac7-4d25-865a-ceec562e811a
+# ╟─92180b46-9680-4d08-b0c5-ec3b54136d9d
+# ╟─2b7e6913-6f38-44ec-beeb-3aab7d2a62d7
+# ╟─bc6b0cd4-6910-4155-b046-280ef894d5b1
+# ╟─e726155b-75ed-40a1-b740-eb38dc710d0e
+# ╟─fb198761-91f5-4617-af89-1e9b182c50c9
+# ╟─652b585d-89bb-4375-9034-9536a6b65201
+# ╟─39cdce61-d0d8-401d-93bd-e0e15a192bd2
+# ╟─e38c72e4-89c1-4e59-b9d4-a9a5814bf377
 # ╠═cb6bd145-95c0-4e95-bdab-c178c50a1a3d
-# ╠═38300847-a21c-4ab6-bbd0-94f40752dbf7
-# ╠═8b526341-24f8-4d33-a7f5-b858af1e48f6
-# ╠═c5f69f8c-1a36-4241-beb0-84aa0efc9933
 # ╟─200b9df9-6cce-4642-8589-a82ff54edaf9
 # ╠═f1a96db1-7ca3-4e88-8a6f-626b84242a58
-# ╠═71fe6b04-a4e3-11f0-bd15-b54fe8fc3d4a
+# ╟─71fe6b04-a4e3-11f0-bd15-b54fe8fc3d4a
 # ╟─9ee9299e-0c7c-4ec8-87fa-4300c2ac3922
 # ╟─88603703-1b2f-435e-9d71-91481a22cb4d
 # ╠═9c179f46-afa1-4b73-880c-71e90eee1d3a
-# ╠═2b831af6-19a0-46c6-9c50-197fdc0c49c5
+# ╟─2b831af6-19a0-46c6-9c50-197fdc0c49c5
 # ╟─25287032-d3e4-4971-8e8a-27436df9a8e8
+# ╟─e5b0d928-a45f-4607-8312-84540c2149a2
 # ╟─014eab47-f662-4090-b37f-93d2366d1f4d
 # ╠═3e546e87-104f-47b3-b1a2-1b091a82ff52
 # ╠═f1223ccc-bac6-4764-9558-8effaea669d3
-# ╟─cb1b3c47-a735-4e27-89f5-e1c4227e76b1
-# ╠═4681f440-9844-4ef1-a58c-3d8ae43738d3
-# ╠═4f8d089d-97e3-43a3-93ce-396fedd2a0e4
 # ╠═fabc8341-1eb8-45c1-b667-d7d23a8d2646
-# ╟─fcebb948-aba2-4c08-afe5-21ad4e228bb3
-# ╠═98122bbc-8bea-4420-b110-fc08858e8098
-# ╠═fc720f70-e118-42f6-abce-fce999025680
-# ╟─6c8f0562-f5bf-4049-893e-aa9e85f024cd
-# ╠═cb44f1a3-2db3-425e-a850-9d970a1b3159
+# ╟─cb44f1a3-2db3-425e-a850-9d970a1b3159
+# ╟─d9f1da54-e069-4b1b-ad79-d9a2002e62ff
 # ╟─70c9825e-6061-4ef3-8a58-a8f69e7f44ea
 # ╟─6ac40f48-7be3-47dd-94f5-39a833e60bcd
 # ╠═e4b87ddb-bc6f-4d04-870b-108dcf9be1df
