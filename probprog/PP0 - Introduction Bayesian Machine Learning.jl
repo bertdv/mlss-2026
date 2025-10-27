@@ -20,7 +20,10 @@ end
 begin
 	using Distributions
 	using Plots
-	using PlutoUI
+
+	# Normally you would add this to get Slider, but in this notebook, PlutoUI is reexported by our package BmlipTeachingTools so we skip the import here.
+	
+	# using PlutoUI
 end
 
 # ╔═╡ 7bba65e4-f0c0-11ea-231c-290c9a4e290a
@@ -29,19 +32,22 @@ begin
 	using CSV
 end
 
-# ╔═╡ 7e474146-f044-11ea-2c0c-cbda0c574da5
-md"
-# Probabilistic Programming 0
-### Introduction to Bayesian Machine Learning
+# ╔═╡ 53918345-9b60-4608-9cf1-d64abb83f902
+using BmlipTeachingTools
 
+# ╔═╡ 369042f4-67ce-4cac-871e-72adc503d4e3
+title("Probabilistic Programming 0: Introduction to Bayesian Machine Learning")
+
+# ╔═╡ 7e474146-f044-11ea-2c0c-cbda0c574da5
+md"""
 #### Goal:
   - Familiarize yourself with basic concepts from Bayesian inference such as priors and posteriors.
   - Familiarize yourself with working with the Julia programming language in notebooks.
 
 #### Materials:
-  - [Intro to programming in Julia](https://youtu.be/8h8rQyEpiZA?t=233).
+  - [Intro to programming in Julia (video)](https://youtu.be/8h8rQyEpiZA?t=233).
   - [Cheatsheets: how does Julia differ from Matlab / Python](https://docs.julialang.org/en/v1/manual/noteworthy-differences/index.html).
-"
+"""
 
 # ╔═╡ 59abbfe8-f0bb-11ea-267b-2126df2b62c9
 md"In 1937, one of the founders of the field of statistics, [Ronald Fisher](https://en.wikipedia.org/wiki/Ronald_Fisher), published a story of how he explained _statistical inference_ to a friend. This story, called the \"Lady Tasting Tea\", has been re-told many times in different forms. In this notebook, we will re-tell one of its modern variants and introduce you to some important concepts along the way."
@@ -109,10 +115,15 @@ md"""As you can see, the Beta distribution is quite flexible and can capture you
 
 A prior distribution is a probability distribution function of an unknown parameter $p(\theta)$, that signifies how probable each value of the parameter is **before** you observe data in your experiment. It is up to you to define what that prior distribution looks like. """
 
-# ╔═╡ 23fa4662-f0c0-11ea-2df0-d9dd86ebf137
-md"""#### **Assignment**: 
+# ╔═╡ f2f67347-7d99-4e67-87db-61a302e2aa81
+exercise_statement("Prior parameters")
 
-I want you to pick values for the prior parameters $\alpha$ and $\beta$ that reflect how often you think the participants will get it right."""
+# ╔═╡ 23fa4662-f0c0-11ea-2df0-d9dd86ebf137
+md"""
+
+
+I want you to pick values for the prior parameters $\alpha$ and $\beta$ that reflect how often you think the participants will get it right.
+"""
 
 # ╔═╡ 2fc7ef3a-f0c0-11ea-3eca-ab02d7f3fcfe
 md"""## 2. Likelihood
@@ -205,7 +216,8 @@ md"""That looks great! We have updated our belief from thinking that roughly $0.
 
 # ╔═╡ 5e3b0846-f0ef-11ea-2c4a-15c55ba5cd43
 md"""
-#### **Assignment**: 
+
+$(exercise_statement(""))
 
 Plug the shape parameters of your prior into the code block above and see how your posterior differs (if you had a different prior than I had). Play around with different parameters to get a feeling for how the posterior depends on the prior.
 """
@@ -299,18 +311,18 @@ BF10 = pdf(pθ0, 0.5) / pdf(pθX, 0.5)
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
+BmlipTeachingTools = "~1.3.1"
 CSV = "~0.10.15"
 DataFrames = "~1.8.1"
 Distributions = "~0.25.122"
 Plots = "~1.41.1"
-PlutoUI = "~0.7.72"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -319,7 +331,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.12.1"
 manifest_format = "2.0"
-project_hash = "205f59925b77dafb5036efc420bd1f94c1a4151d"
+project_hash = "de97f0e80e8d726ea8b06d0747144e16194c02a8"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -349,6 +361,12 @@ version = "1.11.0"
 git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
 uuid = "d1d4a3ce-64b1-5f1a-9ba4-7e7e69966f35"
 version = "0.1.9"
+
+[[deps.BmlipTeachingTools]]
+deps = ["HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoTeachingTools", "PlutoUI", "Reexport"]
+git-tree-sha1 = "806eadb642467b05f9d930f0d127f1e6fa5130f0"
+uuid = "656a7065-6f73-6c65-7465-6e646e617262"
+version = "1.3.1"
 
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1051,6 +1069,12 @@ version = "1.41.1"
     ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
     Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
+[[deps.PlutoTeachingTools]]
+deps = ["Downloads", "HypertextLiteral", "Latexify", "Markdown", "PlutoUI"]
+git-tree-sha1 = "dacc8be63916b078b592806acd13bb5e5137d7e9"
+uuid = "661c6b06-c737-4d37-b85c-46df65de6f69"
+version = "0.4.6"
+
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
 git-tree-sha1 = "f53232a27a8c1c836d3998ae1e17d898d4df2a46"
@@ -1644,6 +1668,7 @@ version = "1.9.2+0"
 """
 
 # ╔═╡ Cell order:
+# ╟─369042f4-67ce-4cac-871e-72adc503d4e3
 # ╟─7e474146-f044-11ea-2c0c-cbda0c574da5
 # ╟─59abbfe8-f0bb-11ea-267b-2126df2b62c9
 # ╟─0e55ea72-f0bc-11ea-16dc-4d9ccba649e0
@@ -1657,10 +1682,11 @@ version = "1.9.2+0"
 # ╠═87373db4-f0bd-11ea-0b4b-0fbf22e8098d
 # ╟─8553e0b4-f0be-11ea-2487-07aacadc4508
 # ╟─02c1ebd0-f0c0-11ea-1f7d-a33e7bb4c88f
+# ╟─f2f67347-7d99-4e67-87db-61a302e2aa81
 # ╟─23fa4662-f0c0-11ea-2df0-d9dd86ebf137
 # ╟─2fc7ef3a-f0c0-11ea-3eca-ab02d7f3fcfe
 # ╟─63ef008c-f0c0-11ea-3d12-070c342c851b
-# ╟─7bba65e4-f0c0-11ea-231c-290c9a4e290a
+# ╠═7bba65e4-f0c0-11ea-231c-290c9a4e290a
 # ╟─993aaf52-f0c0-11ea-3a6a-9141a6706f7e
 # ╠═e617816a-f0c0-11ea-1a5d-81f5db895c05
 # ╟─ee206a84-f0c0-11ea-041d-97696dd759d6
@@ -1676,11 +1702,12 @@ version = "1.9.2+0"
 # ╠═d8899b9a-f0ee-11ea-3396-c51ae5beb62b
 # ╠═c9f295b4-f0ee-11ea-2505-b1705a92ebd1
 # ╟─543b0024-f0ef-11ea-2775-6f0c0b586865
-# ╠═5e3b0846-f0ef-11ea-2c4a-15c55ba5cd43
+# ╟─5e3b0846-f0ef-11ea-2c4a-15c55ba5cd43
 # ╟─85d9fc20-f0ef-11ea-2b0a-e9f51d73d562
 # ╠═4a58cc90-f0f0-11ea-1afc-152c4acac936
 # ╟─53d29d28-f0f0-11ea-3e2d-4bb7363f37cb
 # ╟─30062e75-5e94-4b1f-835e-353cc51bee32
+# ╠═53918345-9b60-4608-9cf1-d64abb83f902
 # ╟─2dba463a-e8ce-450b-9874-d76ce75e55f7
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
