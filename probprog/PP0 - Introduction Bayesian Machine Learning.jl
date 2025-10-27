@@ -45,8 +45,14 @@ md"""
   - Familiarize yourself with working with the Julia programming language in notebooks.
 
 #### Materials:
-  - [Intro to programming in Julia (video)](https://youtu.be/8h8rQyEpiZA?t=233).
-  - [Cheatsheets: how does Julia differ from Matlab / Python](https://docs.julialang.org/en/v1/manual/noteworthy-differences/index.html).
+  - **Mandatory**
+    - **Julia Basics** from _"Julia Programming for Machine Learning"_ currently being taught at TU Berlin:
+      - [L1: Essentials](https://adrianhill.de/julia-ml-course/L1_Basics_1/) (syntax, types, operations, functions)
+      - [L2: Arrays](https://adrianhill.de/julia-ml-course/L2_Basics_2/) (vector, matrix, linear algebra)
+    - [Mini: Distributions in Julia](https://bmlip.github.io/course/minis/Distributions%20in%20Julia.html)
+  - **Optional**
+    - [Intro to programming in Julia (video)](https://youtu.be/8h8rQyEpiZA?t=233).
+    - [Cheatsheets: how does Julia differ from Matlab / Python](https://docs.julialang.org/en/v1/manual/noteworthy-differences/index.html).
 """
 
 # ╔═╡ 59abbfe8-f0bb-11ea-267b-2126df2b62c9
@@ -92,7 +98,7 @@ begin
 	# Visualize probability distribution function
 	plot(θ, pdf.(pθ, θ);
 		 linewidth=3, color="red", 
-		 label="α = $α, β = $β", 
+		 label="α = $(α), β = $(β)", 
 		 xlabel="θ", ylabel="p(θ)",
 		)
 end
@@ -100,13 +106,16 @@ end
 # ╔═╡ 8553e0b4-f0be-11ea-2487-07aacadc4508
 md"""A couple of things to note about the code block: 
 - You can use greek letters as variables (write them like in latex, e.g. \alpha, and press `tab`)
-- To get sliders, you can wrap html code. The "@" in front of 'bind' is called a ["macro" operator](https://docs.julialang.org/en/v1/base/base/#macro). It essentially groups a set of commands into one to get a clean function call.
+- To get sliders, you can use [PlutoUI.jl](https://github.com/JuliaPluto/PlutoUI.jl). The "@" in front of 'bind' is called a ["macro" operator](https://docs.julialang.org/en/v1/base/base/#macro). It essentially groups a set of commands into one to get a clean function call.
 - Ranges of numbers work just like they do in Matlab (e.g. `0.0:0.1:1.0`) and Python (e.g. `range(0.0, stop=100., length=100)`). Note that Julia is strict about types, i.e. it will generate integers if you don't use a decimal point.
 - There is a `.` after the command `pdf`. This refers to ["broadcasting"](https://julia-guide.netlify.app/broadcasting): the function is applied to each element of a list or array. Here we use the `pdf` command to compute the probability for each value of $\theta$ in the array.
-- Many of the keyword arguments in the `plot` command should be familiar to you if you've worked with [Matplotlib](https://matplotlib.org/) (Python's plotting library).
-- In the `label=` argument to plots, we have performed \"string concatenation\". In Julia, you write a string with double-quote characters and concatenate two strings by "multiplying", i.e. using `*`.
+- Plotting is done with [Plots.jl](https://github.com/JuliaPlots/Plots.jl/). Many of the keyword arguments in the `plot` command should be familiar to you if you've worked with [Matplotlib](https://matplotlib.org/) (Python's plotting library).
+- In the `label=` argument to plots, we have performed \"string interpolation\". In Julia, you write a string with double-quote characters and you can insert a value using `$`.
 
 I encourage you to play around with the parameters and see how they alter the distribution."""
+
+# ╔═╡ 911adcbb-a647-4c4f-8aa6-d2206b227811
+NotebookCard("https://bmlip.github.io/course/minis/Distributions%20in%20Julia.html")
 
 # ╔═╡ 02c1ebd0-f0c0-11ea-1f7d-a33e7bb4c88f
 md"""As you can see, the Beta distribution is quite flexible and can capture your belief about how often participants will correctly detect the alcoholic beverage. For example, the purple line indicates that you believe that it is very probable that participants will always get it right (peak lies on $\theta=1.0$), but you still think there is some probability that the participants will guess at random ($p(\theta = 1/2) \approx 0.3$). The yellow-brown line indicates you believe that it is nearly impossible that the participants will always get it right ($p(\theta = 1) \approx 0.0$), but you still believe that they will get it right most often (peak lies around $\theta \approx 0.8$).
@@ -262,7 +271,6 @@ function get_data_file(name::String)
 end
 
 # ╔═╡ e617816a-f0c0-11ea-1a5d-81f5db895c05
-# Read data from CSV file
 data = DataFrame(CSV.File(get_data_file("TastingBeerResults.csv")))
 
 # ╔═╡ 096fb72c-f0c1-11ea-3323-fdb949953348
@@ -276,7 +284,13 @@ begin
 	F = sum(X .== 0)
 	
 	# Visualize frequencies
-	histogram(X, bins=[0,1,2], label="Incorrect = "*string(F)*", Correct = "*string(S), xlabel="X", xticks=[0,1], ylabel="Number", legend=:topleft)
+	histogram(
+		X, bins=[0,1,2]; 
+		label="Incorrect = $(F), Correct = $(S)", 
+		xlabel="X", ylabel="Number", 
+		xticks=[0,1], 
+		legend=:topleft,
+	)
 end
 
 # ╔═╡ 5e3b806a-f0ee-11ea-245e-77cb9d224ff3
@@ -1679,8 +1693,9 @@ version = "1.9.2+0"
 # ╠═31427b48-f0be-11ea-3493-39d0617e6c14
 # ╟─f51c794d-9753-4431-bf5a-ccf0a7a0641c
 # ╠═3e8a79b8-f0be-11ea-314c-333d84cea659
-# ╠═87373db4-f0bd-11ea-0b4b-0fbf22e8098d
+# ╟─87373db4-f0bd-11ea-0b4b-0fbf22e8098d
 # ╟─8553e0b4-f0be-11ea-2487-07aacadc4508
+# ╟─911adcbb-a647-4c4f-8aa6-d2206b227811
 # ╟─02c1ebd0-f0c0-11ea-1f7d-a33e7bb4c88f
 # ╟─f2f67347-7d99-4e67-87db-61a302e2aa81
 # ╟─23fa4662-f0c0-11ea-2df0-d9dd86ebf137
