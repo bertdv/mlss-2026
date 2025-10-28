@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.19
+# v0.20.20
 
 using Markdown
 using InteractiveUtils
@@ -21,17 +21,157 @@ begin
 	using Plots
 	using Distributions
 	using RxInfer
-	using PlutoUI
+	using BmlipTeachingTools
 end
 
-# ╔═╡ 73a97245-edd9-440a-90b7-e975c322639f
-@bindname λ Slider(0:0.01:10; show_value=true)
+# ╔═╡ c35889f4-162e-4dac-a0d2-652460048577
+title("Assignment 1: Observational Astronomy")
 
-# ╔═╡ 5852648b-02c7-47ec-b721-bb28e744b08f
-D = rand(Poisson(λ), 100)
+# ╔═╡ 6b41e750-bff0-4fbd-bf3c-006dbcfb8892
+TableOfContents()
 
-# ╔═╡ fe4324e8-4cb7-45e8-b520-37694d4f2f2d
-histogram(D, xlim=(0,20), ylim=(0,100), bins=0:20)
+# ╔═╡ 012abee8-72f0-4c51-96df-f4d914f63c62
+md"""
+# Introduction: CCD Data
+
+In _Observational Astronomy_, scientists use optical equipment to learn more about the universe. Often, a **telescope** is used, together with a **CCD**, a digital image sensor. The telescope can magnify and focus star light, and these photons hit different pixels of the CCD surface. 
+
+
+
+
+
+"""
+
+# ╔═╡ 381924b0-73c3-45f9-8495-6a265723501b
+@htl """
+<blockquote>
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Robotick%C3%BD_dalekohled_FRAM_na_Los_Leones.jpg" >
+
+<p>Here you see an optical telescope (large black cylinder with yellow text), fitted with a CCD (black disk on the right). Between the two is an adjustable color filter array. The 2-axis mounting system (bottom) allows the telescope to follow the rotation of the sky.
+
+<p>Source: <em>Institute of Physics of the Czech Academy of Sciences / Fyzikální ústav AV ČR</em>, <a href="https://commons.wikimedia.org/wiki/File:Robotick%C3%BD_dalekohled_FRAM_na_Los_Leones.jpg">WikiMedia Commons</a>.
+
+"""
+
+# ╔═╡ a1928949-cf80-4185-beec-515f507d8252
+md"""
+
+The CCD (Charge Coupled Device) is a small rectangular grid of photosensitive pixels. During an exposure period, it counts **the number of photons** that hit every pixel of its surface. After exposure, these numbers are read by a computer, and stored in a matrix. The result is a 2D (grayscale) image.
+
+> ### CCDs and color
+> CCDs are also used in digital cameras, with the modification that individual CCD pixels have color filters (red, green, blue) in a regular pattern. These values are displayed by corresponding colored lights a digital screen.
+> 
+> In astronomy, a CCD-telescope can be used in combination with filters. A filter (e.g. a "red" filter) is placed in front of the CCD, to only capture light of a specific wavelength. By taking a series of images with different filters, you can infer knowledge of the spectrum of light emitted by a star.
+>
+> In this assignment, we will only consider images taken through the same filter.
+
+
+"""
+
+# ╔═╡ a41f49a2-534e-4fa0-bfcd-4c31d52922ea
+TODO("CCD image")
+
+# ╔═╡ 8c5b5de8-b3f7-480d-88c5-6bbcaf7fe184
+md"""
+In this assignment, we will use Bayesian statistics to analyse **raw CCD data** from an astronomical study. The goal is to reason about the data source (a star), and infer parameters (i.e. star properties) from the data.
+"""
+
+# ╔═╡ cf7ece91-1835-4dca-a5bd-95562ed83cf8
+md"""
+# Part 1: CCD calibration
+
+Internally, a CCD uses a digital amplifier to measure photons with such high sensitivity. This setup is able to pick up individual photons, but there is also noise introduced in the amplifier gain process. This gain noise (aka _thermal noise_ or _dark current_) is a constant background level of noise that is added to every pixel's reading.
+
+Because the level of gain noise is temperature-dependent, it is important to calibrate this for every study. Usually, before making observations (i.e. taking star pictures), you take some calibration images:
+1. **Dark frame** - you take a picture of the same exposure time as your observation (e.g. 60 seconds), but **with the lid on** the telescope. This means no star light is measured, only CCD noise.
+2. **Flat field** _(not in this assignment)_ – you take a picture of a uniform light source, e.g. the inside of the telescope dome with the lights on, or a _sky flat_ taken during twilight. This measures pixel-to-pixel sensitivity variations and vignetting (uneven illumination).
+3. **Science frame** – the actual image of the celestial object.
+"""
+
+# ╔═╡ 3ca242d1-60fc-4061-a9f4-0d3c80a5de72
+md"""
+Here is a dark frame and science frame **from our data**. Notice the difference color limits.
+"""
+
+# ╔═╡ aa061b82-1a05-4abc-ad9f-13b00214a58e
+TODO(
+	md"""
+	maybe interesting: astronomy and bayes
+	- origin of bayesian reasoning
+	- astronomy is not repeated experiments
+	"""
+)
+
+# ╔═╡ 4c3d6b76-86a2-4c28-ac79-2c80df9cc120
+md"""
+$(exercise_statement("Dark frame calibration"))
+
+We want to **model the background noise** measured in the dark frame. Using the dark frame, we have many IID samples of this noise.
+
+👉 Make a **histogram** of the pixel values in the dark frame. What can you say about the distribution of these values?
+"""
+
+# ╔═╡ ca962b18-231d-4ed4-9f50-6111ed90476b
+
+
+# ╔═╡ 6b6ea464-b5fb-4e21-8272-a12759c720b8
+md"""
+👉 Make a **probabilistic model** for this problem. Use Bayesian inference to **infer a distribution for the noise intensity of a pixel**.
+"""
+
+# ╔═╡ 2f7dc689-8874-48f8-a0c6-e0d54ea9e7ea
+
+
+# ╔═╡ b850a730-74cc-4c6e-a6f1-0c2f6ce182d9
+md"""
+👉 Now that you have a model for the noise, we can **calibrate our image**. We wrote a function for this, which subtracts the mean of your distribution from every pixel. Apply the function `calibrate_science_image` to the test image, using your noise distribution, and display the result using `show_image`.
+"""
+
+# ╔═╡ aa3b3363-c6a3-43a6-a424-d304c765279b
+# The calibrated image
+# show_image(...)
+
+# ╔═╡ 1d13028d-acde-487c-9e97-0efed665849f
+begin
+	
+	function calibrate_science_image(image::Matrix, noise::Distribution)
+		# Let's keep it simple for now :)
+		calibrate_science_image(image, mean(noise))
+	end
+
+	"""
+	```julia
+	calibrate_science_image(image::Matrix, noise::Distribution)::Matrix
+	```
+
+	Remove background noise from `image`, using the provided model for `noise`.
+	"""
+	function calibrate_science_image(image::Matrix, noise::Real)
+		T = eltype(image)
+		max.(zero(T), image .- round(T, noise))
+	end
+
+end
+
+# ╔═╡ 11d91dd8-c187-4dec-a167-da7ed1254716
+md"""
+# Part 2: Observation
+
+
+Now that we can calibrate the thermal noise of our image, we can properly analyse our science image. 
+
+TODO explain how and why we are now switching to a scatter.
+"""
+
+# ╔═╡ 800bafda-091a-4d10-841a-d3e7ac9fe777
+function bins_to_observations(image::AbstractArray{<:Integer})::Vector
+	Iterators.flatmap(pairs(IndexCartesian(), image)) do (coord, val)
+		fill([Tuple(coord)...], val)
+	end |> collect
+end
+
+# ╔═╡ 7ccc2ee1-28c5-4013-9e46-b28f0c7f44ab
+
 
 # ╔═╡ 0434352d-c7bc-4976-9124-54d541825a84
 bin_positions = -6:.2:6
@@ -107,7 +247,7 @@ yooo(z) = pdf(Normal(0, 1), z)
 end
 
 # ╔═╡ 9cb93465-4d29-4d93-ae75-339a7de63cec
-peak_data = data(; time=50, gain=0)
+peak_data = data(; time=50, gain=10)
 
 # ╔═╡ 0930329b-cdcf-4b69-89bf-a6f68eaeb4fd
 peak_data
@@ -164,12 +304,27 @@ img_data = map(Iterators.product(1:30, 1:40)) do (y,x)
 	# val
 end;
 
+# ╔═╡ ecbe959f-9db8-4089-932b-ab938b7767aa
+calibrated_image = calibrate_science_image(img_data, Poisson(10))
+
+# ╔═╡ 164b2a68-05b2-4e14-b239-c0a139c90bf2
+obs = bins_to_observations(calibrated_image)
+
+# ╔═╡ 289132ad-b138-4690-99d4-6849b259bba6
+scatter(obs)
+
+# ╔═╡ 69ac3c11-dbe1-4525-b672-856d84f8507f
+bins_to_observations(img_data) #|> scatter
+
 # ╔═╡ 259ee98e-e6fc-4885-869e-4bc1a12fd571
 noise_data = map(Iterators.product(1:30, 1:40)) do (y,x)
 	val = pdf(MvNormal(secret_star_position, secret_star_σ), [x,y])
 	rand(Poisson(secret_ccd_gain + 0*val))
 	# val
 end;
+
+# ╔═╡ d5805d09-a4e9-426f-8fd5-ff3a1e98112e
+dark_frame_values = vec(noise_data)
 
 # ╔═╡ 5b58173b-a82b-4aa7-b8f3-28942f4683ac
 sum(img_data)
@@ -185,6 +340,16 @@ function show_image(data::AbstractMatrix{<:Real})
 		c=:thermal,
 	)
 end
+
+# ╔═╡ 95f8457e-14c6-4a0d-b6b0-610f1515bbb2
+TwoColumn(
+	plot!(show_image(noise_data); title="Dark frame"),
+	plot!(show_image(img_data); title="Science frame"),
+)
+
+# ╔═╡ 9136a513-83a2-424b-b990-92b1324bf118
+# The original
+show_image(img_data)
 
 # ╔═╡ b5aac936-0d8e-4f47-ad7d-ee9d124b6ca7
 show_image(noise_data)
@@ -263,10 +428,19 @@ end
 	log(mixed_pdf(x,y))
 end
 
+# ╔═╡ 0baf0eeb-6e17-4a70-94c7-c2f898ec5de7
+fit_distr = fit_mle(MvNormal, star_scatter)
+
 # ╔═╡ 4e9cd40a-555a-4bc2-a691-8ab32eecb3c6
 20000 + sum(eachcol(star_scatter)) do (x,y)
 	logpdf(fit_distr, [x,y])
 end
+
+# ╔═╡ dbda8e11-9630-431d-bbdf-63e13c9e3e99
+# ╠═╡ disabled = true
+#=╠═╡
+fit_distr = MvNormal(mean(eachcol(star_scatter)), scatter_cov)
+  ╠═╡ =#
 
 # ╔═╡ cbc55973-a9d1-4b02-b89a-a4c8ba3b017a
 # @model function simple_gmm(Y, mixing)
@@ -302,27 +476,18 @@ melkwegstelsel met verschillende hoeken tov aarde. Fit normal en je krijgt versc
 
 """
 
-# ╔═╡ 0baf0eeb-6e17-4a70-94c7-c2f898ec5de7
-fit_distr = fit_mle(MvNormal, star_scatter)
-
-# ╔═╡ dbda8e11-9630-431d-bbdf-63e13c9e3e99
-# ╠═╡ disabled = true
-#=╠═╡
-fit_distr = MvNormal(mean(eachcol(star_scatter)), scatter_cov)
-  ╠═╡ =#
-
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 RxInfer = "86711068-29c9-4ff7-b620-ae75d7495b3d"
 
 [compat]
+BmlipTeachingTools = "~1.3.1"
 Distributions = "~0.25.120"
 Plots = "~1.41.1"
-PlutoUI = "~0.7.71"
 RxInfer = "~4.6.0"
 """
 
@@ -330,9 +495,9 @@ RxInfer = "~4.6.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.7"
+julia_version = "1.12.1"
 manifest_format = "2.0"
-project_hash = "c4c74a1115f177a372acdf7cd289b8fef55b407e"
+project_hash = "0aea3c1b8a814194ffea60fa19d414ee247059d9"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "27cecae79e5cc9935255f90c53bb831cc3c870d7"
@@ -469,6 +634,12 @@ version = "1.7.2"
     Adapt = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
     BandedMatrices = "aae01518-5342-5314-be14-df237901396f"
 
+[[deps.BmlipTeachingTools]]
+deps = ["HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoTeachingTools", "PlutoUI", "Reexport"]
+git-tree-sha1 = "806eadb642467b05f9d930f0d127f1e6fa5130f0"
+uuid = "656a7065-6f73-6c65-7465-6e646e617262"
+version = "1.3.1"
+
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "1b96ea4a01afe0ea4090c5c8039690672dd13f2e"
@@ -565,7 +736,7 @@ weakdeps = ["Dates", "LinearAlgebra"]
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "1.1.1+0"
+version = "1.3.0+1"
 
 [[deps.CompositeTypes]]
 git-tree-sha1 = "bce26c3dab336582805503bed209faab1c279768"
@@ -1085,6 +1256,11 @@ git-tree-sha1 = "4255f0032eafd6451d707a51d5f0248b8a165e4d"
 uuid = "aacddb02-875f-59d6-b918-886e6ef4fbf8"
 version = "3.1.3+0"
 
+[[deps.JuliaSyntaxHighlighting]]
+deps = ["StyledStrings"]
+uuid = "ac6e5ff7-fb65-4e79-a425-ec3bc9c03011"
+version = "1.12.0"
+
 [[deps.LAME_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "059aabebaa7c82ccb853dd4a0ee9d17796f7e1bc"
@@ -1156,24 +1332,24 @@ uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
 version = "0.6.4"
 
 [[deps.LibCURL_jll]]
-deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
+deps = ["Artifacts", "LibSSH2_jll", "Libdl", "OpenSSL_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "8.6.0+0"
+version = "8.11.1+1"
 
 [[deps.LibGit2]]
-deps = ["Base64", "LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
+deps = ["LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
 version = "1.11.0"
 
 [[deps.LibGit2_jll]]
-deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll"]
+deps = ["Artifacts", "LibSSH2_jll", "Libdl", "OpenSSL_jll"]
 uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
-version = "1.7.2+0"
+version = "1.9.0+0"
 
 [[deps.LibSSH2_jll]]
-deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
+deps = ["Artifacts", "Libdl", "OpenSSL_jll"]
 uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
-version = "1.11.0+1"
+version = "1.11.3+1"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
@@ -1224,7 +1400,7 @@ version = "7.4.0"
 [[deps.LinearAlgebra]]
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-version = "1.11.0"
+version = "1.12.0"
 
 [[deps.LogExpFunctions]]
 deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
@@ -1263,7 +1439,7 @@ uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 version = "0.5.16"
 
 [[deps.Markdown]]
-deps = ["Base64"]
+deps = ["Base64", "JuliaSyntaxHighlighting", "StyledStrings"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 version = "1.11.0"
 
@@ -1280,7 +1456,8 @@ uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
 version = "1.1.9"
 
 [[deps.MbedTLS_jll]]
-deps = ["Artifacts", "Libdl"]
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "926c6af3a037c68d02596a44c22ec3595f5f760b"
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
 version = "2.28.6+0"
 
@@ -1307,7 +1484,7 @@ version = "1.11.0"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
-version = "2023.12.12"
+version = "2025.5.20"
 
 [[deps.NLSolversBase]]
 deps = ["ADTypes", "DifferentiationInterface", "Distributed", "FiniteDiff", "ForwardDiff"]
@@ -1328,7 +1505,7 @@ version = "0.14.3"
 
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
-version = "1.2.0"
+version = "1.3.0"
 
 [[deps.Ogg_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1339,12 +1516,12 @@ version = "1.3.6+0"
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
-version = "0.3.27+1"
+version = "0.3.29+0"
 
 [[deps.OpenLibm_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
-version = "0.8.5+0"
+version = "0.8.7+0"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
@@ -1353,10 +1530,9 @@ uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
 version = "1.5.0"
 
 [[deps.OpenSSL_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "2ae7d4ddec2e13ad3bddf5c0796f7547cf682391"
+deps = ["Artifacts", "Libdl"]
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "3.5.2+0"
+version = "3.5.1+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl"]
@@ -1390,7 +1566,7 @@ version = "1.8.1"
 [[deps.PCRE2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
-version = "10.42.0+1"
+version = "10.44.0+1"
 
 [[deps.PDMats]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
@@ -1425,7 +1601,7 @@ version = "0.44.2+0"
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-version = "1.11.0"
+version = "1.12.0"
 weakdeps = ["REPL"]
 
     [deps.Pkg.extensions]
@@ -1463,11 +1639,17 @@ version = "1.41.1"
     ImageInTerminal = "d8c32880-2388-543b-8c61-d9f865259254"
     Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
+[[deps.PlutoTeachingTools]]
+deps = ["Downloads", "HypertextLiteral", "Latexify", "Markdown", "PlutoUI"]
+git-tree-sha1 = "dacc8be63916b078b592806acd13bb5e5137d7e9"
+uuid = "661c6b06-c737-4d37-b85c-46df65de6f69"
+version = "0.4.6"
+
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "8329a3a4f75e178c11c1ce2342778bcbbbfa7e3c"
+git-tree-sha1 = "f53232a27a8c1c836d3998ae1e17d898d4df2a46"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.71"
+version = "0.7.72"
 
 [[deps.PolyaGammaHybridSamplers]]
 deps = ["Distributions", "Random", "SpecialFunctions", "StatsFuns"]
@@ -1546,7 +1728,7 @@ version = "2.11.2"
     Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 
 [[deps.REPL]]
-deps = ["InteractiveUtils", "Markdown", "Sockets", "StyledStrings", "Unicode"]
+deps = ["InteractiveUtils", "JuliaSyntaxHighlighting", "Markdown", "Sockets", "StyledStrings", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 version = "1.11.0"
 
@@ -1698,7 +1880,7 @@ version = "1.2.2"
 [[deps.SparseArrays]]
 deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-version = "1.11.0"
+version = "1.12.0"
 
 [[deps.SpecialFunctions]]
 deps = ["IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
@@ -1790,7 +1972,7 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
-version = "7.7.0+0"
+version = "7.8.3+2"
 
 [[deps.TOML]]
 deps = ["Dates"]
@@ -2046,7 +2228,7 @@ version = "1.6.0+0"
 [[deps.Zlib_jll]]
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
-version = "1.2.13+1"
+version = "1.3.1+2"
 
 [[deps.Zstd_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -2081,7 +2263,7 @@ version = "0.17.4+0"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-version = "5.11.0+0"
+version = "5.15.0+0"
 
 [[deps.libdecor_jll]]
 deps = ["Artifacts", "Dbus_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pango_jll", "Wayland_jll", "xkbcommon_jll"]
@@ -2128,12 +2310,12 @@ version = "1.1.7+0"
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
-version = "1.59.0+0"
+version = "1.64.0+1"
 
 [[deps.p7zip_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
-version = "17.4.0+2"
+version = "17.5.0+2"
 
 [[deps.x264_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -2155,10 +2337,33 @@ version = "1.9.2+0"
 """
 
 # ╔═╡ Cell order:
-# ╠═6ed43a5c-99f9-11f0-08b4-85fddbb27a76
-# ╠═fe4324e8-4cb7-45e8-b520-37694d4f2f2d
-# ╠═73a97245-edd9-440a-90b7-e975c322639f
-# ╠═5852648b-02c7-47ec-b721-bb28e744b08f
+# ╟─c35889f4-162e-4dac-a0d2-652460048577
+# ╟─6b41e750-bff0-4fbd-bf3c-006dbcfb8892
+# ╟─012abee8-72f0-4c51-96df-f4d914f63c62
+# ╟─381924b0-73c3-45f9-8495-6a265723501b
+# ╟─a1928949-cf80-4185-beec-515f507d8252
+# ╟─a41f49a2-534e-4fa0-bfcd-4c31d52922ea
+# ╟─8c5b5de8-b3f7-480d-88c5-6bbcaf7fe184
+# ╟─cf7ece91-1835-4dca-a5bd-95562ed83cf8
+# ╟─3ca242d1-60fc-4061-a9f4-0d3c80a5de72
+# ╟─95f8457e-14c6-4a0d-b6b0-610f1515bbb2
+# ╟─aa061b82-1a05-4abc-ad9f-13b00214a58e
+# ╟─4c3d6b76-86a2-4c28-ac79-2c80df9cc120
+# ╠═d5805d09-a4e9-426f-8fd5-ff3a1e98112e
+# ╠═ca962b18-231d-4ed4-9f50-6111ed90476b
+# ╟─6b6ea464-b5fb-4e21-8272-a12759c720b8
+# ╠═2f7dc689-8874-48f8-a0c6-e0d54ea9e7ea
+# ╟─b850a730-74cc-4c6e-a6f1-0c2f6ce182d9
+# ╠═9136a513-83a2-424b-b990-92b1324bf118
+# ╠═aa3b3363-c6a3-43a6-a424-d304c765279b
+# ╟─1d13028d-acde-487c-9e97-0efed665849f
+# ╠═11d91dd8-c187-4dec-a167-da7ed1254716
+# ╠═ecbe959f-9db8-4089-932b-ab938b7767aa
+# ╠═164b2a68-05b2-4e14-b239-c0a139c90bf2
+# ╠═289132ad-b138-4690-99d4-6849b259bba6
+# ╠═69ac3c11-dbe1-4525-b672-856d84f8507f
+# ╠═800bafda-091a-4d10-841a-d3e7ac9fe777
+# ╠═7ccc2ee1-28c5-4013-9e46-b28f0c7f44ab
 # ╠═0434352d-c7bc-4976-9124-54d541825a84
 # ╠═9d3c2f56-a055-40f4-9fd6-766c4ad0ebcb
 # ╠═0e5177a5-ea39-46e9-8dd2-6f67f1c43a4e
@@ -2213,5 +2418,6 @@ version = "1.9.2+0"
 # ╠═472e7d91-7a52-431f-81f7-598b7eb9bda9
 # ╠═2d777e1a-65fd-4097-8561-fecbfb8b4966
 # ╠═67f4cf3f-9247-4c43-826d-c31dcace87d2
+# ╠═6ed43a5c-99f9-11f0-08b4-85fddbb27a76
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
