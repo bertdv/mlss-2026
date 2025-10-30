@@ -178,6 +178,8 @@ end
 
 # ╔═╡ 200b9df9-6cce-4642-8589-a82ff54edaf9
 md"""
+## Inference
+
 Now that we have our model, it is time to infer parameters.
 """
 
@@ -239,9 +241,6 @@ A company is trying to develop a measurement device that tells a patient whether
 The data set comes from the [UCI ML Repository](https://archive.ics.uci.edu/dataset/523/exasens). It contains measurements of 79 participants, split into 40 samples for training and 39 for testing. The columns in the data file marked _:x_ are biometric features (x1,x2 = measured signal, x3 = gender, x4 = age, x5 = smoking) and the final column marked _:y_ is the diagnosis (healthy control =0, COPD =1).
 """
 
-# ╔═╡ 6ee7dd8e-977a-4508-8f95-1732a00b4e50
-
-
 # ╔═╡ e6ca720a-53ee-48d6-b9bb-2c96ec16eeec
 md"""
 Let's explore our dataset. In the scatter plot below, you can pick two columns to plot against eachother.
@@ -251,69 +250,123 @@ Let's explore our dataset. In the scatter plot below, you can pick two columns t
 md"""
 ## Model specification
 
-We have features $X$, labels $Y$ and classifier weights $w$. Same as with regression, we are looking for a posterior distribution of the parameters:
+We have $D$-dimensional features $X^{D}$, labels $Y \in \{0,1\}$ and classifier weights $w \in \mathbb{R}^{D+1}$. Same as with regression, we are looking for a posterior distribution of the parameters:
 
 ```math
 \underbrace{p(w \mid Y, X)}_{\text{posterior}} \propto\ \underbrace{p(Y \mid X, w)}_{\text{likelihood}} \cdot \underbrace{p(w)}_{\text{prior}}
 ```
 
-The likelihood in this case will be of a probit form:
+### Likelihood
+
+For now, we shall restrict ourselves to linear classification, that is, $f_w(X) = w^{\top} \begin{bmatrix} X \\ 1 \end{bmatrix}$. The outcomes is a real-valued number but our labels are binary. One way to overcome this is to introduce a "Probit" likelihood: $f_w(X)$ is squashed between the interval $(0,1)$ with a transfer (a.k.a. _link_) function and that result is used as the rate parameter of a Bernoulli distribution,
 
 ```math 
-p(Y \mid X, w) = \prod_{i=1}^{N} \ \mathcal{B} \big(Y_i \mid \Phi(f_w(X_i) \big) \, .
+p(Y \mid X, w) = \prod_{i=1}^{N} \ \mathcal{B} \Big(Y_i \mid \Phi(w^{\top} \begin{bmatrix} X \\ 1 \end{bmatrix} \big) \Big) \, .
 ```
 
-As you can see it is a Bernoulli distribution with a cumulative normal distribution as transfer (a.k.a. _link_) function: 
+In a Probit likelihood function, the transfer (a.k.a. _link_) function is a cumulative normal distribution: 
 
 ```math
 \Phi(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{x} \exp \left(-\frac{t^2}{2} \right) \mathrm{d}t \, .
 ```
 
-The transfer function maps the input ($f_w(X_i)$) to the interval $(0,1)$ so that the result acts as a rate parameter to the Bernoulli. Check Bert's lecture on discriminative classification for more information.
+In RxInfer, there is a special type of distribution called `Probit()`, which can be used as a likelihood function.
 
-We will use a Gaussian prior distribution for the classification parameters $w$:
+"""
 
-```math 
-p(w) = \mathcal{N}(w \mid \mu_w, \Sigma_w) \, .
+# ╔═╡ 29a62393-f5ef-4ed4-91f2-185a88858343
+exercise_statement("Prior distribution", header_level=3)
+
+# ╔═╡ 76ba2291-a697-4bcb-a40a-94c521b972ca
+md"""
+What do you think would be a suitable prior distribution for the classifier weights?
+
+Hint: If you're unsure, note that the `Probit()` node expects real-valued numbers as inputs.
+"""
+
+# ╔═╡ 74a476e1-5356-4c92-bd04-519776818e7f
+### YOUR CODE HERE
+
+# ╔═╡ baeeb607-b4ba-40bb-9cfd-32160f06733a
+hide_solution(md"""
+```julia
+prior = MvNormalMeanCovariance(zeros(num_features+1), diageye(num_features+1))
 ```
+""")
 
-You have probably noticed that this combination of likelihood and prior is not part of the family of conjugate pairings. As such, we don't have an exact posterior. The Laplace approximation is one procedure but under the hood, our toolbox is actually performing a different procedure for obtaining the posterior parameters: [moment matching](https://en.wikipedia.org/wiki/Method_of_moments_(statistics)). The cumulative normal distribution allows for integrating the product of prior and likelihood by hand, with respect to the first (mean) and second (variance) moments. The toolbox is essentially performing a lookup for the analytically derived formula, which computationally cheaper than performing the iterative steps necessary for the Laplace approximation.
+# ╔═╡ 121259d9-595a-47a9-843e-4bcc96d9b37a
+exercise_statement("Linear classification", prefix="Model ", header_level=3)
+
+# ╔═╡ e9a02eca-4593-4a37-a16b-4abceee50799
+md"""
+Given the equations and hints above, can you specify a probabilistic model for inferring the weights of a linear classifier?
 """
 
 # ╔═╡ 3205a5d3-499d-48ae-aef5-41f8c06b2304
-@model function linear_classification(y,X, μ_w, Σ_w,N)
-	"Bayesian classification model"
+# ╠═╡ skip_as_script = true
+#=╠═╡
+### YOUR CODE HERE
+  ╠═╡ =#
 
-    
-    # Weight prior distribution
-    w ~ MvNormalMeanCovariance(μ_w, Σ_w)
-    
-    # Binary likelihood
-    for i = 1:N
-        y[i] ~ Probit(dot(w, X[i]))
-    end
+# ╔═╡ 6b1168ff-2f9d-48c8-a4d8-df580a1a2dac
+hide_solution(md"""
+@model function linear_classification(X,y,N)
+
+    w ~ MvNormalMeanCovariance(zeros(num_features+1), 
+							   diageye(num_features+1))
+
+	for i in 1:N
+		y[i] ~ Probit(dot(w, X[i]))
+	end	
 end
+""")
 
-# ╔═╡ fb115606-1429-47ed-968c-dd0434cb4e9b
-md"""
-Prior parameters:
-"""
+# ╔═╡ f833221b-d121-4338-a86e-c09587d98f85
+exercise_statement("Classifier weights", prefix="Inference ", header_level=3)
 
 # ╔═╡ 9419fc69-ab16-4019-8928-66db1370f3db
 md"""
-## Inference
-Prepare data:
+Can you specify an inference function for the model above? 
+
+Important note: inference with the Probit node iterative, so you need two extra arguments,
+
+```julia
+results_classifier = infer(
+
+	...
+	iterations = 10,
+	returnvars  = (w = KeepLast(),),
+)
+```
 """
 
-# ╔═╡ a01c2cae-f4d5-4b00-a3f2-b32b3be8869f
-md"""
-Now we can run inference:
-"""
+# ╔═╡ 5aae30a8-bed6-4338-bb8a-317c85cc278d
+# ╠═╡ skip_as_script = true
+#=╠═╡
+### YOUR CODE HERE
+  ╠═╡ =#
+
+# ╔═╡ c4cb41fe-e28d-4073-a0ac-cf023b57ca52
+hide_solution(md"""			  
+```julia			
+results_classifier = infer(
+			  model = linear_classification(N=num_train),
+			  data = (X = [[features_train[i,:]; 1.] for i in 1:num_train], 
+					  y = labels_train),
+			  iterations = 10,
+)
+```			  
+""")
 
 # ╔═╡ e372257b-cf0c-4175-b345-87238df78be3
 md"""
 ### Results
 Unfortunately, we cannot visualize a distribution of more than 2 dimensions. But we can visualize a pair of dimensions:
+"""
+
+# ╔═╡ 63c82fe9-5a64-4e06-8690-d70dd928ee1b
+md"""
+The following cell is disabled, you can enable it by pressing the circle with three dots on the top-right, after you've specified your model and inference function.
 """
 
 # ╔═╡ 8a8d8175-58cd-4d98-a367-8f5dc66b5a99
@@ -323,14 +376,9 @@ md"""
 The device should make accurate predictions for future patients. We can evaluate this with a test data set.
 """
 
-# ╔═╡ eb97f977-8217-41fa-a5ec-2991afcdec3c
-md"""
-Split dataframe into features and labels:
-"""
-
 # ╔═╡ e53a0a50-bbc6-4da2-95ff-ef1ce202b834
 md"""
-We can generate the most probable class labels by extracting the most probable classifier weights, calculating the dot product with the test feature vectors, and applying the Probit node's link function. This produces the class label probability and by rounding we get hard assignments to $0$ or $1$. This can be checked against the true test labels.
+We can generate the most probable class labels by extracting the most probable classifier weights, calculating the dot product with the test feature vectors, and applying the Probit node's link function. This produces the class label probability and by rounding we get hard assignments to $0$ or $1$. This can be checked against the true test labels to obtain an overall classification accuracy.
 """
 
 # ╔═╡ f828742d-c720-429f-b6e6-f9623bca6843
@@ -387,35 +435,6 @@ results_regression = infer(
 				   y = stock_val,),
 )
 
-# ╔═╡ 71fe6b04-a4e3-11f0-bd15-b54fe8fc3d4a
-begin
-	prior_θ = MvNormal(μ_θ, Σ_θ)
-	post_θ = results_regression.posteriors[:θ]
-
-	common_kwargs = (
-		;
-		fillalpha=0,
-		linecolor=:red,
-		linewidth=3,
-		xlim=(-.5,.5),
-		ylim=(-.5,.5),
-		n_std=[.15,.3,.6,1,2],
-	)
-	
-	p1a = covellipse_many(
-		prior_θ;
-		common_kwargs...,
-		xlabel="θ1", ylabel="θ2", title="prior",
-	)
-	p1b = covellipse_many(
-		post_θ;
-		common_kwargs...,
-		xlabel="θ1", title="posterior",
-	)
-	
-	plot(p1a, p1b, size=(700,300))
-end
-
 # ╔═╡ 9c179f46-afa1-4b73-880c-71e90eee1d3a
 begin
 	# Extract estimated weights
@@ -462,16 +481,22 @@ end
 # ╔═╡ 3e546e87-104f-47b3-b1a2-1b091a82ff52
 future = DataFrame(CSV.File(get_data_file("stock_futures.csv"))) |> fix_dates!
 
-# ╔═╡ f1223ccc-bac6-4764-9558-8effaea669d3
-num_all_samples = num_trn_samples + length(future[!,:date])
-
 # ╔═╡ fabc8341-1eb8-45c1-b667-d7d23a8d2646
-results_all = infer(
-	model       = linear_regression(μ_θ=μ_θ, Σ_θ=Σ_θ, σ2=σ2_y, N=num_all_samples),
-	data        = (X = [[(date - dates[1]).value,1.] for date in [dates...,future.date...]],
-				   y = [stock_val..., future[!,:ISE]...],), 
-	predictvars = (y = KeepLast(),),
-)
+begin
+	num_all_samples = num_trn_samples + length(future[!,:date])
+	all_X = [[(date - dates[1]).value,1.] for date in [dates...,future.date...]]
+	all_y = [stock_val..., future[!,:ISE]...]
+	
+	results_all = infer(
+		model       = linear_regression(μ_θ=μ_θ, 
+										Σ_θ=Σ_θ, 
+										σ2=σ2_y, 
+										N=num_all_samples),
+		data        = (X = all_X,
+					   y = all_y,), 
+		predictvars = (y = KeepLast(),),
+	)
+end
 
 # ╔═╡ cb44f1a3-2db3-425e-a850-9d970a1b3159
 begin
@@ -498,64 +523,40 @@ end
 train_data = DataFrame(CSV.File(get_data_file("diagnosis_train.csv")))
 
 # ╔═╡ 443714fd-ffc9-45f8-b88d-3eb67ebaca8b
-features_train = Matrix(train_data[:,1:5]);
-
-# ╔═╡ c05225cf-48a0-42cc-8fc1-a0958e8d7901
-num_features = size(features_train,2)
-
-# ╔═╡ 0ea2af28-c848-44e5-9344-7a3699d9ad6b
-μ_w = zeros(num_features+1);
-
-# ╔═╡ 04a5bb66-c7c2-4113-8cd0-6770dea8d6b0
-Σ_w = diagm(ones(num_features+1));
-
-# ╔═╡ 44ecdc4f-7040-4807-a90d-a8e42b96d2eb
-num_train = size(features_train,1)
-
-# ╔═╡ 2ef921f8-3d4c-48ed-a79d-1943678ce259
-X_input = [[features_train[i,:]; 1.0] for i in 1:num_train]
-
-# ╔═╡ bfdd724f-9746-4b2b-82a0-7181962a8a54
-labels_train = Vector(train_data[:,6]);
-
-# ╔═╡ 5aae30a8-bed6-4338-bb8a-317c85cc278d
-results_classifier = infer(
-	model       = linear_classification(μ_w=μ_w, Σ_w=Σ_w, N=num_train),
-	data        = (y = labels_train, X = X_input),
-	returnvars  = (w = KeepLast(),),
-	iterations  = 10,
-)
-
-# ╔═╡ 17b682cc-4457-45cc-b808-1fe854b41a21
-# Extract MAP estimate of classification parameters
-w_MAP = mode(results_classifier.posteriors[:w])
+begin
+	features_train = Matrix(train_data[:,1:5]);
+	num_train,num_features = size(features_train)
+	labels_train = Vector(train_data[:,6]);
+end
 
 # ╔═╡ 17bd4c14-d8a6-48c9-b71c-a762a7e8f20e
 test_data = DataFrame(CSV.File(get_data_file("diagnosis_test.csv")))
 
-# ╔═╡ d65c66ba-74b2-4d81-bbe5-b1fed6bd3f05
-num_test = size(test_data,1)
+# ╔═╡ 17b682cc-4457-45cc-b808-1fe854b41a21
+# ╠═╡ disabled = true
+#=╠═╡
+begin
 
-# ╔═╡ ddc7e1cf-d7aa-4438-bbb5-f3ddf83064dd
-features_test = Matrix(test_data[:,1:5]);
+	# Extract features and labels from dataset
+	features_test = Matrix(test_data[:,1:5]);
+	labels_test = Vector(test_data[:,6]);
+	num_test = size(test_data,1)
+	
+	# Extract MAP estimate of classification parameters
+	w_MAP = mode(results_classifier.posteriors[:w])
 
-# ╔═╡ cecad45c-e08e-48bf-b906-81385dfaaaad
-# Compute dot product between parameters and test data
-fw_pred = [features_test ones(num_test,)] * w_MAP
+	# Compute dot product between parameters and test data
+	fw_pred = [features_test ones(num_test,)] * w_MAP
+	
+	# Predict labels through probit
+	labels_pred = round.(normcdf.(fw_pred))
 
-# ╔═╡ d7554360-518b-4499-b591-8384c47fc50b
-# Predict labels through probit
-labels_pred = round.(normcdf.(fw_pred))
-
-# ╔═╡ 687b3067-26cd-43f8-b1c7-3fc6c53df844
-labels_test = Vector(test_data[:,6]);
-
-# ╔═╡ 90fcfbf0-930b-4040-8e7b-870b9f9098b2
-let
 	# Compute classification accuracy of test data
 	accuracy_test = mean(labels_test .== labels_pred)
 	@info("Test Accuracy = $(round(accuracy_test*100; digits=1))%")
+	
 end
+  ╠═╡ =#
 
 # ╔═╡ f2af9458-2cd3-4c23-aeca-2feae3ada506
 function features_picker()
@@ -582,27 +583,75 @@ end
 # ╔═╡ 3a133aa1-c260-4ce9-9824-e956ee44b5b6
 @bind features_viz_2 features_picker()
 
+# ╔═╡ 71fe6b04-a4e3-11f0-bd15-b54fe8fc3d4a
+#=╠═╡
+begin
+	prior_θ = MvNormal(μ_θ, Σ_θ)
+	post_θ = results_regression.posteriors[:θ]
+
+	common_kwargs = (
+		;
+		fillalpha=0,
+		linecolor=:red,
+		linewidth=3,
+		xlim=(-.5,.5),
+		ylim=(-.5,.5),
+		n_std=[.15,.3,.6,1,2],
+	)
+	
+	p1a = covellipse_many(
+		prior_θ;
+		common_kwargs...,
+		xlabel="θ1", ylabel="θ2", title="prior",
+	)
+	p1b = covellipse_many(
+		post_θ;
+		common_kwargs...,
+		xlabel="θ1", title="posterior",
+	)
+	
+	plot(p1a, p1b, size=(700,300))
+end
+  ╠═╡ =#
+
 # ╔═╡ 7c35254e-a7de-4d4b-b114-d4ba372ed9ad
-let
+# ╠═╡ disabled = true
+# ╠═╡ skip_as_script = true
+#=╠═╡
+begin
 	cix = collect(features_viz_2)
 
-	# Reduce posterior distribution to chosen dimensions
+	m_cix = mean(prior)[cix]
+	S_cix = cov(prior)[cix,cix]
+	prior_cix = MvNormal(m_cix, S_cix)
+	
 	m_cix = mean(results_classifier.posteriors[:w])[cix]
 	S_cix = cov( results_classifier.posteriors[:w])[cix,cix]
-	post_w = MvNormal(m_cix, S_cix)
+	post_cix = MvNormal(m_cix, S_cix)
+
+	common_kwargs = (;
+		fillalpha=0,
+		linecolor=:red,
+		linewidth=3,
+		xlim=(-.5,.5),
+		ylim=(-.5,.5),
+		n_std=[.15,.3,.6,1,2],
+	)
 	
-	# Reduce prior distribution to chosen dimensions
-	prior_w = MvNormal(μ_w[cix], Σ_w[cix,cix])
-	
-	# # Define ranges for plot
-	w1 = range(-1., length=500, stop=1.)
-	w2 = range(-1., length=500, stop=1.)
-	
-	# Draw contour plots of distributions
-	p2a = contour(w1, w2, (w1,w2) -> pdf(prior_w, [w1,w2]), levels=3, xlabel="w₁", ylabel="w₂", title="prior", label="")
-	p2b = contour(w1, w2, (w1,w2) -> pdf(post_w, [w1,w2]), levels=3, xlabel="w₁", title="posterior", label="")
-	plot(p2a, p2b, size=(900,300))
+	p2a = covellipse_many(prior_cix,
+					xlabel="feature $(cix[1])",
+					ylabel="feature $(cix[2])",
+					title="Prior",
+					common_kwargs...)
+
+	p2b = covellipse_many(post_cix,
+				    xlabel="feature $(cix[1])",
+				    title="Posterior",
+					common_kwargs...)
+
+	plot(p2a,p2b, layout=(1,2), size=(600,400))
 end
+  ╠═╡ =#
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -2773,7 +2822,7 @@ version = "1.9.2+0"
 # ╠═cb6bd145-95c0-4e95-bdab-c178c50a1a3d
 # ╟─200b9df9-6cce-4642-8589-a82ff54edaf9
 # ╠═f1a96db1-7ca3-4e88-8a6f-626b84242a58
-# ╟─71fe6b04-a4e3-11f0-bd15-b54fe8fc3d4a
+# ╠═71fe6b04-a4e3-11f0-bd15-b54fe8fc3d4a
 # ╟─9ee9299e-0c7c-4ec8-87fa-4300c2ac3922
 # ╟─88603703-1b2f-435e-9d71-91481a22cb4d
 # ╠═9c179f46-afa1-4b73-880c-71e90eee1d3a
@@ -2782,7 +2831,6 @@ version = "1.9.2+0"
 # ╟─e5b0d928-a45f-4607-8312-84540c2149a2
 # ╟─014eab47-f662-4090-b37f-93d2366d1f4d
 # ╠═3e546e87-104f-47b3-b1a2-1b091a82ff52
-# ╠═f1223ccc-bac6-4764-9558-8effaea669d3
 # ╠═fabc8341-1eb8-45c1-b667-d7d23a8d2646
 # ╟─cb44f1a3-2db3-425e-a850-9d970a1b3159
 # ╟─d9f1da54-e069-4b1b-ad79-d9a2002e62ff
@@ -2790,36 +2838,30 @@ version = "1.9.2+0"
 # ╟─6ac40f48-7be3-47dd-94f5-39a833e60bcd
 # ╠═e4b87ddb-bc6f-4d04-870b-108dcf9be1df
 # ╠═443714fd-ffc9-45f8-b88d-3eb67ebaca8b
-# ╠═bfdd724f-9746-4b2b-82a0-7181962a8a54
-# ╠═c05225cf-48a0-42cc-8fc1-a0958e8d7901
-# ╠═44ecdc4f-7040-4807-a90d-a8e42b96d2eb
-# ╟─6ee7dd8e-977a-4508-8f95-1732a00b4e50
 # ╟─e6ca720a-53ee-48d6-b9bb-2c96ec16eeec
 # ╟─88b853fb-516e-43cb-83d8-2c4b466c0796
 # ╟─1850b926-fe9b-4877-b8b3-a2b83c9ed446
 # ╟─6b5f25e5-0dd7-4519-a758-9127e87062c6
+# ╟─29a62393-f5ef-4ed4-91f2-185a88858343
+# ╟─76ba2291-a697-4bcb-a40a-94c521b972ca
+# ╠═74a476e1-5356-4c92-bd04-519776818e7f
+# ╟─baeeb607-b4ba-40bb-9cfd-32160f06733a
+# ╟─121259d9-595a-47a9-843e-4bcc96d9b37a
+# ╟─e9a02eca-4593-4a37-a16b-4abceee50799
 # ╠═3205a5d3-499d-48ae-aef5-41f8c06b2304
-# ╟─fb115606-1429-47ed-968c-dd0434cb4e9b
-# ╠═0ea2af28-c848-44e5-9344-7a3699d9ad6b
-# ╠═04a5bb66-c7c2-4113-8cd0-6770dea8d6b0
+# ╟─6b1168ff-2f9d-48c8-a4d8-df580a1a2dac
+# ╟─f833221b-d121-4338-a86e-c09587d98f85
 # ╟─9419fc69-ab16-4019-8928-66db1370f3db
-# ╠═2ef921f8-3d4c-48ed-a79d-1943678ce259
-# ╟─a01c2cae-f4d5-4b00-a3f2-b32b3be8869f
 # ╠═5aae30a8-bed6-4338-bb8a-317c85cc278d
+# ╟─c4cb41fe-e28d-4073-a0ac-cf023b57ca52
 # ╟─e372257b-cf0c-4175-b345-87238df78be3
 # ╟─3a133aa1-c260-4ce9-9824-e956ee44b5b6
-# ╟─7c35254e-a7de-4d4b-b114-d4ba372ed9ad
+# ╟─63c82fe9-5a64-4e06-8690-d70dd928ee1b
+# ╠═7c35254e-a7de-4d4b-b114-d4ba372ed9ad
 # ╟─8a8d8175-58cd-4d98-a367-8f5dc66b5a99
 # ╠═17bd4c14-d8a6-48c9-b71c-a762a7e8f20e
-# ╠═d65c66ba-74b2-4d81-bbe5-b1fed6bd3f05
-# ╟─eb97f977-8217-41fa-a5ec-2991afcdec3c
-# ╠═ddc7e1cf-d7aa-4438-bbb5-f3ddf83064dd
-# ╠═687b3067-26cd-43f8-b1c7-3fc6c53df844
 # ╟─e53a0a50-bbc6-4da2-95ff-ef1ce202b834
 # ╠═17b682cc-4457-45cc-b808-1fe854b41a21
-# ╠═cecad45c-e08e-48bf-b906-81385dfaaaad
-# ╠═d7554360-518b-4499-b591-8384c47fc50b
-# ╠═90fcfbf0-930b-4040-8e7b-870b9f9098b2
 # ╟─f828742d-c720-429f-b6e6-f9623bca6843
 # ╠═e189ac0c-f443-4f0f-9d57-ad24e7f82e79
 # ╟─e4bc30be-138a-425b-a501-7fb53ed4aa72
