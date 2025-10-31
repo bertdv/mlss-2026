@@ -338,6 +338,7 @@ results_classifier = infer(
 	returnvars  = (w = KeepLast(),),
 )
 ```
+These arguments will be explained in [Probabilistic Programming 3](https://bmlip.github.io/course/probprog/PP3%20-%20variational%20Bayesian%20inference.html).
 """
 
 # ╔═╡ 5aae30a8-bed6-4338-bb8a-317c85cc278d
@@ -369,6 +370,45 @@ md"""
 The following cell is disabled, you can enable it by pressing the circle with three dots on the top-right, after you've specified your model and inference function.
 """
 
+# ╔═╡ 7c35254e-a7de-4d4b-b114-d4ba372ed9ad
+# ╠═╡ disabled = true
+# ╠═╡ skip_as_script = true
+#=╠═╡
+begin
+	cix = collect(features_viz_2)
+
+	m_cix = mean(prior)[cix]
+	S_cix = cov(prior)[cix,cix]
+	prior_cix = MvNormal(m_cix, S_cix)
+	
+	m_cix = mean(results_classifier.posteriors[:w])[cix]
+	S_cix = cov( results_classifier.posteriors[:w])[cix,cix]
+	post_cix = MvNormal(m_cix, S_cix)
+
+	common_kwargs = (;
+		fillalpha=0,
+		linecolor=:red,
+		linewidth=3,
+		xlim=(-.5,.5),
+		ylim=(-.5,.5),
+		n_std=[.15,.3,.6,1,2],
+	)
+	
+	p2a = covellipse_many(prior_cix,
+					xlabel="feature $(cix[1])",
+					ylabel="feature $(cix[2])",
+					title="Prior",
+					common_kwargs...)
+
+	p2b = covellipse_many(post_cix,
+				    xlabel="feature $(cix[1])",
+				    title="Posterior",
+					common_kwargs...)
+
+	plot(p2a,p2b, layout=(1,2), size=(600,400))
+end
+  ╠═╡ =#
+
 # ╔═╡ 8a8d8175-58cd-4d98-a367-8f5dc66b5a99
 md"""
 ## Classify
@@ -380,6 +420,32 @@ The device should make accurate predictions for future patients. We can evaluate
 md"""
 We can generate the most probable class labels by extracting the most probable classifier weights, calculating the dot product with the test feature vectors, and applying the Probit node's link function. This produces the class label probability and by rounding we get hard assignments to $0$ or $1$. This can be checked against the true test labels to obtain an overall classification accuracy.
 """
+
+# ╔═╡ 17b682cc-4457-45cc-b808-1fe854b41a21
+# ╠═╡ disabled = true
+#=╠═╡
+begin
+
+	# Extract features and labels from dataset
+	features_test = Matrix(test_data[:,1:5]);
+	labels_test = Vector(test_data[:,6]);
+	num_test = size(test_data,1)
+	
+	# Extract MAP estimate of classification parameters
+	w_MAP = mode(results_classifier.posteriors[:w])
+
+	# Compute dot product between parameters and test data
+	fw_pred = [features_test ones(num_test,)] * w_MAP
+	
+	# Predict labels through probit
+	labels_pred = round.(normcdf.(fw_pred))
+
+	# Compute classification accuracy of test data
+	accuracy_test = mean(labels_test .== labels_pred)
+	@info("Test Accuracy = $(round(accuracy_test*100; digits=1))%")
+	
+end
+  ╠═╡ =#
 
 # ╔═╡ f828742d-c720-429f-b6e6-f9623bca6843
 md"""
@@ -434,6 +500,35 @@ results_regression = infer(
     data        = (X = [[(date - dates[1]).value, 1.0] for date in dates],
 				   y = stock_val,),
 )
+
+# ╔═╡ 71fe6b04-a4e3-11f0-bd15-b54fe8fc3d4a
+begin
+	prior_θ = MvNormal(μ_θ, Σ_θ)
+	post_θ = results_regression.posteriors[:θ]
+
+	common_kwargs = (
+		;
+		fillalpha=0,
+		linecolor=:red,
+		linewidth=3,
+		xlim=(-.5,.5),
+		ylim=(-.5,.5),
+		n_std=[.15,.3,.6,1,2],
+	)
+	
+	p1a = covellipse_many(
+		prior_θ;
+		common_kwargs...,
+		xlabel="θ1", ylabel="θ2", title="prior",
+	)
+	p1b = covellipse_many(
+		post_θ;
+		common_kwargs...,
+		xlabel="θ1", title="posterior",
+	)
+	
+	plot(p1a, p1b, size=(700,300))
+end
 
 # ╔═╡ 9c179f46-afa1-4b73-880c-71e90eee1d3a
 begin
@@ -532,32 +627,6 @@ end
 # ╔═╡ 17bd4c14-d8a6-48c9-b71c-a762a7e8f20e
 test_data = DataFrame(CSV.File(get_data_file("diagnosis_test.csv")))
 
-# ╔═╡ 17b682cc-4457-45cc-b808-1fe854b41a21
-# ╠═╡ disabled = true
-#=╠═╡
-begin
-
-	# Extract features and labels from dataset
-	features_test = Matrix(test_data[:,1:5]);
-	labels_test = Vector(test_data[:,6]);
-	num_test = size(test_data,1)
-	
-	# Extract MAP estimate of classification parameters
-	w_MAP = mode(results_classifier.posteriors[:w])
-
-	# Compute dot product between parameters and test data
-	fw_pred = [features_test ones(num_test,)] * w_MAP
-	
-	# Predict labels through probit
-	labels_pred = round.(normcdf.(fw_pred))
-
-	# Compute classification accuracy of test data
-	accuracy_test = mean(labels_test .== labels_pred)
-	@info("Test Accuracy = $(round(accuracy_test*100; digits=1))%")
-	
-end
-  ╠═╡ =#
-
 # ╔═╡ f2af9458-2cd3-4c23-aeca-2feae3ada506
 function features_picker()
 	s(i) = Slider(1:5; show_value=true, default=i)
@@ -582,76 +651,6 @@ end
 
 # ╔═╡ 3a133aa1-c260-4ce9-9824-e956ee44b5b6
 @bind features_viz_2 features_picker()
-
-# ╔═╡ 71fe6b04-a4e3-11f0-bd15-b54fe8fc3d4a
-#=╠═╡
-begin
-	prior_θ = MvNormal(μ_θ, Σ_θ)
-	post_θ = results_regression.posteriors[:θ]
-
-	common_kwargs = (
-		;
-		fillalpha=0,
-		linecolor=:red,
-		linewidth=3,
-		xlim=(-.5,.5),
-		ylim=(-.5,.5),
-		n_std=[.15,.3,.6,1,2],
-	)
-	
-	p1a = covellipse_many(
-		prior_θ;
-		common_kwargs...,
-		xlabel="θ1", ylabel="θ2", title="prior",
-	)
-	p1b = covellipse_many(
-		post_θ;
-		common_kwargs...,
-		xlabel="θ1", title="posterior",
-	)
-	
-	plot(p1a, p1b, size=(700,300))
-end
-  ╠═╡ =#
-
-# ╔═╡ 7c35254e-a7de-4d4b-b114-d4ba372ed9ad
-# ╠═╡ disabled = true
-# ╠═╡ skip_as_script = true
-#=╠═╡
-begin
-	cix = collect(features_viz_2)
-
-	m_cix = mean(prior)[cix]
-	S_cix = cov(prior)[cix,cix]
-	prior_cix = MvNormal(m_cix, S_cix)
-	
-	m_cix = mean(results_classifier.posteriors[:w])[cix]
-	S_cix = cov( results_classifier.posteriors[:w])[cix,cix]
-	post_cix = MvNormal(m_cix, S_cix)
-
-	common_kwargs = (;
-		fillalpha=0,
-		linecolor=:red,
-		linewidth=3,
-		xlim=(-.5,.5),
-		ylim=(-.5,.5),
-		n_std=[.15,.3,.6,1,2],
-	)
-	
-	p2a = covellipse_many(prior_cix,
-					xlabel="feature $(cix[1])",
-					ylabel="feature $(cix[2])",
-					title="Prior",
-					common_kwargs...)
-
-	p2b = covellipse_many(post_cix,
-				    xlabel="feature $(cix[1])",
-				    title="Posterior",
-					common_kwargs...)
-
-	plot(p2a,p2b, layout=(1,2), size=(600,400))
-end
-  ╠═╡ =#
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
