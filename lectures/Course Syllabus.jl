@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.19
+# v0.20.20
 
 #> [frontmatter]
 #> description = "Course Syllabus"
@@ -56,12 +56,9 @@ Please bookmark the following three websites:
 
 1. The course homepage [http://bmlip.nl](http://bmlip.nl) contains links to all materials, such as lecture notes and video lectures.
 2. The [Piazza course site](https://piazza.com/tue.nl/winter2026/5ssd0/home) will be used for Q&A and communication.
-3. The [Canvas course site](https://canvas.tue.nl/courses/30024) will be sparingly used for communication (mostly by ESA staff)
+3. The [Canvas course site](https://canvas.tue.nl/courses/33478) will be sparingly used for communication (mostly by ESA staff)
 
 """
-
-# ╔═╡ 6076dc43-797f-406a-83d3-ba4507c5dd55
-TODO("Piazza and Canvas links")
 
 # ╔═╡ 0d015ab4-d294-11ef-2e53-5339062c435c
 md"""
@@ -139,6 +136,18 @@ Piazza also supports **LaTeX**, please use it for math. And don’t forget to tr
 # ╔═╡ 74dedaac-0a3e-4b83-a081-d76cdb301d56
 keyconcept("",
 md""" Piazza is a great resource for continuing discussion outside the classroom, where you can both ask and answer questions.""")
+
+# ╔═╡ 8317254e-249d-49c8-acfb-1725c6349df8
+md"""
+## Pluto
+
+All lectures were developed in executable [Julia](https://julialang.org/) code. Julia is an open-source programming language with a MATLAB-like syntax and performance comparable to C.
+
+We created interactive course notebooks using [Pluto](https://plutojl.org/), which allows students to modify simulation conditions and immediately observe the results.
+
+We look forward to receiving your feedback on your experiences with Pluto as an educational tool for playing with interactive learning materials.
+
+"""
 
 # ╔═╡ 0d018ee2-d294-11ef-3b3d-e34d0532a953
 md"""
@@ -567,13 +576,13 @@ version = "17.5.0+2"
 # ╟─0cffef7e-d294-11ef-3dd5-1fd862260b70
 # ╟─0d013750-d294-11ef-333c-d9eb7578fab2
 # ╟─0d0142b6-d294-11ef-0297-e5bb923ad942
-# ╠═6076dc43-797f-406a-83d3-ba4507c5dd55
 # ╟─0d015ab4-d294-11ef-2e53-5339062c435c
 # ╟─ab61d2fe-312c-4aca-9029-e446aaf2bfa2
 # ╟─0d016cf8-d294-11ef-0c84-336979a02dd7
 # ╟─646b8c08-bcd8-4c20-973a-b03583a7d472
 # ╟─0d017b82-d294-11ef-2d11-df36557202c9
 # ╟─74dedaac-0a3e-4b83-a081-d76cdb301d56
+# ╟─8317254e-249d-49c8-acfb-1725c6349df8
 # ╟─0d018ee2-d294-11ef-3b3d-e34d0532a953
 # ╟─31f8669b-b547-4a11-acc6-64e02e6e9dc0
 # ╟─f46ccac8-e87c-4cbe-9d2c-fdb4723c639e

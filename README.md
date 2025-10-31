@@ -1,8 +1,10 @@
 # 5SSD0 Course Homepage, *2025-2026 edition*
 ### Bayesian Machine Learning and Information Processing (at [TU Eindhoven](https://www.tue.nl/en/))
 
+<!---
 > [!WARNING]
 > This site is currently under construction. This is the class for 12 Nov 2025 - 29 Jan 2026 (2nd quarter).
+--->
 
 <img src="https://github.com/bmlip/course/blob/main/assets/figures/5SSD0-banner.png?raw=true">
 
@@ -10,15 +12,15 @@
 This course provides an introduction to Bayesian machine learning and information processing systems. The Bayesian approach affords a unified and consistent treatment of many useful information processing systems.
 
 ### Course summary
-This course covers the fundamentals of a Bayesian (i.e., probabilistic) approach to machine learning and information processing systems. The Bayesian approach allows for a unified and consistent treatment of many model-based machine learning techniques. 
+This course covers the fundamentals of a Bayesian (i.e., probabilistic) approach to machine learning and information processing systems. The Bayesian approach provides a unified, consistent framework for many model-based machine learning techniques. 
 
-Initially, we focus on Linear Gaussian systems and will discuss many useful models and applications, including common regression and classification methods, Gaussian mixture models, hidden Markov models and Kalman filters. We will discuss important algorithms for parameter estimation in these models including the _Variational Bayes_ method. 
+Initially, we focus on Linear Gaussian systems and will discuss many useful models and applications, including common regression and classification methods, Gaussian mixture models, hidden Markov models, and Kalman filters. We will discuss essential algorithms for parameter estimation in these models, including the _Variational Bayes_ method. 
 
 The Bayesian method also provides tools for comparing the _performance_ of different information processing systems by means of estimating the _Bayesian evidence_ for each model. We will discuss several methods for approximating Bayesian evidence. 
 
-Next, we will discuss intelligent _agents_ that learn purposeful behavior from interactions with their environment. These agents are used for applications such as self-driving cars or interactive design of virtual and augmented realities. 
+Next, we will discuss intelligent _agents_ that learn purposeful behavior through interactions with their environment. These agents are used in applications such as self-driving cars and the interactive design of virtual and augmented realities. 
 
-Indeed, in this course we relate synthetic Bayesian intelligent agents to natural intelligent agents such as the brain. You will be challenged to code Bayesian machine learning algorithms yourself and apply them to practical information processing problems.
+Indeed, in this course, we relate synthetic Bayesian intelligent agents to natural intelligent agents such as the brain. You will be challenged to code Bayesian machine learning algorithms yourself and apply them to practical information processing problems.
 
 
 
@@ -26,10 +28,11 @@ Indeed, in this course we relate synthetic Bayesian intelligent agents to natura
 News and Announcements
 </h2>
 
-- See Piazza
 <!---
-- (13-Nov-2024) Please sign up for Piazza (Q&A platform) at [signup link](https://piazza.com/tue.nl/winter2025/5ssd0). As much as possible we will use the Piazza site for new announcements as well.
+- See Piazza
 --->
+- (12-Nov-2025) Please sign up for Piazza (Q&A platform) at [signup link](https://piazza.com/tue.nl/winter2026/5ssd0). As much as possible, we will use the Piazza site for new announcements as well.
+
 
 ## Instructors
 
@@ -63,7 +66,7 @@ Bishop](http://research.microsoft.com/en-us/um/people/cmbishop/index.htm) (2006)
 
 ### Software
 
-Please follow the [software installation instructions](https://github.com/bmlip/course/blob/main/Software%20installation.md). If you encounter any problems, please contact us in class or on Piazza.
+Please follow the [software installation instructions](https://github.com/bmlip/course/blob/main/Software%20installation.md). If you encounter any problems, please get in touch with us in class or on Piazza.
 
 
 ### <a name="lectures">Lecture notes, assignments and video recordings</a>
@@ -235,7 +238,7 @@ You can access all lecture materials online through the links below:
          <tr>
             <td>14-Jan-2026 <em>(Wed)</em></td>
             <td>⚪️ B12: Intelligent Agents and Active Inference</td>
-            <td><a href="https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html">B12,</a><br/> <a href="https://github.com/bmlip/course/blob/main/assets/files/BdV-Jan2024-Natural-Artificial-Intelligence.ppsx">slides</a> </td>
+            <td><a href="https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html">B12,</a><br/> <a href="https://github.com/bmlip/course/blob/main/lectures/bdv-Nov2025-AIF-lecture.ppsx">slides</a> </td>
             <td></td>
             <td><a href="https://youtu.be/fBm1oAzlv0w">B12.1</a>,  <a href="https://youtu.be/UbOuLxv9EdI">B12.2</a> </td>
          </tr>
