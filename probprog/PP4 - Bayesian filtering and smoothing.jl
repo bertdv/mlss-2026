@@ -38,7 +38,7 @@ md"""
 
 #### Goal 
   - Learn how to setup problems for dynamical systems.
-  - Learn how to infer states and noise in linear Gaussian state-space model using variational inference.
+  - Learn how to infer states and noise in linear Gaussian state-space model.
 
 #### Materials        
   - Mandatory
@@ -84,12 +84,15 @@ where the measurement noise is white as well: ``r_k \sim \mathcal{N}(0, \sigma^2
 
 # ╔═╡ 1385c3bd-de01-4096-810e-9f374577ff4c
 md"""
-## Model specification
+## Model specification 1
 
 Following the steps from the [lecture on Dynamic Systems](https://bmlip.github.io/course/lectures/Dynamic%20Models.html), we can derive the following probabilistic state-space model:
 
 ```math
-p(z_k \mid z_{k-1}) = \mathcal{N}(z_k \mid A z_{k-1}, Q)\\ p(y_k \mid z_k) = \mathcal{N}(y_k \mid C z_k, \sigma^2) \, .
+\begin{align}
+p(z_k \mid z_{k-1}) &= \mathcal{N}(z_k \mid A z_{k-1}, Q) \\ 
+p(y_k \mid z_k) &= \mathcal{N}(y_k \mid C z_k, \sigma^2) \, .
+\end{align}
 ```
 
 For now, we will use a simple structure for the process noise covariance matrix, e.g. ``Q = I``. If we consider a Gaussian prior distribution for the initial state
@@ -106,14 +109,6 @@ we obtain a complete generative model:
 
 To define this model in RxInfer, we must start with the process matrices:
 """
-
-# ╔═╡ e35328ea-3b2c-4fc0-8334-a24cdf00a66c
-# Emission matrix
-C = [1.0, 0.0]
-
-# ╔═╡ 160b8b9b-c526-455f-b27d-473221e75dfe
-# Set process noise covariance matrix
-Q = diagm(ones(2))
 
 # ╔═╡ 7a49292c-64ca-4690-8db1-55187ace724b
 md"""
@@ -142,25 +137,77 @@ Next, we define a linear Gaussian dynamical system with only the states as unkno
 	end
 end
 
+# ╔═╡ 48dd8ea5-56f1-4902-9129-765b283825e8
+md"""
+## Inference: states only
+
+We can do exact Bayesian inference in this model, so our `infer` function is pretty straightforward.
+"""
+
 # ╔═╡ 97bddd3e-cc71-4882-92a0-b790bb26297d
 md"Let's extract the inferred states and visualize them."
 
 # ╔═╡ 26a31bf7-91c6-45b0-982c-cb77e0845118
 md"""
 Mmmh... the inferred states are not smooth at all. This is most likely due to our process noise covariance matrix not being calibrated. So can we improve? 
+"""
 
+# ╔═╡ ac4953f7-e4b2-4654-b861-9499d38fbd8f
+exercise_statement("Forecasting", header_level=2)
 
-## Improved model
+# ╔═╡ 7426a6e8-a4cf-4fb4-8722-e2ec7db454ec
+md"""
+Can you make predictions for the building's position for the next few seconds?
+"""
+
+# ╔═╡ 6964c499-0557-44c1-9dd6-c8888b2429b6
+begin
+	num_preds_bond = @bindname num_predictions Slider(1:100; default=10, show_value=true)
+end
+
+# ╔═╡ 585c10ee-c6b9-4fb7-870c-cb43fc880a9a
+hint(NotebookCard("https://bmlip.github.io/course/probprog/PP2%20-%20Bayesian%20regression%20and%20classification.html"))
+
+# ╔═╡ 9e563b23-5e0e-4b0c-a39d-83b36c6f825b
+### YOUR CODE HERE
+
+# ╔═╡ d9b7e009-08c3-4335-8001-43c404fe948e
+hide_solution(md"""
+You have to provide `missing` observations to the model.
+```julia			  
+results_ = infer(
+	model		= LGDS(A=A,C=C,Q=Q, σ=σ, T=T+num_predictions),
+	data		= (y = [[observations[k] for k in 1:T];
+						repeat([missing],num_predictions)],),
+	predictvars = (y = KeepLast(),),
+)
+```
+""")
+
+# ╔═╡ 41a00097-be03-4756-b7ce-6756ed7db5a4
+md"""
+You can use the function below to visualize your inferred predictions. It expects the results structure. So if you named yours differently, make sure to change the argument below. 
+"""
+
+# ╔═╡ 667af543-c1e7-44dc-afab-06c729f4050e
+# viz_states_and_predictions(results)
+
+# ╔═╡ f5eb3574-3918-4c1d-b5fd-2f28e08dd45d
+num_preds_bond
+
+# ╔═╡ d856c7e0-4238-4e04-b07c-067bfa63ecf3
+md"""
+## Model specification 2
+
 Of course, as Bayesians, we can just treat ``Q`` as an unknown random variable and infer its posterior distribution. Adjusting the model is straightforward. The probabilistic state-space model becomes:
 
 ```math
-p(z_k \mid z_{k-1},Q) = \mathcal{N}(z_k \mid A z_{k-1}, Q) \qquad p(y_k \mid z_k) = \mathcal{N}(y_k \mid C z_k, \sigma^2) \, , 
-```
-
-with priors
-
-```math 
-p(Q) = \mathcal{W}^{-1}(\nu, \Lambda) \qquad p(z_0) = \mathcal{N}(m_0, S_0) \, .
+\begin{align}
+p(z_k \mid z_{k-1},Q) &= \mathcal{N}(z_k \mid A z_{k-1}, Q) \\
+p(y_k \mid z_k) &= \mathcal{N}(y_k \mid C z_k, \sigma^2) \\
+p(z_0) &= \mathcal{N}(m_0, S_0) \\
+p(Q) &= \mathcal{W}^{-1}(\nu, \Lambda) \, .
+\end{align}
 ```
 
 The ``\mathcal{W}^{-1}`` represents an inverse-Wishart distribution with degrees-of-freedom ``\nu`` and scale matrix ``\Lambda``. This will give the following generative model:
@@ -169,37 +216,46 @@ The ``\mathcal{W}^{-1}`` represents an inverse-Wishart distribution with degrees
 \underbrace{p(y_{1:T}, z_{0:T}, Q)}_{\text{generative model}} = \underbrace{p(z_0)p(Q)}_{\text{priors}} \, \prod_{k=1}^T \, \underbrace{p(y_k \mid z_k)}_{\text{likelihood}} \, \underbrace{p(z_k \mid z_{k-1},Q)}_{\text{state transition}}
 ```
 
-Our model definition in ReactiveMP is only slightly larger:
+Our model definition in RxInfer is only slightly larger:
 """
 
-# ╔═╡ ab2348cc-9e4b-4b08-9e46-35b4e7067d4a
-@model function LGDS_Q(y, A,C,σ,T)
-	"State estimation in a linear Gaussian dynamical system with unknown process noise"
-	
-	# Prior state
-	z_0 ~ MvNormalMeanCovariance(zeros(2), diageye(2))
-	
-	# Process noise covariance matrix
-	Q ~ InverseWishart(10, diageye(2))
-	
-	z_kmin1 = z_0
-	for k in 1:T
-		
-		# State transition
-		z[k] ~ MvNormalMeanCovariance(A * z_kmin1, Q)
-		
-		# Likelihood
-		y[k] ~ NormalMeanVariance(dot(C, z[k]), σ^2)
-		
-		# Update recursive aux
-		z_kmin1 = z[k]
-		
-	end
+# ╔═╡ cab789ef-c65a-49af-8b02-78ed784e3e4f
+md"""
+## Inference: states and noise covariance
+
+Now, we cannot infer the posterior distribution exactly anymore. We switch to variational inference, which means we have to specify constraints, initialization and a number of iterations.
+"""
+
+# ╔═╡ 0c621039-25ce-4976-b950-f9979c5e2fc5
+md"""
+### Constraints
+
+There are two unknowns in this model, the states $z_{0:T}$ and the process noise covariance matrix $Q$. We are going to impose a factorization constraint that the states and noise are independent of each other. But importantly, we do not impose a factorization constraint over states; we know the time-dependence of states is critical to making accurate predictions.
+
+In our model, we defined a vector of random variables `z` and a separate initial state `z_0`. These will be put together in a joint distribution, `q(z_0,z)`.
+"""
+
+# ╔═╡ 869f3ae5-3b4a-498f-b446-3053ecef830a
+constraints = @constraints begin
+	q(z_0,z,Q) = q(z_0, z)q(Q)
 end
 
-# ╔═╡ 7fd2d571-9fdc-4a51-b506-7a7835c4c8a9
+# ╔═╡ 5e25bb4e-b5d3-40b5-b9bf-17c332699d6b
 md"""
-The variational inference procedure for estimating states and the process noise covariance matrix simultaneously requires a bit more thought, but is still very straightforward:
+### Initialization
+
+We start the optimization procedure with a Gaussian distribution for each state and an Inverse-Wishart distribution for the process noise covariance matrix.
+"""
+
+# ╔═╡ 786375a5-b828-4e1a-b99c-d6e33d72727d
+init = @initialization begin
+	q(z) = MvNormalMeanCovariance(zeros(2), diageye(2))
+	q(Q) = InverseWishart(10, diageye(2))
+end
+
+# ╔═╡ 45c5136b-1bc2-4da6-bb53-c3a1554f494f
+md"""
+### Number of iterations
 """
 
 # ╔═╡ af0d783a-38f3-4e86-91ea-357d7ec513d4
@@ -207,36 +263,58 @@ begin
 	num_iters_bond = @bindname num_iters Slider(1:100; default=10, show_value=true)
 end
 
-# ╔═╡ 154a986d-1a57-4b74-a6dc-3e0bf1ad0f04
-# Initialize variational marginal distributions
-init = @initialization begin
-	q(z) = MvNormalMeanCovariance(zeros(2), diageye(2))
-	q(Q) = InverseWishart(10, diageye(2))
-end;
-
-# ╔═╡ 5a1ebc96-d2b4-4329-9bed-2ba5f7ec4fa6
-# Define variational distribution factorization
-constraints = @constraints begin
-	q(z_0,z,Q) = q(z_0, z)q(Q)
-end;
-
-# ╔═╡ f6d1fbe3-e21f-424b-8354-3429f943fac1
-md"Again, let's inspect the free energy to see if we have converged."
-
-# ╔═╡ ea5e2580-1b08-47ec-8372-455967b63df7
-md"Alright. That looks good. Let's extract the inferred states and visualize."
-
-# ╔═╡ f066fa05-6787-486a-b1ba-ec2b88563899
+# ╔═╡ 00c02bf2-a769-42a8-8be2-5da1931a80d7
 md"""
-That's much smoother. The free energy of this model ($\mathcal{F} = 357.08$) is smaller than that of the earlier model with $Q$ set to an identity matrix ($\mathcal{F} = 434.10$). That means that the added cost of inferring the matrix $Q$ is offset by the increase in performance it provides. 
+We now have everything we need. 
 
-The error with respect to the true states seems smaller as well, but in practice we of course can't check this.
-
-Let's inspect the inferred process noise covariance matrix:
+It could be that RxInfer complains about "stack depth". In that case, you can add the keyword argument `options		= (limit_stack_depth = 100,)`.
 """
 
-# ╔═╡ eab26918-1ce0-4617-9098-88435a2e7796
+# ╔═╡ f6d1fbe3-e21f-424b-8354-3429f943fac1
+md"Alright, let's inspect the free energy and the inferred states."
+
+# ╔═╡ ea5e2580-1b08-47ec-8372-455967b63df7
 num_iters_bond
+
+# ╔═╡ 5119fb42-cdb8-47bb-b10d-44a5f4251cb4
+exercise_statement("Visual inspection", header_level=2)
+
+# ╔═╡ 04a76ce1-f124-4322-a081-106fd6e2108a
+md"""
+Can you visualize the most probable value for $Q$ under the inferred posterior distribution?
+"""
+
+# ╔═╡ 0b795fe0-561b-4a05-a4ae-46bd1adf58ee
+### YOUR CODE HERE
+
+# ╔═╡ 3c6b7dc4-4099-4235-8135-34e734e3d92b
+hide_solution(md"""
+```julia
+begin
+
+# Mode of the posterior over Q
+Q_MAP = mode(last(results_LGDSQ.posteriors[:Q]))
+
+# True Q matrix
+Q_true = data["Q"]
+		  
+# Colorbar limits
+clims = (minimum([Q_MAP[:]; Q_true[:]]), maximum([Q_MAP[:]; Q_true[:]]))
+ 
+# Plot covariance matrices as heatmaps
+p401 = heatmap(Q_MAP, axis=([], false), yflip=true, title="Estimate", clims=clims)
+p402 = heatmap(Q_true, axis=([], false), yflip=true, title="True", clims=clims)
+
+plot(p401,p402, layout=(1,2))
+			  
+end
+```
+""")
+
+# ╔═╡ 5e17db03-e544-48be-acf9-9147871e66b2
+md"""
+# Appendix
+"""
 
 # ╔═╡ 40e84310-7924-4986-a943-8b66b67678cc
 """
@@ -279,13 +357,48 @@ end;
 # ╔═╡ 7cd94c60-7523-4abe-8eab-649ada27a7b4
 
 let
-	plot(time, states[1,:], color="red", label="states", xlabel="time (sec)", ylabel="train position")
+	plot(time, states[1,:], color="red", label="states", xlabel="time (sec)", ylabel="position")
 	scatter!(time, observations, color="black", label="observations", legend=:topleft)
 end
 
 # ╔═╡ 608241ff-4374-4a09-95cb-ebdf70716098
-# Transition matrix
-A = [1 Δt; -stiffness/mass*Δt -friction/mass*Δt+1]
+begin
+
+	# Transition matrix
+	A = [               1.0                  Δt; 
+		 -stiffness/mass*Δt -friction/mass*Δt+1]
+
+	# Emission matrix
+	C = [1.0, 0.0]
+
+	# Set process noise covariance matrix
+	Q = diagm(ones(2))
+
+end
+
+# ╔═╡ ab2348cc-9e4b-4b08-9e46-35b4e7067d4a
+@model function LGDS_Q(y, A,C,σ,T)
+	
+	# Prior state
+	z_0 ~ MvNormalMeanCovariance(zeros(2), diageye(2))
+	
+	# Process noise covariance matrix
+	Q ~ InverseWishart(10, diageye(2))
+	
+	z_kmin1 = z_0
+	for k in 1:T
+		
+		# State transition
+		z[k] ~ MvNormalMeanCovariance(A * z_kmin1, Q)
+		
+		# Likelihood
+		y[k] ~ NormalMeanVariance(dot(C, z[k]), σ^2)
+		
+		# Update recursive aux
+		z_kmin1 = z[k]
+		
+	end
+end
 
 # ╔═╡ 5403efea-05be-46a9-8c31-d762c2ea2549
 results_LGDS = infer(
@@ -299,19 +412,17 @@ let
 	m_z_LGDS = cat(mean.(results_LGDS.posteriors[:z])...,dims=2)
 	v_z_LGDS = cat(var.( results_LGDS.posteriors[:z])...,dims=2)
 	
-	plot(time, states[1,:], color="red", label="states", xlabel="time (sec)", ylabel="train position")
+	plot(time, states[1,:], color="red", label="states", xlabel="time (sec)", ylabel="position")
 	plot!(time, m_z_LGDS[1,:], color="blue", ribbon=v_z_LGDS[1,:], label="inferred")
 	scatter!(time, observations, color="black", alpha=0.2, label="observations", legend=:bottomright)
 end
 
 # ╔═╡ 5b5fc431-7fdc-42ac-af3c-69ce45e8ce99
-# Variational inference procedure
 results_LGDSQ = infer(
 	model		  = LGDS_Q(A=A,C=C, σ=σ, T=T),
 	data		   = (y = [observations[k] for k in 1:T],),
 	constraints	= constraints,
 	iterations	 = num_iters,
-	options		= (limit_stack_depth = 100,),
 	initialization = init,
 	free_energy	= true,
 )
@@ -325,33 +436,49 @@ plot(
 	ylabel="Free Energy", 
 )
 
-# ╔═╡ 0b795fe0-561b-4a05-a4ae-46bd1adf58ee
-Q_MAP = mean(last(results_LGDSQ.posteriors[:Q]))
+# ╔═╡ f066fa05-6787-486a-b1ba-ec2b88563899
+begin
+    FE1 = round(results_LGDS.free_energy[end],digits=1)
+    FE2 = round(results_LGDSQ.free_energy[end],digits=1)
+
+    if FE1 < FE2
+		
+        md"""
+        The free energy has gone up, from F = $(FE1) for states only, to F = $(FE2) for inferring both states and process noise covariance. It seems the small increase in accuracy was not worth the large increase in complexity.
+        """
+    else
+        md"""
+        The free energy has gone down, from F = $(FE1) for states only, to F = $(FE2) for inferring both states and process noise covariance. That means that the added cost of inferring the matrix \( Q \) is offset by the increase in performance it provides.
+        """
+    end
+end
+
 
 # ╔═╡ 51e3c0b3-26e3-4971-9695-f87556612d09
 let
 	m_z_LGDSQ = cat(mean.(last(results_LGDSQ.posteriors[:z]))...,dims=2)
 	v_z_LGDSQ = cat(var.(last(results_LGDSQ.posteriors[:z]))...,dims=2)
 	
-	plot(time, states[1,:], color="red", label="states", xlabel="time (sec)", ylabel="train position")
+	plot(time, states[1,:], color="red", label="states", xlabel="time (sec)", ylabel="position")
 	plot!(time, m_z_LGDSQ[1,:], color="blue", ribbon=v_z_LGDSQ[1,:], label="inferred")
 	scatter!(time, observations, color="black", alpha=0.2, label="observations", legend=:topleft)
 end
 
-# ╔═╡ 62464f26-0b55-4c09-b3d1-15bfc66df0ca
-# True data
-Q_true = data["Q"]
+# ╔═╡ 0a8c1697-9c68-4e7e-94fe-670bf5d108fe
+function viz_states_and_predictions(results)
 
-# ╔═╡ c12609ff-9c01-4efe-92fd-dcbaf96f1dbc
-let
-	# Colorbar limits
-	clims = (minimum([Q_MAP[:]; Q_true[:]]), maximum([Q_MAP[:]; Q_true[:]]))
-	 
-	# Plot covariance matrices as heatmaps
-	p401 = heatmap(Q_MAP, axis=([], false), yflip=true, title="Estimated", clims=clims)
-	p402 = heatmap(Q_true, axis=([], false), yflip=true, title="True", clims=clims)
+	future_index = 1:num_predictions
+	m_z_LGDS_ = cat(mean.(results.posteriors[:z])...,dims=2)
+	v_z_LGDS_ = cat(var.( results.posteriors[:z])...,dims=2)
+	m_preds_  = cat(mean.(results.predictions[:y])...,dims=2)[1,T.+future_index]
+	v_preds_  = cat(var.(results.predictions[:y])...,dims=2)[1,T.+future_index]
+	future_time = time[end] .+ Δt.*future_index
 	
-	plot(p401,p402, layout=(1,2))
+	plot(time, states[1,1:T], color="red", label="states", xlabel="time (sec)", ylabel="position")
+	plot!(time, m_z_LGDS_[1,1:T], color="blue", ribbon=v_z_LGDS_[1,1:T], label="inferred")
+	scatter!(time, observations, color="black", alpha=0.2, label="observations", legend=:bottomright)
+	vline!([time[end]], linestyle=:dash, color="green")
+	plot!(future_time, m_preds_, color="purple", ribbon=v_preds_, label="predictions")
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -2532,29 +2659,44 @@ version = "1.9.2+0"
 # ╟─7cd94c60-7523-4abe-8eab-649ada27a7b4
 # ╟─1385c3bd-de01-4096-810e-9f374577ff4c
 # ╠═608241ff-4374-4a09-95cb-ebdf70716098
-# ╠═e35328ea-3b2c-4fc0-8334-a24cdf00a66c
-# ╠═160b8b9b-c526-455f-b27d-473221e75dfe
 # ╟─7a49292c-64ca-4690-8db1-55187ace724b
 # ╠═def8153a-aced-4092-b08c-c027756936e5
+# ╟─48dd8ea5-56f1-4902-9129-765b283825e8
 # ╠═5403efea-05be-46a9-8c31-d762c2ea2549
 # ╟─97bddd3e-cc71-4882-92a0-b790bb26297d
-# ╠═06b5c673-286a-4286-b45c-5dcd00af2226
+# ╟─06b5c673-286a-4286-b45c-5dcd00af2226
 # ╟─26a31bf7-91c6-45b0-982c-cb77e0845118
+# ╟─ac4953f7-e4b2-4654-b861-9499d38fbd8f
+# ╟─7426a6e8-a4cf-4fb4-8722-e2ec7db454ec
+# ╟─6964c499-0557-44c1-9dd6-c8888b2429b6
+# ╟─585c10ee-c6b9-4fb7-870c-cb43fc880a9a
+# ╠═9e563b23-5e0e-4b0c-a39d-83b36c6f825b
+# ╟─d9b7e009-08c3-4335-8001-43c404fe948e
+# ╟─41a00097-be03-4756-b7ce-6756ed7db5a4
+# ╠═667af543-c1e7-44dc-afab-06c729f4050e
+# ╟─f5eb3574-3918-4c1d-b5fd-2f28e08dd45d
+# ╟─d856c7e0-4238-4e04-b07c-067bfa63ecf3
 # ╠═ab2348cc-9e4b-4b08-9e46-35b4e7067d4a
-# ╟─7fd2d571-9fdc-4a51-b506-7a7835c4c8a9
+# ╟─cab789ef-c65a-49af-8b02-78ed784e3e4f
+# ╟─0c621039-25ce-4976-b950-f9979c5e2fc5
+# ╠═869f3ae5-3b4a-498f-b446-3053ecef830a
+# ╟─5e25bb4e-b5d3-40b5-b9bf-17c332699d6b
+# ╠═786375a5-b828-4e1a-b99c-d6e33d72727d
+# ╟─45c5136b-1bc2-4da6-bb53-c3a1554f494f
 # ╟─af0d783a-38f3-4e86-91ea-357d7ec513d4
-# ╠═154a986d-1a57-4b74-a6dc-3e0bf1ad0f04
-# ╠═5a1ebc96-d2b4-4329-9bed-2ba5f7ec4fa6
+# ╟─00c02bf2-a769-42a8-8be2-5da1931a80d7
 # ╠═5b5fc431-7fdc-42ac-af3c-69ce45e8ce99
 # ╟─f6d1fbe3-e21f-424b-8354-3429f943fac1
 # ╟─ec24638a-a84d-47d8-a5bd-71d47c6e1abe
 # ╟─ea5e2580-1b08-47ec-8372-455967b63df7
-# ╠═51e3c0b3-26e3-4971-9695-f87556612d09
+# ╟─51e3c0b3-26e3-4971-9695-f87556612d09
 # ╟─f066fa05-6787-486a-b1ba-ec2b88563899
-# ╠═eab26918-1ce0-4617-9098-88435a2e7796
+# ╟─5119fb42-cdb8-47bb-b10d-44a5f4251cb4
+# ╟─04a76ce1-f124-4322-a081-106fd6e2108a
 # ╠═0b795fe0-561b-4a05-a4ae-46bd1adf58ee
-# ╠═62464f26-0b55-4c09-b3d1-15bfc66df0ca
-# ╠═c12609ff-9c01-4efe-92fd-dcbaf96f1dbc
+# ╟─3c6b7dc4-4099-4235-8135-34e734e3d92b
+# ╟─5e17db03-e544-48be-acf9-9147871e66b2
 # ╟─40e84310-7924-4986-a943-8b66b67678cc
+# ╟─0a8c1697-9c68-4e7e-94fe-670bf5d108fe
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
