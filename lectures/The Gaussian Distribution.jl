@@ -99,7 +99,7 @@ We now draw an extra observation ``x_\bullet = (a,b)`` from the same data-genera
 
 # ╔═╡ 148f82be-5012-4c12-9002-6a8bcbf5ad08
 md"""
-> ``D`` and ``x_\bullet`` are shown in the plot above.
+``D`` and ``x_\bullet`` are shown in the plot above.
 """
 
 # ╔═╡ b1b9bc8f-2653-42af-ad49-6aaaba2ae70e
