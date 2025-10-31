@@ -407,7 +407,7 @@ where ``\sigma`` is the standard deviation. Think of this as the accuracy with w
 # ╔═╡ abe4105c-c42b-4d97-bc15-ef9741c23fcf
 begin
 	likvarspec = @htl """
-	likelihood variance σ² = &nbsp; $(@bind σ2 Slider(0.01:0.01:2, default=0.5, show_value=true))
+	likelihood variance σ2 = &nbsp; $(@bind σ2 Slider(0.01:0.01:2, default=0.5, show_value=true))
 	"""
 end
 
@@ -450,19 +450,40 @@ But feel free to change these to what you think is reasonable.
 """
 
 # ╔═╡ 7cc095a9-fbf3-4402-bba6-f25fdb1347b1
-exercise_statement("Model specification"; header_level=1)
+exercise_statement("Real scores"; prefix="Model ", header_level=3)
 
 # ╔═╡ 27991fcd-6754-42fe-8e47-d52187065afb
 md"""
-Can you specify a model in RxInfer code for the continuous-valued score case, described above?
+Can you specify a model in RxInfer code for the continuous-valued score case, described above? 
 """
 
+# ╔═╡ 86f213ce-b2b2-48ce-bd94-ccd863e3e2d7
+hint(md"""
+- Hint: for a Gaussian distribution, use `NormalMeanVariance(μ,σ²)`.
+- Hint: the parameters are called `m0`, `v0`, `σ2`.	 
+""")
+
 # ╔═╡ 12d5f6d1-f214-448e-9c2e-da691b997d60
-@model function normal_normal()
+### YOUR CODE HERE
+
+# ╔═╡ 67b0f499-9492-48fb-9540-b6600abffc3a
+hide_solution(md"""
+```julia
+@model function normal_normal(Z,m0,v0,σ2,N)
     
-    ### YOUR CODE HERE
-        
+	# Prior distribution
+    θ ~ NormalMeanVariance(m0,v0)
+    
+    # Likelihood
+    for i in 1:N
+        Z[i] ~ NormalMeanVariance(θ,σ2)
+    end 
 end
+```
+""")
+
+# ╔═╡ 017e4cec-544f-46aa-b612-1b1ba83bb792
+exercise_statement("Reaction time", prefix="Inference ", header_level=3)
 
 # ╔═╡ 66b2711a-f4b9-43fe-8f0f-112d1365bbbe
 md"""
@@ -476,14 +497,17 @@ results = infer(
 """
 
 # ╔═╡ 0bb66b2a-5d41-4f6b-b245-0360274b9296
-
 ### YOUR CODE HERE
 
-
-# ╔═╡ aaabe6f9-5f6f-4b0b-8dbe-8acb369a0c1a
-md"""
-(The parameters are called: `σ2`, `m0`, `v0`.)
-"""
+# ╔═╡ df362c96-d688-42c1-acfc-c270c33d5db7
+hide_solution(md"""
+```julia			  
+results = infer(
+	model = normal_normal(m0=m0,v0=v0,σ2=σ2,N=length(Z)),
+	data = (Z = Z,),			  
+)
+```
+""")
 
 # ╔═╡ 5fa37c24-c90e-4e21-921e-03422943f225
 md"""
@@ -491,7 +515,7 @@ To visualize the prior and posterior distribution, uncomment the line below.
 """
 
 # ╔═╡ 6d7f9ad2-8dc4-450d-afb6-c55deaeed564
-### visualize_results(results)
+# visualize_results(results)
 
 # ╔═╡ 5c315bdb-7375-459e-a9e2-0d180271ed78
 likvarspec
@@ -2811,10 +2835,13 @@ version = "1.9.2+0"
 # ╟─71b7e9cb-a6ce-4982-b00c-b98dcd08888f
 # ╟─7cc095a9-fbf3-4402-bba6-f25fdb1347b1
 # ╟─27991fcd-6754-42fe-8e47-d52187065afb
+# ╟─86f213ce-b2b2-48ce-bd94-ccd863e3e2d7
 # ╠═12d5f6d1-f214-448e-9c2e-da691b997d60
+# ╟─67b0f499-9492-48fb-9540-b6600abffc3a
+# ╟─017e4cec-544f-46aa-b612-1b1ba83bb792
 # ╟─66b2711a-f4b9-43fe-8f0f-112d1365bbbe
 # ╠═0bb66b2a-5d41-4f6b-b245-0360274b9296
-# ╟─aaabe6f9-5f6f-4b0b-8dbe-8acb369a0c1a
+# ╟─df362c96-d688-42c1-acfc-c270c33d5db7
 # ╟─5fa37c24-c90e-4e21-921e-03422943f225
 # ╠═6d7f9ad2-8dc4-450d-afb6-c55deaeed564
 # ╟─5c315bdb-7375-459e-a9e2-0d180271ed78
