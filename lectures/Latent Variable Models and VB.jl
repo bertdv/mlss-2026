@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.19
+# v0.20.20
 
 #> [frontmatter]
 #> image = "https://imgur.com/oS96z4w.png"
@@ -3395,13 +3395,13 @@ version = "1.9.2+0"
 # ╟─26c65092-d294-11ef-39cc-1953a725f285
 # ╟─f1f7407d-86a1-4f24-b78a-61a411d1f371
 # ╟─26c67f04-d294-11ef-03a4-838ae255689d
-# ╟─87715fcd-c92e-4bfa-8b0a-15e469548f3d
 # ╟─26c6e002-d294-11ef-15a4-33e30d0d76ec
 # ╟─ae7ed1fc-fc36-4327-be55-a142477ca0ad
 # ╟─b4d965d1-91d8-43f8-84a5-b37ad5c6cafa
 # ╟─18f5d694-8869-4265-98ac-9ef7ff451eaf
 # ╟─c4b23b39-e6e4-44ec-b204-0c7d7d5a4026
 # ╟─baec0494-9557-49d1-b4d8-a8030d3281b7
+# ╟─87715fcd-c92e-4bfa-8b0a-15e469548f3d
 # ╟─40ce0abb-a086-4977-9131-10f60ab44152
 # ╟─26c6f63c-d294-11ef-1090-e9238dd6ad3f
 # ╟─aea77d69-9ecd-4be0-b6fd-c944d27d68df
