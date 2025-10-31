@@ -51,15 +51,18 @@ md"""
     - [Differences between Julia and Matlab / Python](https://docs.julialang.org/en/v1/manual/noteworthy-differences/index.html).
 """
 
+# ╔═╡ 70f128e8-1171-4dc7-a29f-37ee01816494
+TableOfContents()
+
 # ╔═╡ 02a6dd2e-eedc-4a5b-a9e5-891ed74257f6
-challenge_statement("Stone Tools"; header_level=1, big=true)
+challenge_statement("Archeological analysis"; header_level=1, big=true)
 
 # ╔═╡ cfdb60cf-60db-4539-9b4d-ba6f7555d0d7
 md"""
 
-Archeologists have asked for your help in analyzing data on tools made of stone. It is believed that primitive humans created tools by striking stones with others. During this process, the stone loses flakes, which have been preserved. The archeologists have recovered these flakes from various locations and time periods and want to know whether this stone tool shaping process has improved over the centuries.
+Archeologists have asked for your help in analyzing data on stone tools. It is believed that primitive humans created tools by striking stones with others. During this process, the stone loses flakes, which have been preserved. The archeologists have recovered these flakes from various locations and time periods and want to know whether this stone tool shaping process has improved over the centuries.
 
-### Data
+## Data
 
 The data is available from the [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/StoneFlakes). Each instance represents summary information of the stone flakes for a particular site. We will be using the attributes _flaking angle_ (FLA) and the _proportion of the dorsal surface worked_ (PROZD) for now.
 
@@ -67,27 +70,23 @@ The data is available from the [UCI Machine Learning Repository](https://archive
 
 # ╔═╡ 78fe8c22-c251-416f-bed7-3d3a9674ea01
 md"""
-### Model specification
+## Model specification
 
-We will be clustering this data with a Gaussian mixture model, to see if we can identify clear types of stone tools. The generative model for a Gaussian mixture consists of:
-
-```math 
-p(X, z, \pi, \mu, \Lambda) = \underbrace{p(X \mid z, \mu, \Lambda)}_{\text{likelihood}}\ \times \ \underbrace{p(z \mid \pi)}_{\text{prior latent variables}} \ \times \ \underbrace{p(\mu \mid \Lambda)\  p(\Lambda)\ p(\pi)}_{\text{prior parameters}}
-```
-
-with the likelihood of observation $X_i$ being a Gaussian raised to the power of the latent assignment variables $z$
+We will be clustering this data with a two component Gaussian mixture model, to see if we can make a distinction in types of stone tools. The generative model for a Gaussian mixture consists of:
 
 ```math 
-p(X_i \mid z, \mu, \Lambda) = \prod_{k=1}^{K} \mathcal{N}(X_i \mid \mu_k, \Lambda_k^{-1})^{z_i = k}
+p(X, z, \pi, \mu, \Lambda) = \underbrace{p(X \mid z, \mu, \Lambda)}_{\text{likelihood}}\ \times \ \underbrace{p(z \mid \pi)}_{\text{prior latent variables}} \ \times \ \underbrace{p(\mu \mid \Lambda)\  p(\Lambda)\ p(\pi)}_{\text{prior parameters}} .
 ```
 
-the prior for each latent variable $z_i$ being a Categorical distribution
+### Likelihood
+The likelihood function of observation $X_i$ is based on a Gaussian distribution raised to the power of the latent assignment variables $z$
 
-```math
-p(z_i \mid \pi) = \text{Categorical}(z_i \mid \pi)
+```math 
+p(X_i \mid z, \mu, \Lambda) = \prod_{k=1}^{K} \mathcal{N}(X_i \mid \mu_k, \Lambda_k^{-1})^{z_i = k} .
 ```
 
-and priors for the parameters being
+### Prior distributions
+The Gaussian component have prior distributions:
 
 ```math
 p(\Lambda_k) = \text{Wishart}(\Lambda_k \mid V_0, n_0) \qquad \text{for all}\ k
@@ -95,43 +94,193 @@ p(\Lambda_k) = \text{Wishart}(\Lambda_k \mid V_0, n_0) \qquad \text{for all}\ k
 ```math
 p(\mu_k \mid \Lambda_k) = \mathcal{N}(\mu_k \mid m_0, \Lambda_k^{-1}) \qquad \text{for all}\ k , 
 ```
+
+In a two component mixture, the prior for each latent variable $z_i$ is a Bernoulli distribution,
+
 ```math
-p(\pi) = \text{Dirichlet}(\pi \mid a_0) . 
+p(z_i \mid \pi) = \text{Bernoulli}(z_i \mid \pi) ,
 ```
-
-We can implement these equations nearly directly in RxInfer.
+with the prior distribution over its rate parameter a Beta distribution
+```math
+p(\pi) = \text{Beta}(\pi \mid \alpha_0, \beta_0) . 
+```
 """
-
-# ╔═╡ 1e30885a-e084-4ea6-8157-29295cf7d37b
-# Number of mixture components
-num_components = 3;
 
 # ╔═╡ b8784309-ea4e-4184-b115-082ce8b3ea65
 md"""
-Mixture models can be sensitive to initialization, so we are going to specify the prior parameters explicitly.
+We can implement these equations nearly directly in RxInfer. Let's start with the component priors.
 """
-
-# ╔═╡ 873c7116-75fc-4e21-9b99-9f8beb4cad54
-# Prior means
-m0 = [ 1.0 0.0 -1.0;
-	  -1.0 0.0  1.0];
-
-# ╔═╡ 923b480b-9ddd-48a1-88be-9e05181a82f6
-# Prior concentration parameters
-a0 = ones(num_components)
 
 # ╔═╡ cbf78024-05a0-4506-ba04-d4ee277483af
 md"""
 Now to specify the full model.
 """
 
-# ╔═╡ 8f0f748e-13a1-4780-980e-2ef5842358ab
-@model function GMM(X, n0, V0, m0, a0, K, N)
-    "Bayesian Gaussian mixture model"
+# ╔═╡ 569fa63f-a7df-4295-b104-8fceea6e8785
+@model function GMM2(X, n0, V0, m0, α0, β0, N)
+    "Bayesian Gaussian mixture model for 2 components"
 
     local μ
     local Λ
     
+    # Component parameters
+	Λ[1] ~ Wishart(n0, V0[:,:,1])
+	Λ[2] ~ Wishart(n0, V0[:,:,2])
+	μ[1] ~ MvNormalMeanPrecision(m0[:,1], Λ[1])
+	μ[2] ~ MvNormalMeanPrecision(m0[:,2], Λ[2])
+    
+    # Mixture weights
+    π ~ Beta(α0,β0)
+    
+    for i in 1:N
+        
+        # Latent assignment variable
+        z[i] ~ Bernoulli(π)
+        
+        # Mixture distribution
+        X[i] ~ NormalMixture(switch = z[i], m = μ, p = Λ)
+        
+    end
+end
+
+# ╔═╡ 9ff4d966-a9c6-48a0-ba43-db3bbf40aa18
+md"""
+## Inference
+
+This model does not allow us to perform exact Bayesian inference because the combination of prior and likelihood does not simplify to a recognizable type of probability distribution. In variational Bayesian inference, we approximate the true posterior distribution with "variational posteriors". These are free distributions of a pre-specified type whose mismatch with the true posterior, expressed through a free energy functional, is minimized. Each iteration of the minimization process improves the variational posteriors.
+
+To perform variational inference in RxInfer, we must make a few additional specifications:
+1. Constraints
+2. Initialization
+3. Number of iterations
+"""
+
+# ╔═╡ cadef6cc-f443-49a6-b7db-1e01bee75280
+NotebookCard("https://bmlip.github.io/course/lectures/Latent%20Variable%20Models%20and%20VB.html#Constrained-VFE-Minimization")
+
+# ╔═╡ 9ac1f921-31d3-4fff-9ebf-668eb532e906
+md"""
+### 1. Constraints
+
+In variational inference, we can impose constraints on the variational posteriors, which can make the inference process easier at the cost of slightly lower accuracy. There are all sorts of constraints, but the two most commonly used ones are "form" and "factorization" constraints. 
+- Form constraints ensure that the variational posterior may only have a specific type of probability distribution, for instance a Gaussian form constraint ensures that you approximate the posterior distribution with a Gaussian distribution (which may not be the best fit). 
+- Factorization constraints allow you to ignore dependencies between variables. For instance, suppose your true posterior is over three dependent variables $x$,$y$ and $z$. You could constrain your variational model to $q(x,y,z) = q(x)q(y)q(z)$. This makes inference easier at the cost of losing covariance information. 
+
+Here we will use the "mean field" constraint, which assumes that variables in the variational model are independent,
+```math
+q(z,π,μ,Λ) = \prod_{i=1}^{N} q(z_i) \prod_{k=1}^K q(π_k)q(μ_k)q(Λ_k)
+```
+This constraint is available as a standalone function: `MeanField()`.
+
+See also the [RxInfer documentation - page on constraint specification](https://docs.rxinfer.com/stable/manuals/constraints-specification/).
+"""
+
+# ╔═╡ a8fd6aae-0ee4-44cb-bc80-ba8c76ddd3f9
+constraints = @constraints begin
+	q(z,π,μ,Λ) = MeanField()
+end
+
+# ╔═╡ ed03b2ab-a7cb-4f2f-ae65-b15897182ae3
+md"""
+### 2. Initialization
+
+The optimal variational posteriors are found by minimizing a free energy functional, which is in an _iterative_ operation. This iteration has to start somewhere. In the @initialization macro, we specify from which distributions the procedure will start.
+
+In this model, we will initialize the variational posteriors with:
+```math
+\begin{align}
+q(\pi) &= \text{Beta}(\pi \mid \alpha_0, \beta_0) \\
+q(\mu) &= \prod_{k=1}^{K} \mathcal{N}(\mu \mid m_{0k}, I) \\
+q(\Lambda) &= \prod_{k=1}^{K} \text{Wishart}(\Lambda \mid n_0, V_{0k})
+\end{align}
+```
+
+See also the [RxInfer documentation - page on initialization](https://docs.rxinfer.com/stable/manuals/inference/initialization/).
+"""
+
+# ╔═╡ 21e08d81-5cd6-475c-a9dd-2d6e50e9f1e5
+md"""
+### 3. Iterations
+
+With each iteration, free energy is minimized further. At some point, the free energy will not change much anymore, which is known as "convergence". Below is a slider that you let's develop an intuition for how many iterations are required for the model to converge.
+"""
+
+# ╔═╡ 3818b4ee-3f4c-4b44-bba8-3ac2a4a1ff77
+begin
+	num_iters_bond = @bindname num_iterations Slider(1:18, default=5, show_value=true)
+end
+
+# ╔═╡ 90f86822-697a-45f6-881d-e85c4ffc2642
+md"""
+We can now call the inference function.
+"""
+
+# ╔═╡ 8680bd3e-dc25-439a-85e0-3e6a981237c0
+md"""
+Alright, we're done. Let's track the evolution of free energy over iterations, as well as the components cover the data points.
+"""
+
+# ╔═╡ da693279-8c56-43b7-b7ee-d7633f593ceb
+num_iters_bond
+
+# ╔═╡ f1b52f4a-8a69-48bb-98c0-6644f86afdf2
+md"""
+By default, RxInfer keeps the variational posterior at _each_ iteration. This means that when you call the posterior distribution over some variable, e.g., `results.posteriors[:μ]`, it is now a vector of distributions.
+"""
+
+# ╔═╡ d2c15f44-3dc7-411e-9ef2-12d7c3d00613
+md"""
+You can use this to visualize the evolution of a posterior over the iterations. For example, below I've visualized the variational posterior over $\mu$;
+"""
+
+# ╔═╡ 27fe1bcf-1c93-435c-98d3-54189ba9ed71
+num_iters_bond
+
+# ╔═╡ 9aed8f9a-35c3-4a9a-9678-e04d578891f8
+md"""
+If you're not interested in this and find it a hassle to index the posteriors, you can add the keyword argument `returnvars = KeepLast()` to the `infer` function (the default is `returnvars = KeepEach()`.), i.e.,
+```julia
+results = infer(
+	...
+	returnvars = KeepLast(),
+)
+```
+"""
+
+# ╔═╡ 6f4d9103-4626-495f-a04b-c5758fa67d4b
+exercise_statement("K-component Gaussian mixture", prefix="Model ")
+
+# ╔═╡ 496d9a42-5da9-4e95-b327-7b8d95a1f6c9
+md"""
+Can you specify a Gaussian mixture model with $K$ components in RxInfer?
+"""
+
+# ╔═╡ 887c1779-46ef-41e2-a69f-fc87c4b2a528
+hint(md"""
+If you want to define variables in a for-loop, you have to use the following format
+```
+local x
+for i in 1:10
+	x[i] ~ ..
+end
+```
+
+For those interested, this is because variables defined within a for-loop are in a different 'scope' than variables outside the for-loop (i.e., they are not directly accessible until you pull them into "local scope").
+""")
+
+# ╔═╡ 8f0f748e-13a1-4780-980e-2ef5842358ab
+### YOUR CODE HERE
+
+# ╔═╡ 45c7b80e-ed9f-4e4a-99c0-4b08b74b2680
+hide_solution(md"""
+```julia
+@model function GMM(X, n0, V0, m0, a0, K, N)
+    "Bayesian Gaussian mixture model"
+
+	local μ
+	local Λ
+	local z
+
     # Component parameters
     for k in 1:K
         Λ[k] ~ Wishart(n0, V0[:,:,k])
@@ -151,30 +300,51 @@ Now to specify the full model.
         
     end
 end
+```
+""")
 
-# ╔═╡ 3818b4ee-3f4c-4b44-bba8-3ac2a4a1ff77
+# ╔═╡ 2001649f-7189-4940-b212-7f4c8231ae6f
+exercise_statement("K-component posteriors", prefix="Inference ", header_level=2)
+
+# ╔═╡ a59308c5-a0c4-40c7-95c9-d5636de54944
+md"""
+What should our inference function look like?
+"""
+
+# ╔═╡ e07bb303-4b62-4991-b6ac-201aa28e95b8
+### YOUR CODE HERE
+
+# ╔═╡ 8e4fb51f-654d-48e2-aeee-a4db259731df
+hide_solution(md"""
 begin
-	num_iters_bond = @bindname num_iters Slider(1:50, default=10, show_value=true)
+
+K = 3
+	
+# Prior parameters
+V0_K = repeat(diageye(num_features), 1,1,K)
+m0_K = randn(num_features,K)
+a0 = ones(K)	
+
+# Initialization	
+inits_K = @initialization begin
+	q(π) = Dirichlet(a0)
+	q(μ) = [MvNormalMeanCovariance(m0_K[:,k], diageye(num_features)) for k in 1:K]
+	q(Λ) = [Wishart(n0, V0_K[:,:,k]) for k in 1:K]
+end;
+
+# Variational inference	
+results_K = infer(
+	model		   = GMM(n0=n0, V0=V0_K, m0=m0_K, a0=a0, K=K, N=num_samples),
+	data		   = (X = [data["observations"][i,:] for i in 1:num_samples],),
+	constraints	   = MeanField(),
+	initialization = inits_K,
+	iterations	   = num_iterations,
+	free_energy	   = true,
+)
+
+		
 end
-
-# ╔═╡ 8680bd3e-dc25-439a-85e0-3e6a981237c0
-md"""
-Alright, we're done. Let's track the evolution of free energy over iterations.
-"""
-
-# ╔═╡ db99900b-a0de-4c2a-a806-df32e0a5dd7f
-md"""
-That looks like it is nicely decreasing. Let's now visualize the cluster on top of the observations.
-"""
-
-# ╔═╡ da693279-8c56-43b7-b7ee-d7633f593ceb
-num_iters_bond
-
-# ╔═╡ 937d523a-4692-4c5c-8826-1aff2876e334
-md"We can also plot the evolution of the parameters over iterations of the variational inference procedure."
-
-# ╔═╡ a08b0739-8e5e-4f9b-bafa-722e9b3e4544
-num_iters_bond
+""")
 
 # ╔═╡ 3d5b32c1-8f67-412e-8dc9-cbd015804cca
 md"""
@@ -284,76 +454,62 @@ scatter(data["observations"][:,1],
         ylabel="Flaking angle (FLA)",
         size=(800,300))
 
-# ╔═╡ 943fb57a-1bce-41e1-a9f1-5c01faacebfe
-# Data dimensionality
-num_features = size(data["observations"],2)
+# ╔═╡ 548a7551-e32c-4c6f-b613-fc47c0b1fbac
+num_samples,num_features = size(data["observations"])
 
 # ╔═╡ 853ca037-1c82-479c-bb37-21d01ce54ed1
-# Prior scale matrices
-V0 = repeat(diageye(num_features), 1,1,3)
+begin
+	num_components = 2
+	
+	# Prior parameters of components
+	n0 = num_features
+	V0 = repeat(diageye(num_features), 1,1,num_components)
+	m0 = [-1.0  1.0;
+		  -1.0  1.0];
 
-# ╔═╡ e40cf462-bf21-4c60-a77c-6ac82450f50a
-# Prior degrees of freedom 
-n0 = num_features
+	# Prior parameters of assignments
+	α0 = 1.0
+	β0 = 1.0;
+end
 
 # ╔═╡ 0bb0bb1d-897b-4853-8e2e-8efa0a1519b6
-# Initialize variational distributions
-init = @initialization begin
-	q(π) = Dirichlet(a0)
-	q(μ) = [MvNormalMeanCovariance(m0[:,k], diageye(num_features)) for k in 1:num_components]
+inits = @initialization begin
+	q(π) = Beta(α0,β0)
+	q(μ) = [MvNormal(m0[:,k], diageye(num_features)) for k in 1:num_components]
 	q(Λ) = [Wishart(n0, V0[:,:,k]) for k in 1:num_components]
 end;
 
-# ╔═╡ d2afc972-2223-4ebc-b330-a1876bfc3252
-# Sample size
-num_samples = size(data["observations"],1)
-
-# ╔═╡ f05cded0-1be8-438c-b776-e044c253e84d
-# Convert data to a list of vectors
-observations = [data["observations"][i,:] for i in 1:num_samples]
-
 # ╔═╡ 74b57f47-2945-491c-a9cb-064f219efbd7
-# Variational inference
 results = infer(
-	model		  = GMM(n0=n0, V0=V0, m0=m0, a0=a0, K=num_components, N=num_samples),
-	data		   = (X = observations,),
-	constraints	= MeanField(),
-	initialization = init,
-	iterations	 = num_iters,
-	free_energy	= true,
+	model		   = GMM2(n0=n0, V0=V0, m0=m0, α0=α0, β0=β0, N=num_samples),
+	data		   = (X = [data["observations"][i,:] for i in 1:num_samples],),
+	constraints	   = constraints,
+	initialization = inits,
+	iterations	   = num_iterations,
+	free_energy	   = true,
 )
 
 # ╔═╡ 0ae7ee5f-9b35-4e21-977b-42fcc14421bf
-plot(results.free_energy, 
+plot(1:num_iterations,
+	 results.free_energy, 
      color="black",
      xlabel="Number of iterations", 
      ylabel="Free Energy", 
      size=(700,300))
 
-# ╔═╡ 4f836b6c-694a-4f56-9e99-45758237a259
-begin
-	# Extract mean and standard deviation from 
-	mean_π_iters = cat(mean.(results.posteriors[:π])..., dims=2)
-	vars_π_iters = cat(var.( results.posteriors[:π])..., dims=2)
-	
-	plot(mean_π_iters';
-	     ribbon=vars_π_iters', 
-	     xscale=:log10,
-	     xlabel="Number of iterations", 
-	     ylabel="Free Energy", 
-	     size=(700,300))
-end
+# ╔═╡ 541a83c9-3463-42a0-8a08-d7f53f1408c6
+results.posteriors[:μ]
 
 # ╔═╡ 9b9c08d6-1cce-42f8-808b-b4fc8558e2d3
 begin
 	# Extract mixture weights
-	π_hat = mean(results.posteriors[:π][num_iters])
+	π_hat = mean(results.posteriors[:π][num_iterations])
 	
 	# Extract component means
-	μ_hat = mean.(results.posteriors[:μ][num_iters])
+	μ_hat = mean.(results.posteriors[:μ][num_iterations])
 	
 	# Extract covariance matrices
-	Σ_hat = inv.(mean.(results.posteriors[:Λ][num_iters]))
+	Σ_hat = inv.(mean.(results.posteriors[:Λ][num_iterations]))
 	
 	# Select dimensions to plot
 	xlims = [minimum(data["observations"][:,1])-1, maximum(data["observations"][:,1])+1]
@@ -370,6 +526,50 @@ begin
 		ylabel="Flaking angle (FLA)",
 		size=(700,400),
 	)
+end
+
+# ╔═╡ 416a1e9c-645d-4e3c-ba92-002b5b115a41
+begin
+	common_kwargs = (
+		fillcolor = "white",
+		linewidth = 4,
+	)
+	
+	p3a = covellipse(m0[:,1], diageye(2), 
+					 fillcolor="white", 
+					 linecolor="red", 
+					 label="component 1",
+					 linealpha=.1,
+					 title="Evolution of posterior over μ")
+	for i in 1:num_iterations
+		covellipse!(mean(results.posteriors[:μ][i][1]), 
+				    cov(results.posteriors[:μ][i][1]),
+				    linecolor="red",
+				    fillcolor="white",
+				    xlims=xlims,
+				    ylims=ylims,
+					ylabel="Flaking angle (FLA)",
+				    linealpha=.1 + i*(.9/num_iterations))
+	end
+
+	p3b = covellipse(m0[:,2], diageye(2), 
+					 fillcolor="white", 
+					 linecolor="blue", 
+					 label="component 2",
+					 linealpha=.1)
+	for i in 1:num_iterations
+		covellipse!(mean(results.posteriors[:μ][i][2]), 
+				    cov(results.posteriors[:μ][i][2]),
+				    linecolor="blue",
+				    fillcolor="white",
+				   	xlims=xlims,
+				    ylims=ylims,
+					xlabel="Proportion of worked dorsal surface (PROZD)",
+					ylabel="Flaking angle (FLA)",
+				    linealpha=.1 + i*(.9/num_iterations))
+	end
+
+	plot(p3a,p3b, layout=(2,1), size=(700,800))
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -2566,41 +2766,54 @@ version = "1.9.2+0"
 # ╔═╡ Cell order:
 # ╟─341be07e-a641-4a9c-b85a-5d3ce3ff9512
 # ╟─fdb0c1a0-5dc7-11f0-0cd2-ab436f32966c
+# ╟─70f128e8-1171-4dc7-a29f-37ee01816494
 # ╠═42877664-b5a3-48bb-adb1-9559bbaf47d3
 # ╟─02a6dd2e-eedc-4a5b-a9e5-891ed74257f6
 # ╟─cfdb60cf-60db-4539-9b4d-ba6f7555d0d7
-# ╠═0c109225-3c9a-40eb-9599-faa4cabd740c
+# ╟─0c109225-3c9a-40eb-9599-faa4cabd740c
 # ╟─492ce897-34d2-4a95-a300-cf12baf58f71
+# ╠═548a7551-e32c-4c6f-b613-fc47c0b1fbac
 # ╟─78fe8c22-c251-416f-bed7-3d3a9674ea01
-# ╠═943fb57a-1bce-41e1-a9f1-5c01faacebfe
-# ╠═d2afc972-2223-4ebc-b330-a1876bfc3252
-# ╠═1e30885a-e084-4ea6-8157-29295cf7d37b
 # ╟─b8784309-ea4e-4184-b115-082ce8b3ea65
 # ╠═853ca037-1c82-479c-bb37-21d01ce54ed1
-# ╠═e40cf462-bf21-4c60-a77c-6ac82450f50a
-# ╠═873c7116-75fc-4e21-9b99-9f8beb4cad54
-# ╠═923b480b-9ddd-48a1-88be-9e05181a82f6
 # ╟─cbf78024-05a0-4506-ba04-d4ee277483af
-# ╠═8f0f748e-13a1-4780-980e-2ef5842358ab
-# ╟─3818b4ee-3f4c-4b44-bba8-3ac2a4a1ff77
-# ╠═f05cded0-1be8-438c-b776-e044c253e84d
+# ╠═569fa63f-a7df-4295-b104-8fceea6e8785
+# ╟─9ff4d966-a9c6-48a0-ba43-db3bbf40aa18
+# ╟─cadef6cc-f443-49a6-b7db-1e01bee75280
+# ╟─9ac1f921-31d3-4fff-9ebf-668eb532e906
+# ╠═a8fd6aae-0ee4-44cb-bc80-ba8c76ddd3f9
+# ╟─ed03b2ab-a7cb-4f2f-ae65-b15897182ae3
 # ╠═0bb0bb1d-897b-4853-8e2e-8efa0a1519b6
+# ╟─21e08d81-5cd6-475c-a9dd-2d6e50e9f1e5
+# ╟─3818b4ee-3f4c-4b44-bba8-3ac2a4a1ff77
+# ╟─90f86822-697a-45f6-881d-e85c4ffc2642
 # ╠═74b57f47-2945-491c-a9cb-064f219efbd7
 # ╟─8680bd3e-dc25-439a-85e0-3e6a981237c0
-# ╠═0ae7ee5f-9b35-4e21-977b-42fcc14421bf
-# ╟─db99900b-a0de-4c2a-a806-df32e0a5dd7f
+# ╟─0ae7ee5f-9b35-4e21-977b-42fcc14421bf
 # ╟─da693279-8c56-43b7-b7ee-d7633f593ceb
-# ╠═9b9c08d6-1cce-42f8-808b-b4fc8558e2d3
-# ╟─937d523a-4692-4c5c-8826-1aff2876e334
-# ╟─a08b0739-8e5e-4f9b-bafa-722e9b3e4544
-# ╠═4f836b6c-694a-4f56-9e99-45758237a259
+# ╟─9b9c08d6-1cce-42f8-808b-b4fc8558e2d3
+# ╟─f1b52f4a-8a69-48bb-98c0-6644f86afdf2
+# ╠═541a83c9-3463-42a0-8a08-d7f53f1408c6
+# ╟─d2c15f44-3dc7-411e-9ef2-12d7c3d00613
+# ╟─416a1e9c-645d-4e3c-ba92-002b5b115a41
+# ╟─27fe1bcf-1c93-435c-98d3-54189ba9ed71
+# ╟─9aed8f9a-35c3-4a9a-9678-e04d578891f8
+# ╟─6f4d9103-4626-495f-a04b-c5758fa67d4b
+# ╟─496d9a42-5da9-4e95-b327-7b8d95a1f6c9
+# ╟─887c1779-46ef-41e2-a69f-fc87c4b2a528
+# ╠═8f0f748e-13a1-4780-980e-2ef5842358ab
+# ╟─45c7b80e-ed9f-4e4a-99c0-4b08b74b2680
+# ╟─2001649f-7189-4940-b212-7f4c8231ae6f
+# ╟─a59308c5-a0c4-40c7-95c9-d5636de54944
+# ╠═e07bb303-4b62-4991-b6ac-201aa28e95b8
+# ╟─8e4fb51f-654d-48e2-aeee-a4db259731df
 # ╟─3d5b32c1-8f67-412e-8dc9-cbd015804cca
-# ╠═f81ede8b-4ac0-47e6-9381-23329afbdf25
-# ╠═dac4a43b-605e-40e2-9b70-63e951c3c7cd
-# ╠═015ccfa4-8901-4c9d-a9eb-56c2a5968a7f
-# ╠═0caced02-d53e-4076-8b29-4fcd09a4d159
-# ╠═546f9a9c-a1c0-4f42-896b-972f8ac495fe
-# ╠═72882503-6302-4b20-a54a-747b55c90e5a
+# ╟─f81ede8b-4ac0-47e6-9381-23329afbdf25
+# ╟─dac4a43b-605e-40e2-9b70-63e951c3c7cd
+# ╟─015ccfa4-8901-4c9d-a9eb-56c2a5968a7f
+# ╟─0caced02-d53e-4076-8b29-4fcd09a4d159
+# ╟─546f9a9c-a1c0-4f42-896b-972f8ac495fe
+# ╟─72882503-6302-4b20-a54a-747b55c90e5a
 # ╟─45ad143b-1637-4e9a-b891-dfa5c3d37440
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
