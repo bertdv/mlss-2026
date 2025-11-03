@@ -310,6 +310,7 @@ Given the equations and hints above, can you specify a probabilistic model for i
 
 # ╔═╡ 6b1168ff-2f9d-48c8-a4d8-df580a1a2dac
 hide_solution(md"""
+```julia
 @model function linear_classification(X,y,N)
 
     w ~ MvNormalMeanCovariance(zeros(num_features+1), 
@@ -319,6 +320,7 @@ hide_solution(md"""
 		y[i] ~ Probit(dot(w, X[i]))
 	end	
 end
+```
 """)
 
 # ╔═╡ f833221b-d121-4338-a86e-c09587d98f85
