@@ -316,6 +316,7 @@ What should our inference function look like?
 
 # ╔═╡ 8e4fb51f-654d-48e2-aeee-a4db259731df
 hide_solution(md"""
+```julia
 begin
 
 K = 3
@@ -344,6 +345,7 @@ results_K = infer(
 
 		
 end
+```
 """)
 
 # ╔═╡ 3d5b32c1-8f67-412e-8dc9-cbd015804cca
