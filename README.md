@@ -46,24 +46,17 @@ News and Announcements
 All course materials are available in the table above. We recommend reading the lecture notes in your browser, to take advantage of the interactive materials that we prepared for this course, based on [Pluto.jl](https://plutojl.org/).
 
 If necessary, you can download the PDF lecture notes here:
-- [B lecture notes](https://github.com/bmlip/course/releases/download/v5/BMLIP.B.Lectures.pdf)
-- [W lecture notes](https://github.com/bmlip/course/releases/download/v5/BMLIP.W.Lectures.pdf)
+- [B lecture notes](https://github.com/bmlip/course/releases/download/v5/BMLIP.B.Lectures.pdf) version 04-Nov-2025
+- [W lecture notes](https://github.com/bmlip/course/releases/download/v5/BMLIP.W.Lectures.pdf) version 04-Nov-2025
 
 We always recommend reading the lecture notes directly on the website instead of using the PDFs, if possible.
-
-### Lecture Notes
-
-The lecture notes form the mandatory preparation material for the exam. They can be accessed through the Table below. Optionally, you may download PDF bundles of the lecture notes here. Please note, however, that the PDF files do not include interactive links and omit the answers to proofs and exercises. For this reason, we strongly recommend using the online materials via the links in the Table.
-
-- Bert de Vries, [PDF bundle of all lecture notes for lessons B0 through B12](https://github.com/bertdv/BMLIP/blob/master/output/BMLIP-5SSD0-lecture-notes.pdf), version 30-Oct-2024.
-- Wouter Kouw, [PDF bundle of all probabilistic programming lecture notes for lessons W1 through W4](https://github.com/bertdv/BMLIP/blob/master/output/BMLIP-5SSD0-prob-prog.pdf) version 30-Oct-2024.
 
 ### Books
 
 The following (freely downloadable) book is optional but very useful for additional reading:
 
-- [Christopher M.
-Bishop](http://research.microsoft.com/en-us/um/people/cmbishop/index.htm) (2006), [Pattern Recognition and Machine Learning](https://www.microsoft.com/en-us/research/people/cmbishop/prml-book/).
+- Christopher M.
+Bishop (2006), [Pattern Recognition and Machine Learning](https://www.microsoft.com/en-us/research/wp-content/uploads/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf).
 
 <!---
 - [Ariel Caticha](https://www.albany.edu/physics/acaticha.shtml) (2012), [Entropic Inference and the Foundations of Physics](https://github.com/bmlip/course/blob/main/assets/files/Caticha-2012-Entropic-Inference-and-the-Foundations-of-Physics.pdf).
