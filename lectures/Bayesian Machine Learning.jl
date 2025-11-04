@@ -1623,10 +1623,10 @@ StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
 
 [compat]
 BmlipTeachingTools = "~1.3.1"
-Distributions = "~0.25.119"
+Distributions = "~0.25.122"
 LaTeXStrings = "~1.4.0"
 MarkdownLiteral = "~0.1.2"
-Plots = "~1.40.13"
+Plots = "~1.40.17"
 SpecialFunctions = "~2.6.1"
 StatsPlots = "~0.15.8"
 """
@@ -1637,7 +1637,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.12.1"
 manifest_format = "2.0"
-project_hash = "3716bd21ee0dc00ef5804fc95ca4391844f76aab"
+project_hash = "cbe308c57a080037e364873ac63012af4000489b"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -1818,10 +1818,10 @@ uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
 version = "1.16.0"
 
 [[deps.DataStructures]]
-deps = ["OrderedCollections"]
-git-tree-sha1 = "6c72198e6a101cccdd4c9731d3985e904ba26037"
+deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
+git-tree-sha1 = "4e1fe97fdaed23e9dc21d4d664bea76b65fc50a0"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.19.1"
+version = "0.18.22"
 
 [[deps.DataValueInterfaces]]
 git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
@@ -2420,9 +2420,13 @@ version = "10.44.0+1"
 
 [[deps.PDMats]]
 deps = ["LinearAlgebra", "SparseArrays", "SuiteSparse"]
-git-tree-sha1 = "f07c06228a1c670ae4c87d1276b92c7c597fdda0"
+git-tree-sha1 = "d922b4d80d1e12c658da7785e754f4796cc1d60d"
 uuid = "90014a1f-27ba-587c-ab20-58faa44d9150"
-version = "0.11.35"
+version = "0.11.36"
+weakdeps = ["StatsBase"]
+
+    [deps.PDMats.extensions]
+    StatsBaseExt = "StatsBase"
 
 [[deps.Pango_jll]]
 deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "FriBidi_jll", "Glib_jll", "HarfBuzz_jll", "JLLWrappers", "Libdl"]
@@ -2491,9 +2495,9 @@ version = "0.4.6"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "f53232a27a8c1c836d3998ae1e17d898d4df2a46"
+git-tree-sha1 = "3faff84e6f97a7f18e0dd24373daa229fd358db5"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.72"
+version = "0.7.73"
 
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
