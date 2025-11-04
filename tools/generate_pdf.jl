@@ -25,8 +25,8 @@ Pkg.add(["URIs", "PlutoPDF"])
 Pkg.instantiate()
 
 
-
-lectures_dir = mktempdir(; cleanup=false)
+output_dir = mktempdir(; cleanup=false)
+@info "Output directory: $(output_dir)"
 
 lecture_urls = [
     "https://bmlip.github.io/course/lectures/Course%20Syllabus.html",
@@ -68,28 +68,68 @@ const options = (
     displayHeaderFooter=false,
 )
 
-function output_path(i, url)
-    name = URIs.unescapeuri(replace(url, "https://bmlip.github.io/course/lectures/" => "", ".html" => ""))
-    output_path = joinpath(lectures_dir, "B$(lpad(i-1, 2, '0')) $(name).pdf")
+const preamble_html = """
+<script>
+// Open all <details> on the page
+setInterval(() => {
+    [...document.querySelectorAll("details")].forEach(detailEl => {
+        detailEl.setAttribute("open", true);
+    });
+}, 1)
+</script>
+"""
+
+const preamble_html_query = "?preamble_html=$(URIs.escapeuri(preamble_html))"
+
+function output_path(i, url, prefix, base_url_pattern)
+    name = URIs.unescapeuri(replace(url, base_url_pattern => "", ".html" => ""))
+    output_path = joinpath(output_dir, "$(prefix)$(lpad(i-1, 2, '0')) $(name).pdf")
 end
 
-for (i,url) in enumerate(lecture_urls)
-    out_path = output_path(i, url)
+function generate_pdf_collection(urls, prefix, base_url_pattern, collection_name)
+    @info "📚 Processing $(collection_name) collection"
     
-    @info "📄 Generating lecture PDF ($(i)/$(length(lecture_urls)))" out_path
-    PlutoPDF.html_to_pdf(url, out_path; open=false, options)
+    # Generate individual PDFs
+    for (i, url) in enumerate(urls)
+        out_path = output_path(i, url, prefix, base_url_pattern)
+        @info "📄 Generating PDF ($(i)/$(length(urls))): $(basename(out_path))"
+        PlutoPDF.html_to_pdf(url * preamble_html_query, out_path; open=false, options)
+    end
+    
+    # Merge PDFs
+    @info "🗂️ Merging $(collection_name) PDFs"
+    files = [output_path(i, url, prefix, base_url_pattern) for (i, url) in enumerate(urls)]
+    output = joinpath(output_dir, "BMLIP $(prefix) Lectures.pdf")
+    try
+        run(`pdfunite $(files) $output`)
+        @info "✅ Output PDF file: $(output)"
+    catch
+        @error "Failed to merge PDFs" files output
+        throw(ErrorException("Failed to merge PDFs"))
+    end
+    
+    return output
 end
 
-@info "🗂️📚 Merging lecture PDFs"
+# Generate B Lectures
+generate_pdf_collection(
+    lecture_urls,
+    "B",
+    "https://bmlip.github.io/course/lectures/",
+    "B Lectures"
+)
 
-files = [
-    output_path(i, url) for (i, url) in enumerate(lecture_urls)
-]
+# Generate W Lectures
+generate_pdf_collection(
+    prop_prog_urls,
+    "W",
+    "https://bmlip.github.io/course/probprog/",
+    "W Lectures"
+)
 
-output = joinpath(lectures_dir, "BMLIP Lectures.pdf")
 
-run(`pdfunite $(files) $output`)
-
-
-@info "✅ Output pdf file:" output
+try
+    run(`open $(output_dir)`)
+catch
+end
 
