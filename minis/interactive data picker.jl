@@ -196,7 +196,7 @@ PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
 HypertextLiteral = "~0.9.5"
-PlutoUI = "~0.7.72"
+PlutoUI = "~0.7.73"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -205,7 +205,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.12.1"
 manifest_format = "2.0"
-project_hash = "7a294227e4f783ac2b1954be77f2433ef69e6dbb"
+project_hash = "08ef7142f1ebe936c16ae64816ceb42f0428b82c"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -383,9 +383,9 @@ version = "1.12.0"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "f53232a27a8c1c836d3998ae1e17d898d4df2a46"
+git-tree-sha1 = "3faff84e6f97a7f18e0dd24373daa229fd358db5"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.72"
+version = "0.7.73"
 
 [[deps.PrecompileTools]]
 deps = ["Preferences"]

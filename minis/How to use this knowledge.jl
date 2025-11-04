@@ -58,7 +58,6 @@ All the best, and thanks for the question,
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
-[deps]
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
