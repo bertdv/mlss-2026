@@ -1150,7 +1150,7 @@ Procedure VMP, see [Dauwels (2007), section 3](https://github.com/bmlip/course/b
 > 2. Select an edge ``z_k`` in the factor graph of ``f(z_1,\ldots,z_m)``.<br/>
 > 3. Compute the two messages ``\overrightarrow{\nu}(z_k)`` and ``\overleftarrow{\nu}(z_k)`` by applying the following generic rule:
 > ```math
->   \overrightarrow{\nu}(y) \propto \exp\left( \mathbb{E}_{q}\left[ \log > g(x_1,\dots,x_n,y)\right] \right)   
+>   \overrightarrow{\nu}(y) \propto \exp\left( \mathbb{E}_{q}\left[ \log g(x_1,\dots,x_n,y)\right] \right)   
 > ```
 > 4. Compute the marginal ``q(z_k)``
 > ```math
