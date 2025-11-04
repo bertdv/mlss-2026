@@ -170,6 +170,12 @@ keyconcept("","The written exam will be in multiple-choice format. Two previous 
 # ╔═╡ f46ccac8-e87c-4cbe-9d2c-fdb4723c639e
 keyconcept("",md"""When working on exercises or preparing for the written exam, you may use this [Formula Sheet](https://github.com/bmlip/course/blob/main/assets/files/5SSD0_formula_sheet.pdf), which will also be provided during the exam.""" )
 
+# ╔═╡ e56f489e-bd51-4499-aa80-1844c8651184
+md"""
+## Results of Previous Exams
+![](https://github.com/bmlip/course/blob/main/assets/figures/exam-results.png?raw=true)
+"""
+
 # ╔═╡ 0d019cde-d294-11ef-0563-6b41bc2ca80f
 TwoColumn(
 md"""
@@ -586,6 +592,7 @@ version = "17.5.0+2"
 # ╟─0d018ee2-d294-11ef-3b3d-e34d0532a953
 # ╟─31f8669b-b547-4a11-acc6-64e02e6e9dc0
 # ╟─f46ccac8-e87c-4cbe-9d2c-fdb4723c639e
+# ╟─e56f489e-bd51-4499-aa80-1844c8651184
 # ╟─0d019cde-d294-11ef-0563-6b41bc2ca80f
 # ╟─f0a4b221-b4cd-425c-9a35-44c68c64e341
 # ╟─9b1342f1-fcc9-469a-abfe-ed73a5b56d75
