@@ -318,6 +318,7 @@ What should our inference function look like?
 hide_solution(md"""
 begin
 
+```julia			  
 K = 3
 	
 # Prior parameters
@@ -341,7 +342,7 @@ results_K = infer(
 	iterations	   = num_iterations,
 	free_energy	   = true,
 )
-
+```
 		
 end
 """)
