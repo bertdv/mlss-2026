@@ -116,7 +116,7 @@ You can access all lecture materials online through the links below:
          <tr>
             <td>26-Nov-2025 <em>(Wed)</em></td>
             <td>🟢 Introduction to Julia</td>
-            <td><a href="https://bmlip.github.io/course/probprog/PP0%20-%20Introduction%20Bayesian%20Machine%20Learning.html">W0</a></td>
+            <td><a href="https://bmlip.github.io/course/probprog/Intro%20to%20Julia.html">W0</a></td>
             <td></td>
             <td></td>
          </tr>
@@ -125,7 +125,7 @@ You can access all lecture materials online through the links below:
             <td>🔴 Pick-up Julia programming assignment A0</td>
             <td></td>
             <td>
-            <a href="https://github.com/bmlip/course/blob/main/assignments/%5B5SSD0%5D%20Julia%20programming%20assignment.zip">A0</a>
+            A0
             </td>
             <td></td>
          </tr>
@@ -163,7 +163,7 @@ You can access all lecture materials online through the links below:
             <td>🔴 Pick-up probabilistic programming assignment A1</td>
             <td></td>
             <td>
-            <a href="https://bmlip.github.io/course/assignments/A1%20-%20Observational%20Astronomy.html">A1</a>
+            A1
             </td>
             <td></td>
          </tr>
@@ -201,9 +201,6 @@ You can access all lecture materials online through the links below:
             <td>🔴 Submission deadline assignment A1</td>
             <td></td>
             <td><a href="mailto:w.m.kouw@tue.nl?subject=Programming assignment 1">submit</a>
-            <!---
-            <br><a href="https://github.com/bmlip/course/blob/main/assignments/%5B5SSD0%5D%20Probabilistic%20Programming%201%20-%20solutions.ipynb">A1-sol</a>
-            --->
             </td>
             <td></td>
          </tr>
@@ -230,7 +227,7 @@ You can access all lecture materials online through the links below:
             <td>🔴 Pick-up probabilistic programming assignment A2</td>
             <td></td>
             <td>
-            <a href="https://github.com/bmlip/course/blob/main/assignments/%5B5SSD0%5D%20Probabilistic%20programming%202.zip">A2</a>
+            A2
             </td>
             <td></td>
          </tr>
@@ -253,9 +250,6 @@ You can access all lecture materials online through the links below:
             <td>🔴 Submission deadline assignment A2</td>
             <td></td>
             <td><a href="mailto:w.m.kouw@tue.nl?subject=Programming assignment 2">submit</a>
-            <!---
-            <br><a href="https://github.com/bmlip/course/blob/main/assignments/%5B5SSD0%5D%20Probabilistic%20Programming%201%20-%20solutions.ipynb">A2-sol</a>
-            --->
             </td>
             <td></td>
          </tr>
