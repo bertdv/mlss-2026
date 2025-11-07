@@ -7,7 +7,7 @@ A bit of **background information** about the software we are using:
 ## Julia and RxInfer
 For the coding, we use the [Julia programming language](https://julialang.org/). Julia is a high-level programming language (like Python, Matlab, R, JavaScript, etc) which makes it easy to use for complex tasks, but it has the advantage that you can write very fast numerical code (like C++, Rust, Fortran, etc). Not convinced? _Learning Julia is also a [good way to get better at other languages like Python](https://plutojl.org/en/docs/education/#why-julia-for-education)!_
 
-At the [BIASLab](https://biaslab.github.io/), we have developed a specialized package for probabilistic programming and Bayesian inference in Julia: [RxInfer.jl](https://rxinfer.com/). We will use RxInfer in the later lectures, in the Probabilistic Programming lectures and in the assignments. You don't need to install RxInfer manually, it will be loaded automatically when you open a lecture/assignment that uses it.
+At [BIASlab](https://biaslab.github.io/), we have developed a specialized package for probabilistic programming and Bayesian inference in Julia: [RxInfer.jl](https://rxinfer.com/). We will use RxInfer in the later lectures, in the Probabilistic Programming lectures and in the assignments. You don't need to install RxInfer manually, it will be loaded automatically when you open a lecture/assignment that uses it.
 
 ## Pluto
 We use the [Pluto programming environment](https://plutojl.org) for course materials and for assignments. Pluto is an educational notebook environment, which makes it ideal for interactive lectures (with buttons and sliders), and for your assignments (with easy setup, improved error messages, live documentation, and more). 
