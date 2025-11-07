@@ -1,342 +1,599 @@
 ### A Pluto.jl notebook ###
-# v0.20.20
+# v0.20.19
 
 using Markdown
 using InteractiveUtils
 
-# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
-macro bind(def, element)
-    #! format: off
-    return quote
-        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
-        local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
-        el
-    end
-    #! format: on
-end
-
-# ╔═╡ 7654497e-f0bd-11ea-2520-cf6617405b48
+# ╔═╡ d5a8ec92-a4fa-46e6-983c-44572a74f886
 begin
+	using BmlipTeachingTools
+	using LinearAlgebra
+	using DataFrames
+	using ProgressMeter
 	using Distributions
 	using Plots
-
-	# Normally you would add this to get Slider, but in this notebook, PlutoUI is reexported by our package BmlipTeachingTools so we skip the import here.
-	
-	# using PlutoUI
 end
 
-# ╔═╡ 7bba65e4-f0c0-11ea-231c-290c9a4e290a
+# ╔═╡ 77271b72-bafe-11f0-8fa2-33da6741b124
+md"""
+# Programming in Julia
+
+This notebook will teach you some of the basic programming routines in Julia. You will need these skills to complete the probabilistic programming assignments later on in the course. We will assume basic familiarity with programming, such as for-loops, if-else statements and function definitions.
+
+Resources:
+- **Julia Basics** from _"Julia Programming for Machine Learning"_ taught at TU Berlin:
+  - [L1: Essentials](https://adrianhill.de/julia-ml-course/L1_Basics_1/) (syntax, types, operations, functions)
+  - [L2: Arrays](https://adrianhill.de/julia-ml-course/L2_Basics_2/) (vector, matrix, linear algebra)
+- [JuliaLang documentation](https://docs.julialang.org/en/v1/)
+- [Differences to Python, Matlab, C and Java](https://docs.julialang.org/en/v1/manual/noteworthy-differences/)
+- [Video on getting started](https://www.youtube.com/watch?v=4igzy3bGVkQ&list=PLP8iPy9hna6SCcFv3FvY_qjAmtTsNYHQE)
+- [Pluto.jl documentation](https://plutojl.org/en/docs/)
+"""
+
+# ╔═╡ 705dedd6-755f-4a18-9d4d-cde8c9755e05
+TableOfContents()
+
+# ╔═╡ 4588df60-9c5b-49cc-a3a1-44db790d00ed
+md"""
+## Pluto notebooks
+
+The course is built in Pluto.jl, a reactive programming environment. Pluto notebooks are wonderfully intuitive and interactive, and are already revolutionizing mathematics and computer science education (e.g., [18.S191 Computational Thinking @MIT](https://computationalthinking.mit.edu)).
+
+A few things to be aware of when working in Pluto notebooks:
+- Code is not executed sequentially. In other words, you can call a variable in a cell even if that variable is defined in a later cell.
+- You cannot re-use variable names, i.e., you cannot overwrite a variable with a different variable in a latter cell.
+- A cell can only execute a single function/instruction; if you want to execute more instructions, you have to wrap them in a `begin .. end` environment.
+- Each Pluto notebook manages its own software packages (more on that later).
+- The `Live docs` button on the bottom-right corner can be used to look up documentation of functions.
+- The `Status` button on the bottom-right corner displays what the kernel is doing in the background.
+"""
+
+# ╔═╡ 02c03dad-d974-4584-9766-0e7ea79047e0
+md"""
+## Data types
+
+- References: [Numbers](https://docs.julialang.org/en/v1/base/numbers/), [Integers and Float](https://docs.julialang.org/en/v1/manual/integers-and-floating-point-numbers/), [Strings](https://docs.julialang.org/en/v1/base/strings/), [Symbols](https://docs.julialang.org/en/v1/manual/metaprogramming/).
+
+Numbers in Julia have specific types, most notably `Integer`, `Real` and `Complex`. It is important to be aware of what type your numbers are because many functions operate differently on different number types. 
+"""
+
+# ╔═╡ 9d9799b0-2e0c-4180-ae80-44e5c268c8b4
+a = 3
+
+# ╔═╡ f5df9bc3-79df-4e0b-b199-9ade76f53894
+typeof(a)
+
+# ╔═╡ 29f6c7eb-69ba-4072-a77d-7097235c1dac
+md"""
+`Int64` is a 64-byte integer. Other options are 32-,16-, or 8-bit integers and they can be unsigned as well. The default real-valued numbers is a 64-bit floating-point number:
+"""
+
+# ╔═╡ 3e1ca65e-f4cc-4d28-8139-f04d70980ecb
+b = 3.0
+
+# ╔═╡ 6b4c2d62-b1d0-4f42-9ee6-eb2d9f8ba98a
+typeof(b)
+
+# ╔═╡ 5d627a4e-5dee-4c25-b99c-ae7e4221109f
+md"""
+Converting number types is easy:
+"""
+
+# ╔═╡ 14ab0808-3fdb-4113-8854-43255987a006
+c = convert(Float64, 3)
+
+# ╔═╡ e608d8a8-8faa-4302-bf7e-ae135cef47a4
+typeof(c)
+
+# ╔═╡ 7bc7fb04-9d74-4970-b06b-5bc95d7be757
+md"""
+Strings are constructed by enclosing symbols within double parentheses.
+"""
+
+# ╔═╡ 5013d835-99b7-4b08-bc97-8085017d47ab
+d = "3"
+
+# ╔═╡ f5d8574f-b115-4555-8c0e-41f95824740a
+typeof(d)
+
+# ╔═╡ 6bb76a54-2df8-4604-923a-ebb428eb0353
+md"""
+They can be concatenated by multiplication (which is an example of a function, namely `*`, which acts differently on different input argument types): 
+"""
+
+# ╔═╡ 83e2a97e-72d7-404e-b138-f2c5d30d6365
+ab = "a"*"b"
+
+# ╔═╡ 51123db8-3fdf-4497-b121-ce5b989bc063
+md"""
+You can incorporate numbers into strings through a `$` call:
+"""
+
+# ╔═╡ 6969d1e5-38d0-432d-842e-153139f86613
+"e = $a"
+
+# ╔═╡ ec16be17-cdbd-467a-be07-a6fed4e05dad
+md"""
+Julia also has a `Symbol` type, which is used for [meta-programming](https://docs.julialang.org/en/v1/manual/metaprogramming/) (not important for this course). A `Symbol` type is characterized by a `:` in front of a word. For example:
+"""
+
+# ╔═╡ 7a1e8d0a-cffc-497a-88a7-fd9757bc8eda
+f = :foo
+
+# ╔═╡ 8ebd00be-c361-4080-b1a6-8eca643439a5
+typeof(f)
+
+# ╔═╡ ecea873a-ab10-4539-ba66-b05b1ebdf1ec
+md"""
+You will not have to use `Symbol`s in the course, but you may see one every once in a while in the lecture notes. For example, the `plot` command (see Visualization section), may have a `markershape=:cross` argument.
+"""
+
+# ╔═╡ 77f5b5de-040f-4406-bb57-c1fe58e3b32b
+md"""
+## Array manipulation
+
+- References: [Arrays](https://docs.julialang.org/en/v1/base/arrays/)
+
+Arrays are indexed with square brackets, `A[i,j]`. You can construct a matrix by enclosing a set of numbers with square brackets. If you separate your numbers with comma's, then you will get a column vector:
+"""
+
+# ╔═╡ 3d89c37f-0876-4ba1-aa35-0a7273d4d269
+v = [1,2,3,4]
+
+# ╔═╡ 0d8059ae-c158-43f2-81a8-9cba2f667177
+md"""
+If you use spaces, then you will construct a row vector (i.e., a matrix of dimensions 1 by n):
+"""
+
+# ╔═╡ ccbf4589-8d25-434e-a7f4-3d972b4ee078
+w = [1 2 3 4]
+
+# ╔═╡ 895960bf-1ee2-4aa8-b38c-5857525b1ddc
+md"""
+Matrices can be constructed by separating elements with spaces and rows by semicolons:
+"""
+
+# ╔═╡ 96b831a8-09ba-4792-8268-14c368b804f8
+M = [1 2; 3 4]
+
+# ╔═╡ 519dbc40-2c83-4fda-b6fe-d3547b43b407
+md"""
+Common array constructors are:
+"""
+
+# ╔═╡ 881a67da-5f59-437d-91ce-8c8113985fb6
 begin
-	using DataFrames
-	using CSV
+	U = zeros(2,3)
+	V = ones(2,3)
+	W = randn(2,3)
+end;
+
+# ╔═╡ 58b280bc-914e-45e2-bae4-3c767ba09ec3
+md"""
+Matrix operations are intuitive and similar to the mathematical notation:
+"""
+
+# ╔═╡ be6f2317-24c7-470c-bde8-233ad3d6f3bd
+begin
+	A = [3 2 1; 
+		 2 3 2; 
+		 1 2 3]
+	x = [0, 
+		 1, 
+		 2]
+	A*x
 end
 
-# ╔═╡ 53918345-9b60-4608-9cf1-d64abb83f902
-using BmlipTeachingTools
-
-# ╔═╡ 369042f4-67ce-4cac-871e-72adc503d4e3
-title("Probabilistic Programming 0: Introduction to Bayesian Machine Learning")
-
-# ╔═╡ 7e474146-f044-11ea-2c0c-cbda0c574da5
+# ╔═╡ c97780c0-c60f-443d-98c8-100e67576e23
 md"""
-#### Goal:
-  - Familiarize yourself with basic concepts from Bayesian inference such as priors and posteriors.
-  - Familiarize yourself with working with the Julia programming language in notebooks.
-
-#### Materials:
-  - **Mandatory**
-    - **Julia Basics** from _"Julia Programming for Machine Learning"_ currently being taught at TU Berlin:
-      - [L1: Essentials](https://adrianhill.de/julia-ml-course/L1_Basics_1/) (syntax, types, operations, functions)
-      - [L2: Arrays](https://adrianhill.de/julia-ml-course/L2_Basics_2/) (vector, matrix, linear algebra)
-    - [Mini: Distributions in Julia](https://bmlip.github.io/course/minis/Distributions%20in%20Julia.html)
-  - **Optional**
-    - [Intro to programming in Julia (video)](https://youtu.be/8h8rQyEpiZA?t=233).
-    - [Cheatsheets: how does Julia differ from Matlab / Python](https://docs.julialang.org/en/v1/manual/noteworthy-differences/index.html).
+A matrix can be transposed by a single parenthesis, `A'`. Note that this does not mutate the array in memory. It just tells functions defined for matrices that it should change how it indexes the matrix's elements.
 """
 
-# ╔═╡ 59abbfe8-f0bb-11ea-267b-2126df2b62c9
-md"In 1937, one of the founders of the field of statistics, [Ronald Fisher](https://en.wikipedia.org/wiki/Ronald_Fisher), published a story of how he explained _statistical inference_ to a friend. This story, called the \"Lady Tasting Tea\", has been re-told many times in different forms. In this notebook, we will re-tell one of its modern variants and introduce you to some important concepts along the way."
+# ╔═╡ 174612aa-d8a0-4a21-be83-91648dac1f61
+x'*A*x
 
-# ╔═╡ 0e55ea72-f0bc-11ea-16dc-4d9ccba649e0
-md"### Tasting Experiment
+# ╔═╡ e47bad96-4092-4d0a-8035-f05310359565
+md"""
+## Broadcasting
 
-In the summer of 2017, students of the University of Amsterdam participated in a \"Beer Tasting Experiment\" ([Doorn et al., 2019](https://journals.sagepub.com/doi/pdf/10.1177/1475725719848574)). Each participant was given two cups and were told that the cups contained [Hefeweissbier](https://www.bierenco.nl/product/weihenstephaner-hefeweissbier/), one with alcohol and one without. The participants had to taste each beer and guess which of the two contained alcohol.
+- Reference: [Broadcasting](https://docs.julialang.org/en/v1/manual/arrays/#Broadcasting)
 
-We are going to do a statistical analysis of the tasting experiment. We want to know to what degree participants are able to discriminate between the alcoholic and alcohol-free beers. The participants make a choice between two cups. We can model this choice with what's known as a [Bernoulli distribution](https://en.wikipedia.org/wiki/Bernoulli_distribution). The Bernoulli distribution is a formula to compute the probability of a binary event. In this case, the event variable $X$ indicates either a \"correct\" choice of cup, which we will assign the number $1$, or an \"incorrect\" choice of cup, which we will assign the number $0$. The Bernoulli distribution has a \"rate parameter\" $\theta$, a number between $0$ and $1$, which governs the probability of the two events. If $\theta = 1$, then the participant will always choose the right cup (\"always\" = \"with probability $1$\") and if $\theta = 0$, then the participant will never choose the right cup (\"never\" = \"with probability $0$\"). Choosing at random, i.e. getting as many correct choices as incorrect choices, corresponds to $\theta = 0.5$.
+You can apply functions to elements in an array by placing a dot in front:
+"""
 
-Bayesian inference is about 3 core steps: specifying a prior distribution, specifying a likelihood and computing a posterior distribution. We are going to walk through these three steps in detail below."
+# ╔═╡ ab9f639a-abd0-44e0-bb89-ed27472a641d
+ 3 .*[1 2 3]
 
-# ╔═╡ 01c3378c-f0bd-11ea-1983-3bb57d137076
-md"### 1. Prior distributions
+# ╔═╡ 767a5b82-b007-42aa-897c-6dfa4eadf28a
+md"""
+This also works for named functions:
+"""
 
-In Bayesian inference, it is important to think about what kind of _prior knowledge_ you have about your problem. In our tasting experiment, this corresponds to what you think the probability is that a participant will correctly choose the cup. In other words, you have some thoughts about what value $\theta$ is in this scenario. You might think that the participants' choices are all going to be roughly random. Or, given that you have tasted other types of alcohol-free beers before, you might think that the participants are going to choose the right cup most of the time. This intuition, this \"prior knowledge\", needs to be quantified. We do that by specifying another probability distribution for it, in this case the [Beta distribution](https://en.wikipedia.org/wiki/Beta_distribution). The Beta distribution computes the probability of an outcome in the interval $[0,1]$. Like any other other distribution, it has parameters: $\alpha$ and $\beta$. Both are \"shape parameters\", meaning the distribution has a different shape for each value of the parameters. Let's visualise this!"
+# ╔═╡ cf9d6290-0aeb-484a-8816-6972fd3c4891
+sin.([1., 2., 3.])
 
-# ╔═╡ 25cd0414-f0bd-11ea-3eae-f787a36a3798
-md"In Julia, you import libraries and software packages using the `using` command. Here we are importing a library of probability distributions called [Distributions.jl](https://github.com/JuliaStats/Distributions.jl) and a library of plotting utilities called [Plots.jl](https://github.com/JuliaPlots/Plots.jl)."
+# ╔═╡ 2e3b7a55-a85b-4498-8dc4-c14853ec06ab
+md"""
+## Iteration
 
-# ╔═╡ b48f2b86-2281-4804-b4ac-614457eab859
-md"Shape parameter `α` = "
+- Reference: [Collections](https://docs.julialang.org/en/v1/base/collections/)
 
-# ╔═╡ 31427b48-f0be-11ea-3493-39d0617e6c14
-@bind α Slider(0:.1:100; default=50, show_value=true)
+For-loops are one of the simplest forms of iteration and can be defined in a number of ways. First, the matlab way:
+"""
 
-# ╔═╡ f51c794d-9753-4431-bf5a-ccf0a7a0641c
-md"Rate parameter `β` = "
-
-# ╔═╡ 3e8a79b8-f0be-11ea-314c-333d84cea659
-@bind β Slider(0:.1:100; default=50, show_value=true)
-
-# ╔═╡ 87373db4-f0bd-11ea-0b4b-0fbf22e8098d
-begin	
-	# Define random variable
-	θ = range(0.0, step=0.001, stop=1.0)
-	
-	# Define probability distribution
-	pθ = Beta(α, β)
-	
-	# Visualize probability distribution function
-	plot(θ, pdf.(pθ, θ);
-		 linewidth=3, color="red", 
-		 label="α = $(α), β = $(β)", 
-		 xlabel="θ", ylabel="p(θ)",
-		)
+# ╔═╡ cc21a0ab-d413-453b-94a0-15d33524ca4f
+for n = 1:2:5
+    println(n)
 end
 
-# ╔═╡ 8553e0b4-f0be-11ea-2487-07aacadc4508
-md"""A couple of things to note about the code block: 
-- You can use greek letters as variables (write them like in latex, e.g. \alpha, and press `tab`)
-- To get sliders, you can use [PlutoUI.jl](https://github.com/JuliaPluto/PlutoUI.jl). The "@" in front of 'bind' is called a ["macro" operator](https://docs.julialang.org/en/v1/base/base/#macro). It essentially groups a set of commands into one to get a clean function call.
-- Ranges of numbers work just like they do in Matlab (e.g. `0.0:0.1:1.0`) and Python (e.g. `range(0.0, stop=100., length=100)`). Note that Julia is strict about types, i.e. it will generate integers if you don't use a decimal point.
-- There is a `.` after the command `pdf`. This refers to ["broadcasting"](https://julia-guide.netlify.app/broadcasting): the function is applied to each element of a list or array. Here we use the `pdf` command to compute the probability for each value of $\theta$ in the array.
-- Plotting is done with [Plots.jl](https://github.com/JuliaPlots/Plots.jl/). Many of the keyword arguments in the `plot` command should be familiar to you if you've worked with [Matplotlib](https://matplotlib.org/) (Python's plotting library).
-- In the `label=` argument to plots, we have performed \"string interpolation\". In Julia, you write a string with double-quote characters and you can insert a value using `$`.
-
-I encourage you to play around with the parameters and see how they alter the distribution."""
-
-# ╔═╡ 911adcbb-a647-4c4f-8aa6-d2206b227811
-NotebookCard("https://bmlip.github.io/course/minis/Distributions%20in%20Julia.html")
-
-# ╔═╡ 02c1ebd0-f0c0-11ea-1f7d-a33e7bb4c88f
-md"""As you can see, the Beta distribution is quite flexible and can capture your belief about how often participants will correctly detect the alcoholic beverage. For example, the purple line indicates that you believe that it is very probable that participants will always get it right (peak lies on $\theta=1.0$), but you still think there is some probability that the participants will guess at random ($p(\theta = 1/2) \approx 0.3$). The yellow-brown line indicates you believe that it is nearly impossible that the participants will always get it right ($p(\theta = 1) \approx 0.0$), but you still believe that they will get it right most often (peak lies around $\theta \approx 0.8$).
-
-#### Summary
-
-A prior distribution is a probability distribution function of an unknown parameter $p(\theta)$, that signifies how probable each value of the parameter is **before** you observe data in your experiment. It is up to you to define what that prior distribution looks like. """
-
-# ╔═╡ f2f67347-7d99-4e67-87db-61a302e2aa81
-exercise_statement("Prior parameters")
-
-# ╔═╡ 23fa4662-f0c0-11ea-2df0-d9dd86ebf137
+# ╔═╡ ff063276-46ef-4768-a0b1-878e9eb1a13e
 md"""
-
-
-I want you to pick values for the prior parameters $\alpha$ and $\beta$ that reflect how often you think the participants will get it right.
+Next, we can use the `range` command to construct an array of numbers and then use the `in` command to loop over elements in the array:
 """
 
-# ╔═╡ 2fc7ef3a-f0c0-11ea-3eca-ab02d7f3fcfe
-md"""## 2. Likelihood
+# ╔═╡ 2f5ff4dc-5267-4d64-aca5-a6a0be536f8f
+for n in range(0, stop=4, length=2)
+    println(n)
+end
 
-The next step is the [likelihood function](https://en.wikipedia.org/wiki/Likelihood_function). A likelihood is a conditional probability distribution of events $X$ given parameters $\theta$. In our tasting experiment, we are using the Bernoulli distribution: the higher value $\theta$ has, the more probable the event $X=1$, i.e. the participant correctly guesses the alcoholic beverage. The formula for the Bernoulli distribution is:
-
-$$\begin{align}
-p(X = x \mid \theta) =&\ \text{Bernoulli}(X \mid \theta) \\
-=&\ \theta^x (1-\theta)^{1-x}
-\end{align}$$
-
-So, if $X=1$, then the formula simplifies to $p(X = 1 \mid \theta) = \theta^1 (1-\theta)^{1-1} = \theta$ and if $X=0$, it simplifies to $p(X = 0 \mid \theta) = \theta^0 (1-\theta)^{1-0} = 1-\theta$. If you have multiple observations for $X$, you can get the probability of all observations by taking the product of individual probabilities:
-
-$$p(\{x_1, \dots, x_N\} \mid \theta) = \prod_{i=1}^{N} p(X = x_i \mid \theta)$$
-
-The reason we call this the "likelihood" is a subtle but important point: when $X$ is observed the distribution indirectly tells us something about $\theta$. For example, suppose the first three participants have correctly guessed the beverage. Then, the probability under $\theta = 0.8$ is $p(\{1,1,1\} \mid \theta = 0.8) = 0.8 \cdot 0.8 \cdot 0.8 = 0.512$. That is larger than the probability under $\theta = 0.4$, which is $p(\{1,1,1\} \mid \theta = 0.4) = 0.4^3 = 0.064$. We say that the likelihood function tells us how "likely" each value for the parameter is, given the observations. 
-
-#### Summary
-
-A likelihood function is a conditional probability distribution of observed data given an unobserved parameter."""
-
-# ╔═╡ 63ef008c-f0c0-11ea-3d12-070c342c851b
-md"""#### Data
-
-Now we're going to start looking at some data. The data of the participants in Amsterdam is available online at the [Open Science Foundation](https://osf.io/428pb/?view_only=e3dc67dab9c54d23a92fb2e88465f428). We'll reading it in by importing some data libraries."""
-
-# ╔═╡ 993aaf52-f0c0-11ea-3a6a-9141a6706f7e
-md"""[CSV.jl](https://github.com/JuliaData/CSV.jl) is a library for reading in data stored in tables and [DataFrames.jl](https://github.com/JuliaData/DataFrames.jl) manipulates table data."""
-
-# ╔═╡ ee206a84-f0c0-11ea-041d-97696dd759d6
-md"""We are going to specifically look at the "CorrectIdentify" column."""
-
-# ╔═╡ 1302fd1c-f0c1-11ea-1da6-7fd6f5e43ad0
-md"""That's a bit hard to parse, so we'll plot this using a histogram."""
-
-# ╔═╡ ea7364f4-f0ed-11ea-06e1-e1022a7d47d9
-md"""Code notes:
-- The `!` in `data[!, ..]` is specific to the DataFrames syntax.
-- The `.==` checks for each element of the array X whether it is equal."""
-
-# ╔═╡ 564cff50-f0ee-11ea-3908-afe9a2164805
-md"Let's visualize the likelihood of these observations."
-
-# ╔═╡ 6dbf5778-f0ee-11ea-36fb-214682733716
-md"""The likelihood is has quite a clear shape: there is a sharp peak just below $\theta = 0.75$. Note that the likelihood is a conditional distribution which means it is not properly normalized."""
-
-# ╔═╡ 76cc8e12-f0ee-11ea-3aa5-27934c3a44b9
+# ╔═╡ 122a00c1-d3d4-43da-b5d1-6bc660f5d43e
 md"""
-### 3. Posterior
-
-One we have specified the prior and the likelihood, we can compute the posterior. Remember Bayes' rule:
-
-```math
-p(\theta \mid X) = \frac{p(X \mid \theta) p(\theta)}{p(X)} \, .
-```
-
-The posterior ``p(\theta \mid X)`` equals the likelihood ``p(X \mid \theta)`` times the prior ``p(\theta)`` divided by the evidence ``p(X)``. In our tasting experiment, we have a special thing going on: [conjugacy](https://en.wikipedia.org/wiki/Conjugate_prior). The Beta distribution is "conjugate" to the Bernoulli likelihood, meaning that the posterior distribution is also going to be a Beta distribution. Specifically with the Beta-Bernoulli combination, it is easy to see what conjugacy actually means. We haven't looked at the formula for the Beta distribution yet, which is:
-
-```math
-\begin{align} 
-p(\theta) =&\ \text{Beta}(\theta \mid \alpha, \beta) \\
-=&\ \frac{1}{B(\alpha, \beta)} \theta^{\alpha-1} (1-\theta)^{\beta-1} \, .
-\end{align}
-```
-
-The ``B(\alpha, \beta)`` is a function used to normalise this distribution. If you now take the product of the likelihood and the prior (ignoring the normalizing function $B$), you get something that can be simplified beautifully:
-
-```math
-\begin{align} 
-p(X \mid \theta) p(\theta) \ \propto&\ \ \theta^x (1-\theta)^{1-x} \cdot \theta^{\alpha-1} (1-\theta)^{\beta-1} \\
-=&\ \ \theta^{x+\alpha-1} (1-\theta)^{1-x+\beta-1} \quad . 
-\end{align}
-```
-
-This last line is again the formula for the Beta distribution (except for a proper normalisation) but with different parameters (``x+\alpha`` instead of ``\alpha`` and ``x+\beta`` instead of ``\beta``). This is what we mean by conjugacy: the product of the likelihood and the prior simplifies elegantly to produce a convenient form.
-
-Let's now visualise the posterior after observing the data from Amsterdam.
+If you need both the index and the value of the array element, you can use the `enumerate` command:
 """
 
-# ╔═╡ cc76d034-f0ee-11ea-11f2-4f1a8b8cfa47
-# Shape parameter of prior distribution
-@bind α0 Slider(0:.1:100; default=50, show_value=true)
+# ╔═╡ 034f3378-6dc8-4fff-b8a7-afdc330b4f01
+for (j,n) in enumerate(range(0,3))
+    println("$j, $n")
+end
 
-# ╔═╡ d8899b9a-f0ee-11ea-3396-c51ae5beb62b
-# Rate parameter of prior distribution
-@bind β0 Slider(0:.1:100; default=50, show_value=true)
-
-# ╔═╡ 543b0024-f0ef-11ea-2775-6f0c0b586865
-md"""That looks great! We have updated our belief from thinking that roughly $0.8$ of participants would correctly guess the alcoholic beverage to being quite sure that $0.75$ of participants can correctly guess."""
-
-# ╔═╡ 5e3b0846-f0ef-11ea-2c4a-15c55ba5cd43
+# ╔═╡ 408e3447-21bb-4617-bdf2-d60f7cfb8ece
 md"""
-
-$(exercise_statement(""))
-
-Plug the shape parameters of your prior into the code block above and see how your posterior differs (if you had a different prior than I had). Play around with different parameters to get a feeling for how the posterior depends on the prior.
+You may be familiar with "list comprehension", which is a shortened form of iterating through a collection:
 """
 
-# ╔═╡ 85d9fc20-f0ef-11ea-2b0a-e9f51d73d562
-md"""### Hypothesis testing
+# ╔═╡ a02297a2-8660-4fd1-95af-438f363b9f29
+["n = $n" for n in range(2,4)]
 
-Now that we have a posterior distribution, we can do some further analysis. For instance, how sure are we that participants are actually better than chance level at detecting the alcoholic beer? 
-
-This kind of statement, involving relative probabilities, can be tackled by _hypothesis testing_. In hypothesis testing, you start with a null hypothesis $H_0$, which is a particular choice for the detection parameter $\theta$. For example, in the question above, we are interested in "better than chance level". Chance level corresponds to $\theta = 0.5$. We then have an alternative hypothesis $H_1$, namely that we are interested in whether the participants can detect it better than chance, i.e. $\theta > 0.5$. 
-
-Proper hypothesis testing can be quite complicated and there could be factors / terms that are difficult, if not impossible, to compute (see [Wagemakers et al., 2010](https://www.sciencedirect.com/science/article/pii/S0010028509000826?casa_token=oOWuhv4FdwcAAAAA:HdpoBRU0adxKmCDPZF0gADbzbkPoiejfc0ZMJlTKq0DwhVVcnvM0OxS4IJV1GGKbSvb6yLCOvA)). Fortunately, in our current test we can perform some simplifications. The following quantity tells us something about the relative probability of detecting the alcoholic beverage at chance level versus better than chance level:
-
-```math
-\text{BF}_{10} = \frac{p(\theta = 0.5)}{p(\theta = 0.5 \mid X)}
-```
-
-BF stands for Bayes Factor and the subscript $10$ indicates how much more likely $H_1$ is than $H_0$."""
-
-# ╔═╡ 53d29d28-f0f0-11ea-3e2d-4bb7363f37cb
-md"""So, the alternative hypothesis _"people can correctly detect the alcoholic versus non-alcoholic Hefeweissbier better than chance level"_ is almost 200 times more likely than the null hypothesis _"people cannot distinguish between the alcoholic versus non-alcoholic Hefeweissbier"_, according to our data."""
-
-# ╔═╡ 30062e75-5e94-4b1f-835e-353cc51bee32
+# ╔═╡ 277c5574-910b-4f05-8661-ef81278e9319
 md"""
-# Appendix
+## Control flow
+
+- References: [Control flow](https://docs.julialang.org/en/v1/manual/control-flow/), [Logical Operators](https://docs.julialang.org/en/v1/manual/missing/#Logical-operators)
+
+Control flow refers to redirecting how a compiler goes through a program. Instead of traversing it line-by-line, things like `if-else` statements can make a compiler skip steps. These require logical operations: you can use `==` to check if two variables have the same value, `===` to check if they are actually the same object (i.e., same memory reference) and `!=` to check if they're not equal.
 """
 
-# ╔═╡ 2dba463a-e8ce-450b-9874-d76ce75e55f7
-"""
-Get a file from the BMLIP course repository. If it exists locally, we use it directly, otherwise it gets downloaded from github.
-"""
-function get_data_file(name::String)
-	# if the file exists locally...
-	p = joinpath(@__DIR__, "data", name)
-	if basename(@__DIR__) == "probprog" && isfile(p)
-		# ...then use it...
-		p
-	else
-		# ...otherwise download it from our github repo
-		Downloads.download("https://raw.githubusercontent.com/bmlip/course/refs/tags/v4/probprog/data/$(name)")
+# ╔═╡ 61f5260a-dd5b-4ca1-9d55-30d7fd453f4e
+begin
+	r = 3.0
+	if r < 0 
+	    println("Negative")
+	elseif r == 0
+	    println("0.0")
+	else 
+	    println("Positive")
 	end
 end
 
-# ╔═╡ e617816a-f0c0-11ea-1a5d-81f5db895c05
-data = DataFrame(CSV.File(get_data_file("TastingBeerResults.csv")))
+# ╔═╡ 66a29ea6-d467-4909-964d-c88d68da4d50
+md"""
+Simple `if-else` statements can often be replaced by `ternary` checks. Essentially, you ask a question (a logical operation followed by `?`) and then tell the program what to do when the answer is yes (written immediately after the question) or no (written after the yes-answer followed by a `:`).
+"""
 
-# ╔═╡ 096fb72c-f0c1-11ea-3323-fdb949953348
-# Extract variable indicating correctness of guess
-X = data[!, :CorrectIdentify]
+# ╔═╡ 826ef035-bf26-45ac-b33c-dc2dcaa23f7c
+r > 0 ? println("Positive") : println("Not positive")
 
-# ╔═╡ 905abc24-f0c0-11ea-3891-85947dc03075
+# ╔═╡ ce73c7c3-5025-4784-8657-b2b67097c702
+md"""
+## Functions
+
+- References: [Functions](https://docs.julialang.org/en/v1/manual/functions/), [Mutation](https://docs.julialang.org/en/v1/manual/style-guide/#bang-convention)
+
+Function and expressions are a core component of the julia language. Its "multiple dispatch" feature means that you can define multiple functions with the same name but with behaviour that depends on the input argument types. When you're starting out, you may not notice this so much, but you will start to appreciate this feature tremendously when you begin to professionally develop software.
+"""
+
+# ╔═╡ 3889c64c-d018-4c04-80a4-246aaede7d4e
 begin
-	# Number of successes and failures
-	S = sum(X .== 1)
-	F = sum(X .== 0)
+	function foo(bar::Float64)
+	    message = "Boo!"
+	    return message
+	end
 	
-	# Visualize frequencies
-	histogram(
-		X, bins=[0,1,2]; 
-		label="Incorrect = $(F), Correct = $(S)", 
-		xlabel="X", ylabel="Number", 
-		xticks=[0,1], 
-		legend=:topleft,
+	function foo(bar::Integer)
+	    message = "Bah!"
+	    return message
+	end
+	
+	foo(1)
+end
+
+# ╔═╡ a5a577b6-4266-4698-a3a1-7147590795b5
+md"""
+Note that the `return` argument does not need to be at the end of a function ([the return keyword](https://docs.julialang.org/en/v1/manual/functions/#The-return-Keyword)).
+
+You don't actually need the `function` keyword if you have simple enough functions:
+"""
+
+# ╔═╡ 721d9bd7-c04c-4874-897e-61fde49ba257
+fn(x::Number) = 1/x
+
+# ╔═╡ 3b0e1194-e6df-46e4-8c41-032f5beeb8fa
+md"""
+You can add keyword arguments to a function, which are input arguments with default values:
+"""
+
+# ╔═╡ 9dc43526-5604-4251-aa22-3aff5fa3bd0b
+fn(; number::Number = 1) = 1/number
+
+# ╔═╡ 90d21b8f-b29b-420c-894b-a94abb52f2bb
+fn(4)
+
+# ╔═╡ ebbf4498-4082-44a0-a904-c80ca6dab2c7
+[fn() fn(number=3)]
+
+# ╔═╡ 44add801-211a-423d-9279-54ab6a101420
+md"""
+Functions that modify their input arguments instead of creating new output variables are typically marked with an `!`. Below I have defined an unsorted vector and I call `sort` to sort it in increasing order. If I call the sort function and the original vector, then they will be different:
+"""
+
+# ╔═╡ 25c4102b-9ed9-44c7-9c5f-9d7e1810f229
+begin
+	e = [1, 3, 2]
+	[sort(e) e]
+end
+
+# ╔═╡ a520e936-d80b-42fe-9b45-28d972383ff9
+md"""
+But if I call the `sort!` function and the original vector, you'll see that the original vector is now also sorted.
+"""
+
+# ╔═╡ f4753dd6-51f7-48db-b8e9-26b550af1bac
+[sort!(x) x]
+
+# ╔═╡ dab1a565-43a9-48ac-896f-cc0ee7856552
+md"""
+## Packages
+
+The base form of Julia has many wonderful functions and methods. But not everything. To extend functionality, we have to import additional software packages. Below is a list of the few packages we cover in today's tutorial. But you'll see more later in the course.
+"""
+
+# ╔═╡ 9f761389-7125-4df0-877f-9925b315913f
+md"""
+Below are some examples of importing packages and using their added functionalities.
+"""
+
+# ╔═╡ 70a9cd5f-ec47-4c45-b822-64c3ff72322a
+eigen([3. 2.;2. 0.4])
+
+# ╔═╡ 8a606467-0434-418f-85e5-40a35c9df95f
+begin
+	D = Dict(
+	    "a" => 1,
+	    "b" => 2,
+	    "c" => 3
 	)
+	
+	df = DataFrame(D)
 end
 
-# ╔═╡ 5e3b806a-f0ee-11ea-245e-77cb9d224ff3
+# ╔═╡ 5905847d-2358-4380-a5a0-c5ac8c716839
 begin
-	# Define the Bernoulli likelihood function
-	Bernoulli_pdf(S, F, θ) = θ^S * (1-θ)^F
-
-	# Plot likelihood
-	plot(θ, Bernoulli_pdf.(S, F, θ), linewidth=3, color="black", label="", xlabel="θ", ylabel="p(X|θ)")
+	px = Normal(1.0, 0.5)
+	pdf(px, 0.0)
 end
 
-# ╔═╡ c9f295b4-f0ee-11ea-2505-b1705a92ebd1
+# ╔═╡ f72045aa-fa31-40bf-b80c-5259583f1d30
+md"""
+You will see much more of the `Distributions.jl` package in this course. See also:
+"""
+
+# ╔═╡ eacafc14-d0f6-472f-be69-2ab0d81e41b1
+NotebookCard("https://bmlip.github.io/course/minis/Distributions%20in%20Julia.html")
+
+# ╔═╡ e3be7db2-a307-4083-bb35-db4e70dfe1bf
+md"""
+## Visualization
+
+- Reference: [Plots.jl](https://github.com/JuliaPlots/Plots.jl)
+
+Plots.jl provides a common interface to call various other visualization backends (GR, Matplotlib, PGFPlotsX, Plotly, etc.). In other words, commands like `plot(..)` will be translated into the appropriate command for the backend. So, it does not re-invent the wheel but rather gives you access to the already enormous field of visualization tools.
+
+Below are a few examples of the most common visualization commands you'll see throughout the course. The core principle is to use a `plot` type as base command and then provide keyword arguments (in `String`, `Number` or `Symbol` type) to apply variations.
+"""
+
+# ╔═╡ 6048a5ad-2964-4aab-a708-32754e52eb1c
 begin
-	# Define prior distribution
-	pθ0 = Beta(α0, β0)
-
-	# Update parameters for the posterior
-	αN = α0 + sum(X .== 1)
-	βN = β0 + sum(X .== 0)
-
-	# Define posterior distribution
-	pθX = Beta(αN, βN)
-
-	# Visualize probability distribution function
-	plot(θ, pdf.(pθ0, θ), linewidth=3, color="red", label="prior", xlabel="θ", ylabel="p(θ)")
-	plot!(θ, pdf.(pθX, θ), linewidth=3, color="blue", label="posterior")
+	xx = range(-3, stop=3, length=301)
+	
+	plot(xx, pdf.(px, xx), 
+		 xlabel="x", 
+		 ylabel="p(x)", 
+		 label="pdf", 
+		 color="red", 
+		 linewidth=5, 
+		 linestyle=:dash)
 end
 
-# ╔═╡ 4a58cc90-f0f0-11ea-1afc-152c4acac936
-BF10 = pdf(pθ0, 0.5) / pdf(pθX, 0.5)
+# ╔═╡ 755d9324-5447-4240-9a17-6e212dab4edd
+md"""
+`plot` and `scatter` are the most useful commands. A `scatter` command will ignore properties such as `linewidth` and `linestyle` (since there are no lines) and will listen to `markersize` and `markershape` commands (see [Supported Attributes](https://docs.juliaplots.org/stable/generated/supported/) in the API).
+"""
+
+# ╔═╡ 63530cf1-e20d-4250-a6e0-68443253a0e7
+begin
+	X = randn(10,2)
+	
+	scatter(X[:,1], X[:,2], 
+			xlabel="X_1", 
+			ylabel="X_2", 
+			markersize=10, 
+			markershape=:circle)
+end
+
+# ╔═╡ f77783b5-b35a-4437-b436-323d7668d456
+md"""
+It is possible to add plots to the same figure by using a `!` added to your plot command.
+"""
+
+# ╔═╡ 909a83f1-507c-4d8f-855e-f1a45d3aa927
+begin
+	plot(xx, pdf.(Normal(0.,1.), xx), 
+		 xlabel="x", 
+		 ylabel="p(x)", 
+		 label="N(0,1)", 
+		 color="red", 
+		 linewidth=5, 
+		 linestyle=:dash)
+	
+	plot!(xx, pdf.(Normal(1.,0.5), xx), 
+		  xlabel="x", 
+		  ylabel="p(x)", 
+		  label="N(1,0.5)", 
+		  color="blue", 
+		  linestyle=:solid)
+end
+
+# ╔═╡ de01ba69-cc44-4f3a-8dfa-98f4a194b28a
+md"""
+## Macro's
+
+- References: [Macros](https://docs.julialang.org/en/v1/manual/metaprogramming/#man-macros)
+
+Words that start with the `@` symbol are "macro"'s in Julia, for example `@time, @test, @model`. They represent a series of functions called on an input structure and are really handy when you have to use the same set of instructions often. 
+
+For example, you could define a `ProgressMeter` bar, update it at every iteration of a for-loop and write a custom print statement every time. _Or_, you could call the `@showprogress` macro on the for-loop itself:
+"""
+
+# ╔═╡ b3e11050-b799-4d88-b5cc-bc9d057be7bc
+@showprogress for n in 1:10
+    sleep(0.2)
+end
+
+# ╔═╡ 73a811a3-8c64-4bf0-9656-1d8488819f45
+md"""
+Macro's are a somewhat advanced form of metaprogramming. You will not need to define any new macro's; this instruction is just here to explain what they are.
+"""
+
+# ╔═╡ 28f3894f-6135-4359-842e-ef5e783fc469
+md"""
+## Errors & Debugging
+
+- References: [Stack traces](https://docs.julialang.org/en/v1/manual/stacktraces/)
+
+When you call a function that Julia doesn't know, it will return a list of the steps it took to execute your command and point to where its progress was blocked. This is highly useful but it typically requires a bit of practice to parse (i.e., read and filter) stack traces.
+
+Suppose we write a function that expects an `Integer` input and call that function with an `Float64` argument:
+"""
+
+# ╔═╡ 113fa658-4325-4ea6-a5ab-6337889006f4
+function add1(a::Integer)
+    return a + 1
+end
+
+# ╔═╡ 897d515d-bfda-4a8f-abbb-9276d69f0f4d
+add1(3.0)
+
+# ╔═╡ fe650845-f138-4e15-a20e-09dd8bbe6d5c
+md"""
+Note that we first of all get a `MethodError`. This points to the fact that Julia could not find the function (i.e, method) that you asked for; `add1(::Float64)` does not exist.
+
+Furthermore, Julia provides a list of "Closest candidates" which are functions of the same name with different input arguments. It reports:
+```
+Closest candidates are:
+  add1(!Matched::Integer)
+```
+
+You should read this as "there exists a function called `add1` that expects an `Integer` input." Try that.
+"""
+
+# ╔═╡ 8d64ec48-639e-4fc2-9c6c-5cd207c1ba75
+add1(3)
+
+# ╔═╡ e5555433-b323-4af5-805c-db592461307b
+md"""
+The `!Matched` is also important but requires a slightly more complicated example. Suppose we have a function with two `Integer` inputs and we call with `Float64` and `Int64` arguments.
+"""
+
+# ╔═╡ 08b24136-c292-4360-a90e-a8fd82d45d6b
+function add(a::Integer, b::Integer)
+    return a+b
+end
+
+# ╔═╡ 0e341cb6-bbca-4581-858f-50b4e2ca858a
+add(3.0,4)
+
+# ╔═╡ c66b8dec-aa58-4508-9f93-70d65ba2c051
+md"""
+We again get the `MethodError` that the function we asked for doesn't exist and a suggested alternative (i.e., "closest candidate"). But note that in that alternative, `add(!Matched::Integer, ::Integer)`, only one of the inputs is `!Matched`. So, in fact, Julia check your input argument types against those in the closest candidates. This tells you _what_ to change: if you change the first argument of your function call to an `Integer` type, then this closest candidate will be evaluated.
+
+"""
+
+# ╔═╡ 8fe19ca9-6618-4c70-8eca-6ba002630ca9
+add(3,4)
+
+# ╔═╡ 4f785723-2f6a-4dcd-82a7-8d15daf191e8
+md"""
+To summarize, when you get an error, it is important to read the stack trace. It may tell you that you need only change a small thing for your code to work.
+
+The type of error can also be informative. The `MethodError` is probably the error you will see most often. Another important error is the `UndefVarError`, which occurs when you call a variable that was not defined. For example:
+"""
+
+# ╔═╡ 7f1f4e2b-bbb4-4e26-8277-2753991e650d
+md"""
+The solution to this, of course, is to define the variable first. Sometimes this error occurs through a spelling mistake. You will encounter objects in the course called `MvNormalMeanCovariance`. If you misremember that name and write `MvNormalMeanVariance`, this will happen:
+"""
+
+# ╔═╡ 2b5fc25d-eb18-42f8-85fa-f0440f536342
+aa = MvNormalMeanVariance()
+
+# ╔═╡ dcdaf64e-8ec0-42ae-8c6c-34a056bd17d9
+y = 3*aa
+
+# ╔═╡ 54662c5d-7ba3-4e96-88ce-3c9ba1907f8e
+md"""
+You will get an `UndefVarError`.
+
+Next to errors, it is also important to check line numbers in a stack trace. For example, the cell below contains a mistake and evaluating it will throw an error. But which line has the mistake? Press the `Show stack trace..` button to zoom in on the error line.
+"""
+
+# ╔═╡ b6399549-c754-498a-887c-401f252ba21f
+begin
+	kk = 3*2
+	ll = 3*kk
+	mm = kl*ll
+	nn = mm*ll
+end
+
+# ╔═╡ 64934637-5ac4-4c74-9290-26aa876344bf
+md"""
+It's import to look at linenumbers when you're trying to find a bug.
+"""
+
+# ╔═╡ 400ad142-8fad-42f6-a8cb-3a1b9c56f5db
+md"""
+## Closing
+
+That's it for now. If you encounter mysterious errors, please let us know on [Piazza](https://piazza.com/tue.nl/winter2025/5ssd0). We can add them to this primer.
+
+And if you have any feedback about improving this short primer on programming in Julia, let us know!
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 BmlipTeachingTools = "656a7065-6f73-6c65-7465-6e646e617262"
-CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 
 [compat]
 BmlipTeachingTools = "~1.3.1"
-CSV = "~0.10.15"
 DataFrames = "~1.8.1"
 Distributions = "~0.25.122"
-Plots = "~1.40.17"
+Plots = "~1.41.1"
+ProgressMeter = "~1.11.0"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -345,7 +602,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.12.1"
 manifest_format = "2.0"
-project_hash = "6859e30908cd090e55feaeedef5f9ef18d2d4373"
+project_hash = "dbd78bca9a027e6fd88f53ecd3b69bb7805b45f4"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -387,12 +644,6 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "1b96ea4a01afe0ea4090c5c8039690672dd13f2e"
 uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
 version = "1.0.9+0"
-
-[[deps.CSV]]
-deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "PrecompileTools", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings", "WorkerUtilities"]
-git-tree-sha1 = "deddd8725e5e1cc49ee205a1964256043720a6c3"
-uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
-version = "0.10.15"
 
 [[deps.Cairo_jll]]
 deps = ["Artifacts", "Bzip2_jll", "CompilerSupportLibraries_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
@@ -481,10 +732,10 @@ uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 version = "1.8.1"
 
 [[deps.DataStructures]]
-deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
-git-tree-sha1 = "4e1fe97fdaed23e9dc21d4d664bea76b65fc50a0"
+deps = ["OrderedCollections"]
+git-tree-sha1 = "6c72198e6a101cccdd4c9731d3985e904ba26037"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.18.22"
+version = "0.19.1"
 
 [[deps.DataValueInterfaces]]
 git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
@@ -507,6 +758,11 @@ deps = ["Mmap"]
 git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 version = "1.9.1"
+
+[[deps.Distributed]]
+deps = ["Random", "Serialization", "Sockets"]
+uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+version = "1.11.0"
 
 [[deps.Distributions]]
 deps = ["AliasTables", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SpecialFunctions", "Statistics", "StatsAPI", "StatsBase", "StatsFuns"]
@@ -554,26 +810,15 @@ version = "2.7.3+0"
 
 [[deps.FFMPEG]]
 deps = ["FFMPEG_jll"]
-git-tree-sha1 = "83dc665d0312b41367b7263e8a4d172eac1897f4"
+git-tree-sha1 = "95ecf07c2eea562b5adbd0696af6db62c0f52560"
 uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
-version = "0.4.4"
+version = "0.4.5"
 
 [[deps.FFMPEG_jll]]
 deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
-git-tree-sha1 = "3a948313e7a41eb1db7a1e733e6335f17b4ab3c4"
+git-tree-sha1 = "ccc81ba5e42497f4e76553a5545665eed577a663"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
-version = "7.1.1+0"
-
-[[deps.FilePathsBase]]
-deps = ["Compat", "Dates"]
-git-tree-sha1 = "3bab2c5aa25e7840a4b065805c0cdfc01f3068d2"
-uuid = "48062228-2e41-5def-b9a4-89aafe57970f"
-version = "0.9.24"
-weakdeps = ["Mmap", "Test"]
-
-    [deps.FilePathsBase.extensions]
-    FilePathsBaseMmapExt = "Mmap"
-    FilePathsBaseTestExt = "Test"
+version = "8.0.0+0"
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
@@ -633,15 +878,15 @@ version = "3.4.0+2"
 
 [[deps.GR]]
 deps = ["Artifacts", "Base64", "DelimitedFiles", "Downloads", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Preferences", "Printf", "Qt6Wayland_jll", "Random", "Serialization", "Sockets", "TOML", "Tar", "Test", "p7zip_jll"]
-git-tree-sha1 = "1828eb7275491981fa5f1752a5e126e8f26f8741"
+git-tree-sha1 = "f52c27dd921390146624f3aab95f4e8614ad6531"
 uuid = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
-version = "0.73.17"
+version = "0.73.18"
 
 [[deps.GR_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "FreeType2_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Qt6Base_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "27299071cc29e409488ada41ec7643e0ab19091f"
+git-tree-sha1 = "4b0406b866ea9fdbaf1148bc9c0b887e59f9af68"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
-version = "0.73.17+0"
+version = "0.73.18+0"
 
 [[deps.GettextRuntime_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Libiconv_jll"]
@@ -941,9 +1186,9 @@ uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
 version = "2.28.10+0"
 
 [[deps.Measures]]
-git-tree-sha1 = "c13304c81eec1ed3af7fc20e75fb6b26092a1102"
+git-tree-sha1 = "b513cedd20d9c914783d8ad83d08120702bf2c77"
 uuid = "442fdcdd-2543-5da2-b0f3-8c86c306513e"
-version = "0.3.2"
+version = "0.3.3"
 
 [[deps.Missings]]
 deps = ["DataAPI"]
@@ -986,10 +1231,10 @@ uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
 version = "0.8.7+0"
 
 [[deps.OpenSSL]]
-deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
-git-tree-sha1 = "f1a7e086c677df53e064e0fdd2c9d0b0833e3f6e"
+deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "NetworkOptions", "OpenSSL_jll", "Sockets"]
+git-tree-sha1 = "386b47442468acfb1add94bf2d85365dea10cbab"
 uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
-version = "1.5.0"
+version = "1.6.0"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -1063,15 +1308,15 @@ version = "3.3.0"
 
 [[deps.PlotUtils]]
 deps = ["ColorSchemes", "Colors", "Dates", "PrecompileTools", "Printf", "Random", "Reexport", "StableRNGs", "Statistics"]
-git-tree-sha1 = "3ca9a356cd2e113c420f2c13bea19f8d3fb1cb18"
+git-tree-sha1 = "26ca162858917496748aad52bb5d3be4d26a228a"
 uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
-version = "1.4.3"
+version = "1.4.4"
 
 [[deps.Plots]]
-deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "JLFzf", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "PrecompileTools", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "RelocatableFolders", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "TOML", "UUIDs", "UnicodeFun", "UnitfulLatexify", "Unzip"]
-git-tree-sha1 = "bfe839e9668f0c58367fb62d8757315c0eac8777"
+deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "JLFzf", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "PrecompileTools", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "RelocatableFolders", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "TOML", "UUIDs", "UnicodeFun", "Unzip"]
+git-tree-sha1 = "12ce661880f8e309569074a61d3767e5756a199f"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.40.20"
+version = "1.41.1"
 
     [deps.Plots.extensions]
     FileIOExt = "FileIO"
@@ -1126,6 +1371,12 @@ version = "2.4.0"
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+version = "1.11.0"
+
+[[deps.ProgressMeter]]
+deps = ["Distributed", "Printf"]
+git-tree-sha1 = "fbb92c6c56b34e1a2c4c36058f68f332bec840e7"
+uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
 version = "1.11.0"
 
 [[deps.PtrArrays]]
@@ -1210,9 +1461,9 @@ version = "1.3.1"
 
 [[deps.Rmath]]
 deps = ["Random", "Rmath_jll"]
-git-tree-sha1 = "4395a4cad612f95c1d08352f8c53811d6af3060b"
+git-tree-sha1 = "5b3d50eb374cea306873b371d3f8d3915a018f0b"
 uuid = "79098fc4-a85e-5d69-aa6a-4863f24498fa"
-version = "0.8.1"
+version = "0.9.0"
 
 [[deps.Rmath_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1302,15 +1553,15 @@ version = "1.7.1"
 
 [[deps.StatsBase]]
 deps = ["AliasTables", "DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "2c962245732371acd51700dbb268af311bddd719"
+git-tree-sha1 = "a136f98cefaf3e2924a66bd75173d1c891ab7453"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.34.6"
+version = "0.34.7"
 
 [[deps.StatsFuns]]
 deps = ["HypergeometricFunctions", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
-git-tree-sha1 = "8e45cecc66f3b42633b8ce14d431e8e57a3e242e"
+git-tree-sha1 = "91f091a8716a6bb38417a6e6f274602a19aaa685"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
-version = "1.5.0"
+version = "1.5.2"
 
     [deps.StatsFuns.extensions]
     StatsFunsChainRulesCoreExt = "ChainRulesCore"
@@ -1402,30 +1653,6 @@ git-tree-sha1 = "53915e50200959667e78a92a418594b428dffddf"
 uuid = "1cfade01-22cf-5700-b092-accc4b62d6e1"
 version = "0.4.1"
 
-[[deps.Unitful]]
-deps = ["Dates", "LinearAlgebra", "Random"]
-git-tree-sha1 = "6258d453843c466d84c17a58732dda5deeb8d3af"
-uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
-version = "1.24.0"
-
-    [deps.Unitful.extensions]
-    ConstructionBaseUnitfulExt = "ConstructionBase"
-    ForwardDiffExt = "ForwardDiff"
-    InverseFunctionsUnitfulExt = "InverseFunctions"
-    PrintfExt = "Printf"
-
-    [deps.Unitful.weakdeps]
-    ConstructionBase = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
-    ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
-    InverseFunctions = "3587e190-3f89-42d0-90ee-14403ec27112"
-    Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
-
-[[deps.UnitfulLatexify]]
-deps = ["LaTeXStrings", "Latexify", "Unitful"]
-git-tree-sha1 = "af305cc62419f9bd61b6644d19170a4d258c7967"
-uuid = "45397f5d-5981-4c77-b2b3-fc36d6e9b728"
-version = "1.7.0"
-
 [[deps.Unzip]]
 git-tree-sha1 = "ca0969166a028236229f63514992fc073799bb78"
 uuid = "41fe7b60-77ed-43a1-b4f0-825fd5a5650d"
@@ -1442,17 +1669,6 @@ deps = ["Artifacts", "EpollShim_jll", "Expat_jll", "JLLWrappers", "Libdl", "Libf
 git-tree-sha1 = "96478df35bbc2f3e1e791bc7a3d0eeee559e60e9"
 uuid = "a2964d1f-97da-50d4-b82a-358c7fce9d89"
 version = "1.24.0+0"
-
-[[deps.WeakRefStrings]]
-deps = ["DataAPI", "InlineStrings", "Parsers"]
-git-tree-sha1 = "b1be2855ed9ed8eac54e5caff2afcdb442d52c23"
-uuid = "ea10d353-3f73-51f8-a26c-33c1cb351aa5"
-version = "1.4.2"
-
-[[deps.WorkerUtilities]]
-git-tree-sha1 = "cd1659ba0d57b71a464a29e64dbc67cfe83d54e7"
-uuid = "76eceee3-57b5-4d4a-8e66-0e911cebbf60"
-version = "1.6.1"
 
 [[deps.XZ_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1710,47 +1926,103 @@ version = "1.9.2+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─369042f4-67ce-4cac-871e-72adc503d4e3
-# ╟─7e474146-f044-11ea-2c0c-cbda0c574da5
-# ╟─59abbfe8-f0bb-11ea-267b-2126df2b62c9
-# ╟─0e55ea72-f0bc-11ea-16dc-4d9ccba649e0
-# ╟─01c3378c-f0bd-11ea-1983-3bb57d137076
-# ╟─25cd0414-f0bd-11ea-3eae-f787a36a3798
-# ╠═7654497e-f0bd-11ea-2520-cf6617405b48
-# ╟─b48f2b86-2281-4804-b4ac-614457eab859
-# ╠═31427b48-f0be-11ea-3493-39d0617e6c14
-# ╟─f51c794d-9753-4431-bf5a-ccf0a7a0641c
-# ╠═3e8a79b8-f0be-11ea-314c-333d84cea659
-# ╟─87373db4-f0bd-11ea-0b4b-0fbf22e8098d
-# ╟─8553e0b4-f0be-11ea-2487-07aacadc4508
-# ╟─911adcbb-a647-4c4f-8aa6-d2206b227811
-# ╟─02c1ebd0-f0c0-11ea-1f7d-a33e7bb4c88f
-# ╟─f2f67347-7d99-4e67-87db-61a302e2aa81
-# ╟─23fa4662-f0c0-11ea-2df0-d9dd86ebf137
-# ╟─2fc7ef3a-f0c0-11ea-3eca-ab02d7f3fcfe
-# ╟─63ef008c-f0c0-11ea-3d12-070c342c851b
-# ╠═7bba65e4-f0c0-11ea-231c-290c9a4e290a
-# ╟─993aaf52-f0c0-11ea-3a6a-9141a6706f7e
-# ╠═e617816a-f0c0-11ea-1a5d-81f5db895c05
-# ╟─ee206a84-f0c0-11ea-041d-97696dd759d6
-# ╠═096fb72c-f0c1-11ea-3323-fdb949953348
-# ╟─1302fd1c-f0c1-11ea-1da6-7fd6f5e43ad0
-# ╠═905abc24-f0c0-11ea-3891-85947dc03075
-# ╟─ea7364f4-f0ed-11ea-06e1-e1022a7d47d9
-# ╟─564cff50-f0ee-11ea-3908-afe9a2164805
-# ╠═5e3b806a-f0ee-11ea-245e-77cb9d224ff3
-# ╟─6dbf5778-f0ee-11ea-36fb-214682733716
-# ╟─76cc8e12-f0ee-11ea-3aa5-27934c3a44b9
-# ╠═cc76d034-f0ee-11ea-11f2-4f1a8b8cfa47
-# ╠═d8899b9a-f0ee-11ea-3396-c51ae5beb62b
-# ╠═c9f295b4-f0ee-11ea-2505-b1705a92ebd1
-# ╟─543b0024-f0ef-11ea-2775-6f0c0b586865
-# ╟─5e3b0846-f0ef-11ea-2c4a-15c55ba5cd43
-# ╟─85d9fc20-f0ef-11ea-2b0a-e9f51d73d562
-# ╠═4a58cc90-f0f0-11ea-1afc-152c4acac936
-# ╟─53d29d28-f0f0-11ea-3e2d-4bb7363f37cb
-# ╟─30062e75-5e94-4b1f-835e-353cc51bee32
-# ╠═53918345-9b60-4608-9cf1-d64abb83f902
-# ╟─2dba463a-e8ce-450b-9874-d76ce75e55f7
+# ╟─77271b72-bafe-11f0-8fa2-33da6741b124
+# ╟─705dedd6-755f-4a18-9d4d-cde8c9755e05
+# ╟─4588df60-9c5b-49cc-a3a1-44db790d00ed
+# ╟─02c03dad-d974-4584-9766-0e7ea79047e0
+# ╠═9d9799b0-2e0c-4180-ae80-44e5c268c8b4
+# ╠═f5df9bc3-79df-4e0b-b199-9ade76f53894
+# ╟─29f6c7eb-69ba-4072-a77d-7097235c1dac
+# ╠═3e1ca65e-f4cc-4d28-8139-f04d70980ecb
+# ╠═6b4c2d62-b1d0-4f42-9ee6-eb2d9f8ba98a
+# ╟─5d627a4e-5dee-4c25-b99c-ae7e4221109f
+# ╠═14ab0808-3fdb-4113-8854-43255987a006
+# ╠═e608d8a8-8faa-4302-bf7e-ae135cef47a4
+# ╟─7bc7fb04-9d74-4970-b06b-5bc95d7be757
+# ╠═5013d835-99b7-4b08-bc97-8085017d47ab
+# ╠═f5d8574f-b115-4555-8c0e-41f95824740a
+# ╟─6bb76a54-2df8-4604-923a-ebb428eb0353
+# ╟─83e2a97e-72d7-404e-b138-f2c5d30d6365
+# ╟─51123db8-3fdf-4497-b121-ce5b989bc063
+# ╠═6969d1e5-38d0-432d-842e-153139f86613
+# ╟─ec16be17-cdbd-467a-be07-a6fed4e05dad
+# ╠═7a1e8d0a-cffc-497a-88a7-fd9757bc8eda
+# ╠═8ebd00be-c361-4080-b1a6-8eca643439a5
+# ╟─ecea873a-ab10-4539-ba66-b05b1ebdf1ec
+# ╟─77f5b5de-040f-4406-bb57-c1fe58e3b32b
+# ╠═3d89c37f-0876-4ba1-aa35-0a7273d4d269
+# ╟─0d8059ae-c158-43f2-81a8-9cba2f667177
+# ╠═ccbf4589-8d25-434e-a7f4-3d972b4ee078
+# ╟─895960bf-1ee2-4aa8-b38c-5857525b1ddc
+# ╠═96b831a8-09ba-4792-8268-14c368b804f8
+# ╟─519dbc40-2c83-4fda-b6fe-d3547b43b407
+# ╠═881a67da-5f59-437d-91ce-8c8113985fb6
+# ╟─58b280bc-914e-45e2-bae4-3c767ba09ec3
+# ╠═be6f2317-24c7-470c-bde8-233ad3d6f3bd
+# ╟─c97780c0-c60f-443d-98c8-100e67576e23
+# ╠═174612aa-d8a0-4a21-be83-91648dac1f61
+# ╟─e47bad96-4092-4d0a-8035-f05310359565
+# ╠═ab9f639a-abd0-44e0-bb89-ed27472a641d
+# ╟─767a5b82-b007-42aa-897c-6dfa4eadf28a
+# ╠═cf9d6290-0aeb-484a-8816-6972fd3c4891
+# ╟─2e3b7a55-a85b-4498-8dc4-c14853ec06ab
+# ╠═cc21a0ab-d413-453b-94a0-15d33524ca4f
+# ╟─ff063276-46ef-4768-a0b1-878e9eb1a13e
+# ╠═2f5ff4dc-5267-4d64-aca5-a6a0be536f8f
+# ╟─122a00c1-d3d4-43da-b5d1-6bc660f5d43e
+# ╠═034f3378-6dc8-4fff-b8a7-afdc330b4f01
+# ╟─408e3447-21bb-4617-bdf2-d60f7cfb8ece
+# ╠═a02297a2-8660-4fd1-95af-438f363b9f29
+# ╟─277c5574-910b-4f05-8661-ef81278e9319
+# ╠═61f5260a-dd5b-4ca1-9d55-30d7fd453f4e
+# ╟─66a29ea6-d467-4909-964d-c88d68da4d50
+# ╠═826ef035-bf26-45ac-b33c-dc2dcaa23f7c
+# ╟─ce73c7c3-5025-4784-8657-b2b67097c702
+# ╠═3889c64c-d018-4c04-80a4-246aaede7d4e
+# ╟─a5a577b6-4266-4698-a3a1-7147590795b5
+# ╠═721d9bd7-c04c-4874-897e-61fde49ba257
+# ╠═90d21b8f-b29b-420c-894b-a94abb52f2bb
+# ╟─3b0e1194-e6df-46e4-8c41-032f5beeb8fa
+# ╠═9dc43526-5604-4251-aa22-3aff5fa3bd0b
+# ╠═ebbf4498-4082-44a0-a904-c80ca6dab2c7
+# ╟─44add801-211a-423d-9279-54ab6a101420
+# ╠═25c4102b-9ed9-44c7-9c5f-9d7e1810f229
+# ╟─a520e936-d80b-42fe-9b45-28d972383ff9
+# ╠═f4753dd6-51f7-48db-b8e9-26b550af1bac
+# ╟─dab1a565-43a9-48ac-896f-cc0ee7856552
+# ╠═d5a8ec92-a4fa-46e6-983c-44572a74f886
+# ╟─9f761389-7125-4df0-877f-9925b315913f
+# ╠═70a9cd5f-ec47-4c45-b822-64c3ff72322a
+# ╠═8a606467-0434-418f-85e5-40a35c9df95f
+# ╠═5905847d-2358-4380-a5a0-c5ac8c716839
+# ╟─f72045aa-fa31-40bf-b80c-5259583f1d30
+# ╟─eacafc14-d0f6-472f-be69-2ab0d81e41b1
+# ╟─e3be7db2-a307-4083-bb35-db4e70dfe1bf
+# ╠═6048a5ad-2964-4aab-a708-32754e52eb1c
+# ╟─755d9324-5447-4240-9a17-6e212dab4edd
+# ╠═63530cf1-e20d-4250-a6e0-68443253a0e7
+# ╟─f77783b5-b35a-4437-b436-323d7668d456
+# ╠═909a83f1-507c-4d8f-855e-f1a45d3aa927
+# ╟─de01ba69-cc44-4f3a-8dfa-98f4a194b28a
+# ╠═b3e11050-b799-4d88-b5cc-bc9d057be7bc
+# ╟─73a811a3-8c64-4bf0-9656-1d8488819f45
+# ╟─28f3894f-6135-4359-842e-ef5e783fc469
+# ╠═113fa658-4325-4ea6-a5ab-6337889006f4
+# ╠═897d515d-bfda-4a8f-abbb-9276d69f0f4d
+# ╟─fe650845-f138-4e15-a20e-09dd8bbe6d5c
+# ╠═8d64ec48-639e-4fc2-9c6c-5cd207c1ba75
+# ╟─e5555433-b323-4af5-805c-db592461307b
+# ╠═08b24136-c292-4360-a90e-a8fd82d45d6b
+# ╠═0e341cb6-bbca-4581-858f-50b4e2ca858a
+# ╟─c66b8dec-aa58-4508-9f93-70d65ba2c051
+# ╠═8fe19ca9-6618-4c70-8eca-6ba002630ca9
+# ╟─4f785723-2f6a-4dcd-82a7-8d15daf191e8
+# ╠═dcdaf64e-8ec0-42ae-8c6c-34a056bd17d9
+# ╠═7f1f4e2b-bbb4-4e26-8277-2753991e650d
+# ╠═2b5fc25d-eb18-42f8-85fa-f0440f536342
+# ╟─54662c5d-7ba3-4e96-88ce-3c9ba1907f8e
+# ╠═b6399549-c754-498a-887c-401f252ba21f
+# ╟─64934637-5ac4-4c74-9290-26aa876344bf
+# ╟─400ad142-8fad-42f6-a8cb-3a1b9c56f5db
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
