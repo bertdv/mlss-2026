@@ -46,8 +46,8 @@ News and Announcements
 All course materials are available in the table above. We recommend reading the lecture notes in your browser, to take advantage of the interactive materials that we prepared for this course, based on [Pluto.jl](https://plutojl.org/).
 
 If necessary, you can download the PDF lecture notes here:
-- [B lecture notes](https://github.com/bmlip/course/releases/download/v5/BMLIP.B.Lectures.pdf) version 04-Nov-2025
-- [W lecture notes](https://github.com/bmlip/course/releases/download/v5/BMLIP.W.Lectures.pdf) version 04-Nov-2025
+- [B lecture notes](https://github.com/bmlip/course/releases/download/v5.1/BMLIP.B.Lectures.pdf) version 10-Nov-2025
+- [W lecture notes](https://github.com/bmlip/course/releases/download/v5.1/BMLIP.W.Lectures.pdf) version 10-Nov-2025
 
 We always recommend reading the lecture notes directly on the website instead of using the PDFs, if possible.
 
