@@ -43,7 +43,7 @@ News and Announcements
 
 ## Materials
 
-All course materials are available in the table below. If necessary, you can download the PDF lecture notes here:
+All course materials are available in the table below. If necessary, you can download the lecture notes in PDF format here:
 
 - [B lecture notes](https://github.com/bmlip/course/releases/download/v5.1/BMLIP.B.Lectures.pdf) version 10-Nov-2025
 - [W lecture notes](https://github.com/bmlip/course/releases/download/v5.1/BMLIP.W.Lectures.pdf) version 10-Nov-2025
