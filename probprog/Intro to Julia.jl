@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.19
+# v0.20.20
 
 using Markdown
 using InteractiveUtils
@@ -14,9 +14,11 @@ begin
 	using Plots
 end
 
+# ╔═╡ 660571c4-3d5e-4eba-b6d9-bcab17c2a2ee
+title("Programming in Julia")
+
 # ╔═╡ 77271b72-bafe-11f0-8fa2-33da6741b124
 md"""
-# Programming in Julia
 
 This notebook will teach you some of the basic programming routines in Julia. You will need these skills to complete the probabilistic programming assignments later on in the course. We will assume basic familiarity with programming, such as for-loops, if-else statements and function definitions.
 
@@ -33,28 +35,13 @@ Resources:
 # ╔═╡ 705dedd6-755f-4a18-9d4d-cde8c9755e05
 TableOfContents()
 
-# ╔═╡ 4588df60-9c5b-49cc-a3a1-44db790d00ed
-md"""
-## Pluto notebooks
-
-The course is built in Pluto.jl, a reactive programming environment. Pluto notebooks are wonderfully intuitive and interactive, and are already revolutionizing mathematics and computer science education (e.g., [18.S191 Computational Thinking @MIT](https://computationalthinking.mit.edu)).
-
-A few things to be aware of when working in Pluto notebooks:
-- Code is not executed sequentially. In other words, you can call a variable in a cell even if that variable is defined in a later cell.
-- You cannot re-use variable names, i.e., you cannot overwrite a variable with a different variable in a latter cell.
-- A cell can only execute a single function/instruction; if you want to execute more instructions, you have to wrap them in a `begin .. end` environment.
-- Each Pluto notebook manages its own software packages (more on that later).
-- The `Live docs` button on the bottom-right corner can be used to look up documentation of functions.
-- The `Status` button on the bottom-right corner displays what the kernel is doing in the background.
-"""
-
 # ╔═╡ 02c03dad-d974-4584-9766-0e7ea79047e0
 md"""
 ## Data types
 
-- References: [Numbers](https://docs.julialang.org/en/v1/base/numbers/), [Integers and Float](https://docs.julialang.org/en/v1/manual/integers-and-floating-point-numbers/), [Strings](https://docs.julialang.org/en/v1/base/strings/), [Symbols](https://docs.julialang.org/en/v1/manual/metaprogramming/).
+- References: [Numbers](https://docs.julialang.org/en/v1/manual/integers-and-floating-point-numbers/), [Integers and Float](https://docs.julialang.org/en/v1/manual/integers-and-floating-point-numbers/), [Strings](https://docs.julialang.org/en/v1/base/strings/), [Symbols](https://docs.julialang.org/en/v1/manual/metaprogramming/).
 
-Numbers in Julia have specific types, most notably `Integer`, `Real` and `Complex`. It is important to be aware of what type your numbers are because many functions operate differently on different number types. 
+Numbers in Julia have specific types, most notably `Integer`, `Real` and `Complex`. (See [this documentation page](https://docs.julialang.org/en/v1/base/numbers/) for the full type tree.) It is important to be aware of what type your numbers are because many functions operate differently on different number types. 
 """
 
 # ╔═╡ 9d9799b0-2e0c-4180-ae80-44e5c268c8b4
@@ -84,6 +71,9 @@ c = convert(Float64, 3)
 
 # ╔═╡ e608d8a8-8faa-4302-bf7e-ae135cef47a4
 typeof(c)
+
+# ╔═╡ 0103d1f6-ea03-4497-a0de-e1b0c181d648
+
 
 # ╔═╡ 7bc7fb04-9d74-4970-b06b-5bc95d7be757
 md"""
@@ -192,6 +182,21 @@ A matrix can be transposed by a single parenthesis, `A'`. Note that this does no
 # ╔═╡ 174612aa-d8a0-4a21-be83-91648dac1f61
 x'*A*x
 
+# ╔═╡ 4588df60-9c5b-49cc-a3a1-44db790d00ed
+md"""
+## Pluto notebooks
+
+The course is built in Pluto.jl, a reactive programming environment. Pluto notebooks are wonderfully intuitive and interactive, and are already revolutionizing mathematics and computer science education (e.g., [18.S191 Computational Thinking @MIT](https://computationalthinking.mit.edu)).
+
+A few things to be aware of when working in Pluto notebooks:
+- Code is not executed sequentially. In other words, you can call a variable in a cell even if that variable is defined in a later cell.
+- You cannot re-use variable names, i.e., you cannot overwrite a variable with a different variable in a latter cell.
+- A cell can only execute a single function/instruction; if you want to execute more instructions, you have to wrap them in a `begin .. end` environment.
+- Each Pluto notebook manages its own software packages (more on that later).
+- The `Live docs` button on the bottom-right corner can be used to look up documentation of functions.
+- The `Status` button on the bottom-right corner displays what the kernel is doing in the background.
+"""
+
 # ╔═╡ e47bad96-4092-4d0a-8035-f05310359565
 md"""
 ## Broadcasting
@@ -223,7 +228,7 @@ For-loops are one of the simplest forms of iteration and can be defined in a num
 
 # ╔═╡ cc21a0ab-d413-453b-94a0-15d33524ca4f
 for n = 1:2:5
-    println(n)
+    @info(n)
 end
 
 # ╔═╡ ff063276-46ef-4768-a0b1-878e9eb1a13e
@@ -233,7 +238,7 @@ Next, we can use the `range` command to construct an array of numbers and then u
 
 # ╔═╡ 2f5ff4dc-5267-4d64-aca5-a6a0be536f8f
 for n in range(0, stop=4, length=2)
-    println(n)
+    @info(n)
 end
 
 # ╔═╡ 122a00c1-d3d4-43da-b5d1-6bc660f5d43e
@@ -243,7 +248,7 @@ If you need both the index and the value of the array element, you can use the `
 
 # ╔═╡ 034f3378-6dc8-4fff-b8a7-afdc330b4f01
 for (j,n) in enumerate(range(0,3))
-    println("$j, $n")
+    @info("$j, $n")
 end
 
 # ╔═╡ 408e3447-21bb-4617-bdf2-d60f7cfb8ece
@@ -266,12 +271,13 @@ Control flow refers to redirecting how a compiler goes through a program. Instea
 # ╔═╡ 61f5260a-dd5b-4ca1-9d55-30d7fd453f4e
 begin
 	r = 3.0
+	
 	if r < 0 
-	    println("Negative")
+	    "Negative"
 	elseif r == 0
-	    println("0.0")
+	    "0.0"
 	else 
-	    println("Positive")
+	    "Positive"
 	end
 end
 
@@ -281,7 +287,7 @@ Simple `if-else` statements can often be replaced by `ternary` checks. Essential
 """
 
 # ╔═╡ 826ef035-bf26-45ac-b33c-dc2dcaa23f7c
-r > 0 ? println("Positive") : println("Not positive")
+r > 0 ? "Positive" : "Not positive"
 
 # ╔═╡ ce73c7c3-5025-4784-8657-b2b67097c702
 md"""
@@ -401,34 +407,32 @@ Plots.jl provides a common interface to call various other visualization backend
 Below are a few examples of the most common visualization commands you'll see throughout the course. The core principle is to use a `plot` type as base command and then provide keyword arguments (in `String`, `Number` or `Symbol` type) to apply variations.
 """
 
+# ╔═╡ d2d811d0-9e38-4fc6-b576-3156309b3715
+xx = range(-3, stop=3, length=301)
+
 # ╔═╡ 6048a5ad-2964-4aab-a708-32754e52eb1c
-begin
-	xx = range(-3, stop=3, length=301)
-	
-	plot(xx, pdf.(px, xx), 
-		 xlabel="x", 
-		 ylabel="p(x)", 
-		 label="pdf", 
-		 color="red", 
-		 linewidth=5, 
-		 linestyle=:dash)
-end
+plot(xx, pdf.(px, xx), 
+	 xlabel="x", 
+	 ylabel="p(x)", 
+	 label="pdf", 
+	 color="red", 
+	 linewidth=5, 
+	 linestyle=:dash)
 
 # ╔═╡ 755d9324-5447-4240-9a17-6e212dab4edd
 md"""
 `plot` and `scatter` are the most useful commands. A `scatter` command will ignore properties such as `linewidth` and `linestyle` (since there are no lines) and will listen to `markersize` and `markershape` commands (see [Supported Attributes](https://docs.juliaplots.org/stable/generated/supported/) in the API).
 """
 
+# ╔═╡ bfbfe9cf-9a28-4b52-8c50-4ab9965a6288
+X = randn(10,2)
+
 # ╔═╡ 63530cf1-e20d-4250-a6e0-68443253a0e7
-begin
-	X = randn(10,2)
-	
-	scatter(X[:,1], X[:,2], 
-			xlabel="X_1", 
-			ylabel="X_2", 
-			markersize=10, 
-			markershape=:circle)
-end
+scatter(X[:,1], X[:,2], 
+		xlabel="X_1", 
+		ylabel="X_2", 
+		markersize=10, 
+		markershape=:circle)
 
 # ╔═╡ f77783b5-b35a-4437-b436-323d7668d456
 md"""
@@ -455,11 +459,11 @@ end
 
 # ╔═╡ de01ba69-cc44-4f3a-8dfa-98f4a194b28a
 md"""
-## Macro's
+## Macros
 
 - References: [Macros](https://docs.julialang.org/en/v1/manual/metaprogramming/#man-macros)
 
-Words that start with the `@` symbol are "macro"'s in Julia, for example `@time, @test, @model`. They represent a series of functions called on an input structure and are really handy when you have to use the same set of instructions often. 
+Words that start with the `@` symbol are _macros_ in Julia, for example `@time, @test, @model`. They represent a series of functions called on an input structure and are really handy when you have to use the same set of instructions often. 
 
 For example, you could define a `ProgressMeter` bar, update it at every iteration of a for-loop and write a custom print statement every time. _Or_, you could call the `@showprogress` macro on the for-loop itself:
 """
@@ -471,7 +475,7 @@ end
 
 # ╔═╡ 73a811a3-8c64-4bf0-9656-1d8488819f45
 md"""
-Macro's are a somewhat advanced form of metaprogramming. You will not need to define any new macro's; this instruction is just here to explain what they are.
+Macros are a somewhat advanced form of metaprogramming. You will not need to define any new macros; this instruction is just here to explain what they are.
 """
 
 # ╔═╡ 28f3894f-6135-4359-842e-ef5e783fc469
@@ -482,6 +486,8 @@ md"""
 
 When you call a function that Julia doesn't know, it will return a list of the steps it took to execute your command and point to where its progress was blocked. This is highly useful but it typically requires a bit of practice to parse (i.e., read and filter) stack traces.
 
+### MethodError
+
 Suppose we write a function that expects an `Integer` input and call that function with an `Float64` argument:
 """
 
@@ -491,17 +497,23 @@ function add1(a::Integer)
 end
 
 # ╔═╡ 897d515d-bfda-4a8f-abbb-9276d69f0f4d
-add1(3.0)
+add1(3.1415)
 
-# ╔═╡ fe650845-f138-4e15-a20e-09dd8bbe6d5c
+# ╔═╡ 2bad907d-5859-4465-8ed6-4285642d9874
 md"""
 Note that we first of all get a `MethodError`. This points to the fact that Julia could not find the function (i.e, method) that you asked for; `add1(::Float64)` does not exist.
 
 Furthermore, Julia provides a list of "Closest candidates" which are functions of the same name with different input arguments. It reports:
-```
-Closest candidates are:
-  add1(!Matched::Integer)
-```
+"""
+
+# ╔═╡ 5e402035-3a17-4072-8288-cbc613bc4cba
+@htl """
+<pre><code>Closest candidates are:
+  add1(<span style="color: red">::Integer</span>)</code></pre>
+"""
+
+# ╔═╡ 14e2c87f-557e-45fa-8036-464d5b4deac5
+md"""
 
 You should read this as "there exists a function called `add1` that expects an `Integer` input." Try that.
 """
@@ -511,20 +523,26 @@ add1(3)
 
 # ╔═╡ e5555433-b323-4af5-805c-db592461307b
 md"""
-The `!Matched` is also important but requires a slightly more complicated example. Suppose we have a function with two `Integer` inputs and we call with `Float64` and `Int64` arguments.
+#### Mathced types in MethodError
+
+The red highlighting of $(html"<code><span style='color: red'>::Integer</span></code>") is also important but requires a slightly more complicated example. Suppose we have a function with two `Integer` inputs and we call with `Float64` and `Int64` arguments.
 """
 
 # ╔═╡ 08b24136-c292-4360-a90e-a8fd82d45d6b
 function add(a::Integer, b::Integer)
-    return a+b
+    return a + b
 end
 
 # ╔═╡ 0e341cb6-bbca-4581-858f-50b4e2ca858a
-add(3.0,4)
+add(3.0, 4)
 
 # ╔═╡ c66b8dec-aa58-4508-9f93-70d65ba2c051
 md"""
-We again get the `MethodError` that the function we asked for doesn't exist and a suggested alternative (i.e., "closest candidate"). But note that in that alternative, `add(!Matched::Integer, ::Integer)`, only one of the inputs is `!Matched`. So, in fact, Julia check your input argument types against those in the closest candidates. This tells you _what_ to change: if you change the first argument of your function call to an `Integer` type, then this closest candidate will be evaluated.
+We again get the `MethodError` that the function we asked for doesn't exist and a suggested alternative (i.e., "closest candidate"). But this time, only the first argument $(html"<code><span style='color: red'>::Integer</span></code>") is highlighted in red. 
+
+Julia checks your input argument types against those in the closest candidates. This tells you _what_ to change: the solution would be to either:
+- Change the call: Make the first argument of your function call to an `Integer` type. That would be `add(3, 4)`.
+- Change the defintion: Make the function accept a more general `Real` number as the first argument.
 
 """
 
@@ -533,41 +551,39 @@ add(3,4)
 
 # ╔═╡ 4f785723-2f6a-4dcd-82a7-8d15daf191e8
 md"""
-To summarize, when you get an error, it is important to read the stack trace. It may tell you that you need only change a small thing for your code to work.
+### What to do with errors?
+To summarize, when you get an error, it is important to **take your time**, and **read the message**. If you want to know _where_ something happened, look at the stack trace. Try to see an error message as **positive feedback**: you are on the right track, and Julia is trying to help you to write the correct code.
 
-The type of error can also be informative. The `MethodError` is probably the error you will see most often. Another important error is the `UndefVarError`, which occurs when you call a variable that was not defined. For example:
+The type of error can also be informative. The `MethodError` is probably the error you will see most often. 
 """
 
-# ╔═╡ 7f1f4e2b-bbb4-4e26-8277-2753991e650d
+# ╔═╡ 28c7a5ed-cbc7-4865-a6a9-b6395ea80a5c
 md"""
-The solution to this, of course, is to define the variable first. Sometimes this error occurs through a spelling mistake. You will encounter objects in the course called `MvNormalMeanCovariance`. If you misremember that name and write `MvNormalMeanVariance`, this will happen:
+### Stack trace
+
+The stack trace will show you exactly _where_ an error happened.
 """
-
-# ╔═╡ 2b5fc25d-eb18-42f8-85fa-f0440f536342
-aa = MvNormalMeanVariance()
-
-# ╔═╡ dcdaf64e-8ec0-42ae-8c6c-34a056bd17d9
-y = 3*aa
 
 # ╔═╡ 54662c5d-7ba3-4e96-88ce-3c9ba1907f8e
 md"""
-You will get an `UndefVarError`.
+For example, the cell below contains a mistake and evaluating it will throw an error. But which line has the mistake? Press the **Show stack trace...** button or **Show more...** to see the stack trace of the error below. Where did the error happen?
+"""
 
-Next to errors, it is also important to check line numbers in a stack trace. For example, the cell below contains a mistake and evaluating it will throw an error. But which line has the mistake? Press the `Show stack trace..` button to zoom in on the error line.
+# ╔═╡ e500c93a-9a4a-4141-819b-051c4e5d5bb0
+md"""
+Here is the function used in the last cell:
 """
 
 # ╔═╡ b6399549-c754-498a-887c-401f252ba21f
-begin
-	kk = 3*2
+function give_magic_number(x::Real)
+	kk = x*2
 	ll = 3*kk
 	mm = kl*ll
 	nn = mm*ll
 end
 
-# ╔═╡ 64934637-5ac4-4c74-9290-26aa876344bf
-md"""
-It's import to look at linenumbers when you're trying to find a bug.
-"""
+# ╔═╡ 794970ef-f2d2-4dc8-ae43-2b1ecc306a74
+give_magic_number(7)
 
 # ╔═╡ 400ad142-8fad-42f6-a8cb-3a1b9c56f5db
 md"""
@@ -592,7 +608,7 @@ ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 BmlipTeachingTools = "~1.3.1"
 DataFrames = "~1.8.1"
 Distributions = "~0.25.122"
-Plots = "~1.41.1"
+Plots = "~1.40.17"
 ProgressMeter = "~1.11.0"
 """
 
@@ -602,7 +618,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.12.1"
 manifest_format = "2.0"
-project_hash = "dbd78bca9a027e6fd88f53ecd3b69bb7805b45f4"
+project_hash = "a6612d5baf2dd476e7335fac56ce984509f53aaa"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -732,10 +748,10 @@ uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 version = "1.8.1"
 
 [[deps.DataStructures]]
-deps = ["OrderedCollections"]
-git-tree-sha1 = "6c72198e6a101cccdd4c9731d3985e904ba26037"
+deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
+git-tree-sha1 = "4e1fe97fdaed23e9dc21d4d664bea76b65fc50a0"
 uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
-version = "0.19.1"
+version = "0.18.22"
 
 [[deps.DataValueInterfaces]]
 git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
@@ -810,15 +826,15 @@ version = "2.7.3+0"
 
 [[deps.FFMPEG]]
 deps = ["FFMPEG_jll"]
-git-tree-sha1 = "95ecf07c2eea562b5adbd0696af6db62c0f52560"
+git-tree-sha1 = "83dc665d0312b41367b7263e8a4d172eac1897f4"
 uuid = "c87230d0-a227-11e9-1b43-d7ebe4e7570a"
-version = "0.4.5"
+version = "0.4.4"
 
 [[deps.FFMPEG_jll]]
 deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
-git-tree-sha1 = "ccc81ba5e42497f4e76553a5545665eed577a663"
+git-tree-sha1 = "3a948313e7a41eb1db7a1e733e6335f17b4ab3c4"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
-version = "8.0.0+0"
+version = "7.1.1+0"
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
@@ -878,15 +894,15 @@ version = "3.4.0+2"
 
 [[deps.GR]]
 deps = ["Artifacts", "Base64", "DelimitedFiles", "Downloads", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Preferences", "Printf", "Qt6Wayland_jll", "Random", "Serialization", "Sockets", "TOML", "Tar", "Test", "p7zip_jll"]
-git-tree-sha1 = "f52c27dd921390146624f3aab95f4e8614ad6531"
+git-tree-sha1 = "1828eb7275491981fa5f1752a5e126e8f26f8741"
 uuid = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
-version = "0.73.18"
+version = "0.73.17"
 
 [[deps.GR_jll]]
 deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "FreeType2_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Qt6Base_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "4b0406b866ea9fdbaf1148bc9c0b887e59f9af68"
+git-tree-sha1 = "27299071cc29e409488ada41ec7643e0ab19091f"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
-version = "0.73.18+0"
+version = "0.73.17+0"
 
 [[deps.GettextRuntime_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Libiconv_jll"]
@@ -1186,9 +1202,9 @@ uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
 version = "2.28.10+0"
 
 [[deps.Measures]]
-git-tree-sha1 = "b513cedd20d9c914783d8ad83d08120702bf2c77"
+git-tree-sha1 = "c13304c81eec1ed3af7fc20e75fb6b26092a1102"
 uuid = "442fdcdd-2543-5da2-b0f3-8c86c306513e"
-version = "0.3.3"
+version = "0.3.2"
 
 [[deps.Missings]]
 deps = ["DataAPI"]
@@ -1231,10 +1247,10 @@ uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
 version = "0.8.7+0"
 
 [[deps.OpenSSL]]
-deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "NetworkOptions", "OpenSSL_jll", "Sockets"]
-git-tree-sha1 = "386b47442468acfb1add94bf2d85365dea10cbab"
+deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
+git-tree-sha1 = "f1a7e086c677df53e064e0fdd2c9d0b0833e3f6e"
 uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
-version = "1.6.0"
+version = "1.5.0"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -1308,15 +1324,15 @@ version = "3.3.0"
 
 [[deps.PlotUtils]]
 deps = ["ColorSchemes", "Colors", "Dates", "PrecompileTools", "Printf", "Random", "Reexport", "StableRNGs", "Statistics"]
-git-tree-sha1 = "26ca162858917496748aad52bb5d3be4d26a228a"
+git-tree-sha1 = "3ca9a356cd2e113c420f2c13bea19f8d3fb1cb18"
 uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
-version = "1.4.4"
+version = "1.4.3"
 
 [[deps.Plots]]
-deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "JLFzf", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "PrecompileTools", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "RelocatableFolders", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "TOML", "UUIDs", "UnicodeFun", "Unzip"]
-git-tree-sha1 = "12ce661880f8e309569074a61d3767e5756a199f"
+deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "JLFzf", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "PrecompileTools", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "RelocatableFolders", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "TOML", "UUIDs", "UnicodeFun", "UnitfulLatexify", "Unzip"]
+git-tree-sha1 = "bfe839e9668f0c58367fb62d8757315c0eac8777"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.41.1"
+version = "1.40.20"
 
     [deps.Plots.extensions]
     FileIOExt = "FileIO"
@@ -1461,9 +1477,9 @@ version = "1.3.1"
 
 [[deps.Rmath]]
 deps = ["Random", "Rmath_jll"]
-git-tree-sha1 = "5b3d50eb374cea306873b371d3f8d3915a018f0b"
+git-tree-sha1 = "4395a4cad612f95c1d08352f8c53811d6af3060b"
 uuid = "79098fc4-a85e-5d69-aa6a-4863f24498fa"
-version = "0.9.0"
+version = "0.8.1"
 
 [[deps.Rmath_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1531,9 +1547,9 @@ version = "2.6.1"
 
 [[deps.StableRNGs]]
 deps = ["Random"]
-git-tree-sha1 = "95af145932c2ed859b63329952ce8d633719f091"
+git-tree-sha1 = "4f96c596b8c8258cc7d3b19797854d368f243ddc"
 uuid = "860ef19b-820b-49d6-a774-d7a799459cd3"
-version = "1.0.3"
+version = "1.0.4"
 
 [[deps.Statistics]]
 deps = ["LinearAlgebra"]
@@ -1553,15 +1569,15 @@ version = "1.7.1"
 
 [[deps.StatsBase]]
 deps = ["AliasTables", "DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "a136f98cefaf3e2924a66bd75173d1c891ab7453"
+git-tree-sha1 = "2c962245732371acd51700dbb268af311bddd719"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.34.7"
+version = "0.34.6"
 
 [[deps.StatsFuns]]
 deps = ["HypergeometricFunctions", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
-git-tree-sha1 = "91f091a8716a6bb38417a6e6f274602a19aaa685"
+git-tree-sha1 = "8e45cecc66f3b42633b8ce14d431e8e57a3e242e"
 uuid = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
-version = "1.5.2"
+version = "1.5.0"
 
     [deps.StatsFuns.extensions]
     StatsFunsChainRulesCoreExt = "ChainRulesCore"
@@ -1652,6 +1668,30 @@ deps = ["REPL"]
 git-tree-sha1 = "53915e50200959667e78a92a418594b428dffddf"
 uuid = "1cfade01-22cf-5700-b092-accc4b62d6e1"
 version = "0.4.1"
+
+[[deps.Unitful]]
+deps = ["Dates", "LinearAlgebra", "Random"]
+git-tree-sha1 = "6258d453843c466d84c17a58732dda5deeb8d3af"
+uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
+version = "1.24.0"
+
+    [deps.Unitful.extensions]
+    ConstructionBaseUnitfulExt = "ConstructionBase"
+    ForwardDiffExt = "ForwardDiff"
+    InverseFunctionsUnitfulExt = "InverseFunctions"
+    PrintfExt = "Printf"
+
+    [deps.Unitful.weakdeps]
+    ConstructionBase = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
+    ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+    InverseFunctions = "3587e190-3f89-42d0-90ee-14403ec27112"
+    Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[[deps.UnitfulLatexify]]
+deps = ["LaTeXStrings", "Latexify", "Unitful"]
+git-tree-sha1 = "af305cc62419f9bd61b6644d19170a4d258c7967"
+uuid = "45397f5d-5981-4c77-b2b3-fc36d6e9b728"
+version = "1.7.0"
 
 [[deps.Unzip]]
 git-tree-sha1 = "ca0969166a028236229f63514992fc073799bb78"
@@ -1926,9 +1966,9 @@ version = "1.9.2+0"
 """
 
 # ╔═╡ Cell order:
+# ╟─660571c4-3d5e-4eba-b6d9-bcab17c2a2ee
 # ╟─77271b72-bafe-11f0-8fa2-33da6741b124
 # ╟─705dedd6-755f-4a18-9d4d-cde8c9755e05
-# ╟─4588df60-9c5b-49cc-a3a1-44db790d00ed
 # ╟─02c03dad-d974-4584-9766-0e7ea79047e0
 # ╠═9d9799b0-2e0c-4180-ae80-44e5c268c8b4
 # ╠═f5df9bc3-79df-4e0b-b199-9ade76f53894
@@ -1938,11 +1978,12 @@ version = "1.9.2+0"
 # ╟─5d627a4e-5dee-4c25-b99c-ae7e4221109f
 # ╠═14ab0808-3fdb-4113-8854-43255987a006
 # ╠═e608d8a8-8faa-4302-bf7e-ae135cef47a4
+# ╟─0103d1f6-ea03-4497-a0de-e1b0c181d648
 # ╟─7bc7fb04-9d74-4970-b06b-5bc95d7be757
 # ╠═5013d835-99b7-4b08-bc97-8085017d47ab
 # ╠═f5d8574f-b115-4555-8c0e-41f95824740a
 # ╟─6bb76a54-2df8-4604-923a-ebb428eb0353
-# ╟─83e2a97e-72d7-404e-b138-f2c5d30d6365
+# ╠═83e2a97e-72d7-404e-b138-f2c5d30d6365
 # ╟─51123db8-3fdf-4497-b121-ce5b989bc063
 # ╠═6969d1e5-38d0-432d-842e-153139f86613
 # ╟─ec16be17-cdbd-467a-be07-a6fed4e05dad
@@ -1961,6 +2002,7 @@ version = "1.9.2+0"
 # ╠═be6f2317-24c7-470c-bde8-233ad3d6f3bd
 # ╟─c97780c0-c60f-443d-98c8-100e67576e23
 # ╠═174612aa-d8a0-4a21-be83-91648dac1f61
+# ╟─4588df60-9c5b-49cc-a3a1-44db790d00ed
 # ╟─e47bad96-4092-4d0a-8035-f05310359565
 # ╠═ab9f639a-abd0-44e0-bb89-ed27472a641d
 # ╟─767a5b82-b007-42aa-897c-6dfa4eadf28a
@@ -1998,8 +2040,10 @@ version = "1.9.2+0"
 # ╟─f72045aa-fa31-40bf-b80c-5259583f1d30
 # ╟─eacafc14-d0f6-472f-be69-2ab0d81e41b1
 # ╟─e3be7db2-a307-4083-bb35-db4e70dfe1bf
+# ╠═d2d811d0-9e38-4fc6-b576-3156309b3715
 # ╠═6048a5ad-2964-4aab-a708-32754e52eb1c
 # ╟─755d9324-5447-4240-9a17-6e212dab4edd
+# ╠═bfbfe9cf-9a28-4b52-8c50-4ab9965a6288
 # ╠═63530cf1-e20d-4250-a6e0-68443253a0e7
 # ╟─f77783b5-b35a-4437-b436-323d7668d456
 # ╠═909a83f1-507c-4d8f-855e-f1a45d3aa927
@@ -2009,20 +2053,21 @@ version = "1.9.2+0"
 # ╟─28f3894f-6135-4359-842e-ef5e783fc469
 # ╠═113fa658-4325-4ea6-a5ab-6337889006f4
 # ╠═897d515d-bfda-4a8f-abbb-9276d69f0f4d
-# ╟─fe650845-f138-4e15-a20e-09dd8bbe6d5c
+# ╟─2bad907d-5859-4465-8ed6-4285642d9874
+# ╟─5e402035-3a17-4072-8288-cbc613bc4cba
+# ╟─14e2c87f-557e-45fa-8036-464d5b4deac5
 # ╠═8d64ec48-639e-4fc2-9c6c-5cd207c1ba75
 # ╟─e5555433-b323-4af5-805c-db592461307b
 # ╠═08b24136-c292-4360-a90e-a8fd82d45d6b
 # ╠═0e341cb6-bbca-4581-858f-50b4e2ca858a
 # ╟─c66b8dec-aa58-4508-9f93-70d65ba2c051
 # ╠═8fe19ca9-6618-4c70-8eca-6ba002630ca9
-# ╟─4f785723-2f6a-4dcd-82a7-8d15daf191e8
-# ╠═dcdaf64e-8ec0-42ae-8c6c-34a056bd17d9
-# ╠═7f1f4e2b-bbb4-4e26-8277-2753991e650d
-# ╠═2b5fc25d-eb18-42f8-85fa-f0440f536342
+# ╠═4f785723-2f6a-4dcd-82a7-8d15daf191e8
+# ╟─28c7a5ed-cbc7-4865-a6a9-b6395ea80a5c
 # ╟─54662c5d-7ba3-4e96-88ce-3c9ba1907f8e
+# ╠═794970ef-f2d2-4dc8-ae43-2b1ecc306a74
+# ╟─e500c93a-9a4a-4141-819b-051c4e5d5bb0
 # ╠═b6399549-c754-498a-887c-401f252ba21f
-# ╟─64934637-5ac4-4c74-9290-26aa876344bf
 # ╟─400ad142-8fad-42f6-a8cb-3a1b9c56f5db
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
