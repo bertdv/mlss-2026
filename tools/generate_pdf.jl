@@ -45,7 +45,7 @@ lecture_urls = [
 ]
 
 prop_prog_urls = [
-    "https://bmlip.github.io/course/probprog/PP0%20-%20Introduction%20Bayesian%20Machine%20Learning.html",
+    "https://bmlip.github.io/course/probprog/Intro%20to%20Julia.html",
     "https://bmlip.github.io/course/probprog/PP1%20-%20Bayesian%20inference%20in%20conjugate%20models.html",
     "https://bmlip.github.io/course/probprog/PP2%20-%20Bayesian%20regression%20and%20classification.html",
     "https://bmlip.github.io/course/probprog/PP3%20-%20variational%20Bayesian%20inference.html",
