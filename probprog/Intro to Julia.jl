@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.20
+# v0.20.19
 
 using Markdown
 using InteractiveUtils
@@ -589,7 +589,7 @@ give_magic_number(7)
 md"""
 ## Closing
 
-That's it for now. If you encounter mysterious errors, please let us know on [Piazza](https://piazza.com/tue.nl/winter2025/5ssd0). We can add them to this primer.
+That's it for now. If you encounter mysterious errors, please let us know on [Piazza](https://piazza.com/tue.nl/winter2026/5ssd0). We can add them to this primer.
 
 And if you have any feedback about improving this short primer on programming in Julia, let us know!
 """
@@ -2062,12 +2062,12 @@ version = "1.9.2+0"
 # ╠═0e341cb6-bbca-4581-858f-50b4e2ca858a
 # ╟─c66b8dec-aa58-4508-9f93-70d65ba2c051
 # ╠═8fe19ca9-6618-4c70-8eca-6ba002630ca9
-# ╠═4f785723-2f6a-4dcd-82a7-8d15daf191e8
+# ╟─4f785723-2f6a-4dcd-82a7-8d15daf191e8
 # ╟─28c7a5ed-cbc7-4865-a6a9-b6395ea80a5c
 # ╟─54662c5d-7ba3-4e96-88ce-3c9ba1907f8e
 # ╠═794970ef-f2d2-4dc8-ae43-2b1ecc306a74
 # ╟─e500c93a-9a4a-4141-819b-051c4e5d5bb0
 # ╠═b6399549-c754-498a-887c-401f252ba21f
-# ╟─400ad142-8fad-42f6-a8cb-3a1b9c56f5db
+# ╠═400ad142-8fad-42f6-a8cb-3a1b9c56f5db
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
