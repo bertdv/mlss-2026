@@ -149,7 +149,7 @@ You can access all lecture materials online through the links below:
             <td>05-Dec-2025</td>
             <td>🔴 Submission deadline assignment A0</td>
             <td></td>
-            <td><a href="mailto:w.m.kouw@tue.nl?subject=Julia programming assignment">submit</a>
+            <td><a href="https://canvas.tue.nl/courses/33478/assignments/149317">submit</a>
             </td>
             <td></td>
          </tr>
@@ -196,7 +196,7 @@ You can access all lecture materials online through the links below:
             <td>19-Dec-2025</td>
             <td>🔴 Submission deadline assignment A1</td>
             <td></td>
-            <td><a href="mailto:w.m.kouw@tue.nl?subject=Programming assignment 1">submit</a>
+            <td><a href="">submit</a>
             </td>
             <td></td>
          </tr>
@@ -245,7 +245,7 @@ You can access all lecture materials online through the links below:
             <td>23-Jan-2026 <em>(Fri)</em></td>
             <td>🔴 Submission deadline assignment A2</td>
             <td></td>
-            <td><a href="mailto:w.m.kouw@tue.nl?subject=Programming assignment 2">submit</a>
+            <td><a href="">submit</a>
             </td>
             <td></td>
          </tr>
