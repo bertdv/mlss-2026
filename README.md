@@ -122,10 +122,7 @@ You can access all lecture materials online through the links below:
          <tr>
             <td>28-Nov-2025 <em>(Fri)</em></td>
             <td>🔴 Pick-up Julia programming assignment A0</td>
-            <td></td>
-            <td>
-            A0
-            </td>
+            <td><td><a href="https://github.com/bmlip/course/blob/main/assignments/A0%20-%20Julia%20Programming.jl">A0</a></td>
             <td></td>
          </tr>
          <tr>
