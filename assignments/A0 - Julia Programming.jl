@@ -308,7 +308,7 @@ if @isdefined(Q4)
 	if Q4 isa Missing
 		still_missing()
 	elseif Q4 isa Real
-		if Q4 == sum(p -> sum(Tuple(p[1]))*p[2], pairs(IndexCartesian(), C))# shhhhh
+		if Q4 == sum(p -> prod(Tuple(p[1]))*p[2], pairs(IndexCartesian(), C))# shhhhh
 			correct()
 		else
 			keep_working()
