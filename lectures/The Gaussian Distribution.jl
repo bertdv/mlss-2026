@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.19
+# v0.20.21
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/fig-linear-system.png?raw=true"
@@ -69,7 +69,7 @@ md"""
       * [Ariel Caticha - 2012 - Entropic Inference and the Foundations of Physics](https://github.com/bmlip/course/blob/main/assets/files/Caticha-2012-Entropic-Inference-and-the-Foundations-of-Physics.pdf), pp.30-34, section 2.8, the Gaussian distribution
   * References
 
-      * [E.T. Jaynes - 2003 - Probability Theory, The Logic of Science](http://www.med.mcgill.ca/epidemiology/hanley/bios601/GaussianModel/JaynesProbabilityTheory.pdf) (best book available on the Bayesian view on probability theory)
+      * [E.T. Jaynes - 2003 - The central, Gaussian or normal distribution, ch.7 in: Probability Theory, The Logic of Science](https://github.com/bmlip/course/blob/main/assets/files/Jaynes%20-%202003%20-%20Probability%20theory%20-%20ch-7%20-%20Gaussian%20distribution.pdf) (Very insightful chapter in Jaynes' book on the Gaussian distribution.)
 
 """
 
@@ -123,7 +123,7 @@ md"""
 
 ##### Solution 
 
-- See later in this lecture. 
+- See [later in this lecture](#Challenge-Revisited:-Gaussian-Density-Estimation). 
 """
 
 # ╔═╡ 71f1c8ee-3b65-4ef8-b36f-3822837de410
@@ -203,7 +203,7 @@ Why is the Gaussian distribution so ubiquitously used in science and engineering
     * Any smooth function with a single rounded maximum goes into a Gaussian function, if raised to higher and higher powers. This is particularly useful in sequential Bayesian inference where repeated updates leads to Gaussian posteriors. (See also this [tweet](https://x.com/Almost_Sure/status/1745480056288186768)). 
     * The [Gaussian distribution has higher entropy](https://en.wikipedia.org/wiki/Differential_entropy#Maximization_in_the_normal_distribution) than any other with the same variance. 
         * Therefore, any operation on a probability distribution that discards information but preserves variance gets us closer to a Gaussian.
-        * As an example, see [Jaynes, section 7.1.4](http://www.med.mcgill.ca/epidemiology/hanley/bios601/GaussianModel/JaynesProbabilityTheory.pdf#page=250) for how this leads to the [Central Limit Theorem](https://en.wikipedia.org/wiki/Central_limit_theorem), which results from performing convolution operations on distributions.
+        * As an example, see [Jaynes, section 7.1.4](https://github.com/bmlip/course/blob/main/assets/files/Jaynes%20-%202003%20-%20Probability%20theory%20-%20ch-7%20-%20Gaussian%20distribution.pdf) for how this leads to the [Central Limit Theorem](https://en.wikipedia.org/wiki/Central_limit_theorem), which results from performing convolution operations on distributions.
 
 
 2. Once the Gaussian has been attained, this form tends to be preserved. e.g.,   
@@ -212,7 +212,7 @@ Why is the Gaussian distribution so ubiquitously used in science and engineering
     * The product of two Gaussian functions is another Gaussian function (useful in Bayes rule).
     * The Fourier transform of a Gaussian function is another Gaussian function.
 
-See also [Jaynes, section 7.14](http://www.med.mcgill.ca/epidemiology/hanley/bios601/GaussianModel/JaynesProbabilityTheory.pdf#page=250), and the whole chapter 7 in his book for more details on why the Gaussian distribution is so useful.
+See also [Jaynes, section 7.14](https://github.com/bmlip/course/blob/main/assets/files/Jaynes%20-%202003%20-%20Probability%20theory%20-%20ch-7%20-%20Gaussian%20distribution.pdf), and the whole chapter 7 in his book for more details on why the Gaussian distribution is so useful.
 
 """
 
@@ -245,7 +245,7 @@ for given ``A`` and ``b``, the mean and covariance of ``z`` are given by ``\mu_z
 Since a Gaussian distribution is fully specified by its mean and covariance matrix, it follows that a linear transformation ``z=Ax+b`` of a Gaussian variable ``x \sim \mathcal{N}(\mu_x,\Sigma_x)`` is Gaussian distributed as
 
 ```math
-p(z) = \mathcal{N} \left(z \,|\, A\mu_x+b, A\Sigma_x A^T \right) \,. \tag{SRG-4a}
+p(z) = \mathcal{N} \left(z \,|\, A\mu_x+b, A\Sigma_x A^T \right) \,. 
 ```
 
 In case ``x`` is not Gaussian, higher order moments may be needed to specify the distribution for ``z``. 
@@ -265,7 +265,7 @@ A commonly occurring example of a linear transformation is the *sum of two indep
 Let ``x \sim \mathcal{N} \left(\mu_x, \sigma_x^2 \right)`` and ``y \sim \mathcal{N} \left(\mu_y, \sigma_y^2 \right)``. Prove that the PDF for ``z=x+y`` is given by
 
 ```math
-p(z) = \mathcal{N} \left(z\,|\,\mu_x+\mu_y, \sigma_x^2 +\sigma_y^2 \right) \tag{SRG-8}
+p(z) = \mathcal{N} \left(z\,|\,\mu_x+\mu_y, \sigma_x^2 +\sigma_y^2 \right) 
 ```
 
 
@@ -410,8 +410,10 @@ Let ``\theta =\{\mu,\Sigma\}``. Prove that the log-likelihood (LLH) function ``\
 
 # ╔═╡ f008a742-6900-4e18-ab4e-b5da53fb64a6
 hide_proof(
-		
-		md" ```math
+		md""" 
+Hint: it may be helpful here to use the matrix calculus rules from the [5SSD0 Formula Sheet](https://github.com/bmlip/course/blob/main/assets/files/5SSD0_formula_sheet.pdf).
+	
+	```math
 \begin{align*}
 \log p(D|\theta) &= \log \prod_n p(x_n|\theta) \\
  &= \log \prod_n \mathcal{N}(x_n|\mu, \Sigma) \\
@@ -420,7 +422,7 @@ hide_proof(
 &= \frac{N}{2}\log  |\Sigma|^{-1} - \frac{1}{2}\sum_n (x_n-\mu)^T \Sigma^{-1}(x_n-\mu) + \mathrm{const.}
 \end{align*}
 ```
-"	   )
+"""	   )
 
 # ╔═╡ 75e35350-af22-42b1-bb55-15e16cb9c375
 md"""
@@ -673,15 +675,6 @@ This property is an important reason why the canonical parameterization of the G
 md"""
 It is important to distinguish between two concepts: the *product of Gaussian distributions*, which results in a (possibly unnormalized) Gaussian distribution, and the *product of Gaussian-distributed variables*, which generally does not yield a Gaussian-distributed variable. See the [optional slides below](#OPTIONAL-SLIDES) for further discussion.
 """
-
-# ╔═╡ 93361b31-022f-46c0-b80d-b34f3ed61d5f
-md"""
-## Gaussian Distributions in Julia
-Take a look at this mini lecture to see some simple examples of using distributions in Julia:
-"""
-
-# ╔═╡ bbf3a1e7-9f25-434c-95c7-898648b5bc90
-NotebookCard("https://bmlip.github.io/course/minis/Distributions%20in%20Julia.html")
 
 # ╔═╡ b9a7073a-d294-11ef-2330-49ffa7faff21
 md"""
@@ -3267,8 +3260,6 @@ version = "1.9.2+0"
 # ╟─b9a6ecd2-d294-11ef-02af-37c977f2814b
 # ╟─b9a6f916-d294-11ef-38cb-b78c0c448550
 # ╟─d2bedf5f-a0ea-4604-b5da-adf9f11e80be
-# ╟─93361b31-022f-46c0-b80d-b34f3ed61d5f
-# ╟─bbf3a1e7-9f25-434c-95c7-898648b5bc90
 # ╟─b9a7073a-d294-11ef-2330-49ffa7faff21
 # ╟─45c2fb37-a078-4284-9e04-176156cffb1e
 # ╟─df8867ed-0eff-4a52-8f5e-2472467e1aa2
