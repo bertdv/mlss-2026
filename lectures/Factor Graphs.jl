@@ -261,7 +261,7 @@ This factorized probability distribution is represented by the above FFG.
 
 # ╔═╡ 9658329c-d294-11ef-0d03-45e6872c4985
 md"""
-## Terminating an FGG
+## Terminating an FFG
 
 Consider a model 
 
@@ -363,7 +363,7 @@ Due to the factorization of ``f(x_1,x_2,\ldots,x_7)`` and the [Generalized Distr
 \end{align*}
 ```
 
-which, in case ``x_i`` has ``10`` values, requires a few hundred additions and is therefore computationally (much!) lighter than executing the full sum ``\sum_{x_1,\ldots,x_7}f(x_1,x_2,\ldots,x_7)``
+which, in case ``x_i`` has ``10`` values, requires a few hundred additions and is therefore computationally (much!) lighter than executing the whole sum ``\sum_{x_1,\ldots,x_7}f(x_1,x_2,\ldots,x_7)``
 
 
 """
@@ -404,7 +404,7 @@ This operation is known as **Closing-the-Box**. The result is a new **composite 
 
 # ╔═╡ 253d4703-03d6-4961-8c3b-b70d2cbc0710
 md"""
-When closing the box around a terminal node, the result is simply the factor associated with that node, since there are no internal variables that need to be marginalized out.
+When closing the box around a terminal node, the result is simply the factor associated with that node, since there are no internal variables to marginalize.
 """
 
 # ╔═╡ a7b1f559-3c34-491e-83e7-ba95c8c22c80
@@ -422,7 +422,7 @@ In both interpretations, the internal details of the subgraph are abstracted awa
 # ╔═╡ 70736e62-2b6c-4b3a-ab59-7e51522d620b
 md"""
 
-The complete inference process for computing ``\bar{f}(x_3)`` can be interpreted as a **message passing process**. It begins by sending messages from the terminal nodes and proceeds by propagating messages through the internal nodes of the factor graph. This continues until both the forward and backward messages for ``x_3`` have been computed. The final result, ``\bar{f}(x_3)``, is obtained by multiplying the forward and backward messages,
+The complete inference process for computing ``\bar{f}(x_3)`` can be interpreted as a **message passing process**. It begins by sending messages from the terminal nodes and then propagates them through the internal nodes of the factor graph. This continues until both the forward and backward messages for ``x_3`` have been computed. The final result, ``\bar{f}(x_3)``, is obtained by multiplying the forward and backward messages,
 
 ```math
 \bar{f}(x_3) = \overrightarrow{\mu}_{X_3}(x_3) \cdot \overleftarrow{\mu}_{X_3}(x_3)
@@ -470,9 +470,9 @@ Equation (SP) is called a **Sum-Product** message, so named because the computat
 md"""
 
 
-If the factor graph for the whole model has no cycles, i.e., the FFG is a tree, then the process of passing SP message from the terminal nodes to the internal (latent) variables yields exact Bayesian marginals for all hidden variables. This inference method is known as the **Sum-Product** (SP) algorithm.
+If the factor graph for the whole model has no cycles, i.e., the FFG is a tree, then passing SP messages from the terminal nodes to the internal (latent) variables yields exact Bayesian marginals for all hidden variables. This inference method is known as the **Sum-Product** (SP) algorithm.
 
-However, if the graph contains cycles, one can conceptually view the graph as an infinite tree by “unrolling” the cycles. In this loopy setting, SP-based inference is not guaranteed to yield exact marginals. Nevertheless, in practice, if we run the SP algorithm for a limited number of iterations (i.e., a finite unrolling), we often obtain high-quality approximate marginals that are sufficient for many inference tasks.
+However, if the graph contains cycles, one can view it conceptually as an infinite tree by “unrolling” the cycles. In this loopy setting, SP-based inference is not guaranteed to yield exact marginals. Nevertheless, in practice, if we run the SP algorithm for a limited number of iterations (i.e., a finite unrolling), we often obtain high-quality approximate marginals that are sufficient for many inference tasks.
 """
 
 # ╔═╡ 7009cdc8-892c-499e-b932-b828fa300b6c
@@ -539,7 +539,7 @@ md"""
 md"""
 ## Automating Bayesian Inference by Message Passing
 
-The foregoing message update rules can be worked out in closed-form and put into tables (e.g., see Tables 1 through 6 in [Loeliger (2007)](https://github.com/bmlip/course/blob/main/assets/files/Loeliger-2007-The-factor-graph-approach-to-model-based-signal-processing.pdf) for many standard factors such as essential probability distributions and operations such as additions, fixed-gain multiplications and branching (equality nodes).
+The foregoing message update rules can be worked out in closed form and put into tables (e.g., see Tables 1 through 6 in [Loeliger (2007)](https://github.com/bmlip/course/blob/main/assets/files/Loeliger-2007-The-factor-graph-approach-to-model-based-signal-processing.pdf) for many standard factors such as essential probability distributions and operations such as additions, fixed-gain multiplications, and branching (equality nodes).
 
 In the optional slides below, we have worked out a few more update rules for the [addition node](#sp-for-addition-node) and the [multiplication node](#sp-for-multiplication-node).
 
@@ -547,7 +547,7 @@ If the update rules for all node types in a graph have been tabulated, then infe
 
 In our research lab [BIASlab](http://biaslab.org) (FLUX 7.060), we are developing [RxInfer](http://rxinfer.com), which is a (Julia) toolbox for automating Bayesian inference by message passing in a factor graph.
 
-In general, a code package that automates Bayesian inference is called a [Probabilistic Programming](https://en.wikipedia.org/wiki/Probabilistic_programming) Language (PLL). RxInfer is a PLL that automates inference through message passing-based inference in a factor graph. 
+In general, a code package that automates Bayesian inference is called a [Probabilistic Programming](https://en.wikipedia.org/wiki/Probabilistic_programming) Language (PPL). RxInfer is a PPL that automates inference through message passing-based inference in a factor graph. 
 
 """
 
@@ -558,7 +558,7 @@ md"""
 
 # ╔═╡ c4b5b124-e52a-41fc-b27e-a58181622e5c
 md"""
-The figure above (a screen recording from the [RxInfer webpage](http://rxinfer.com)) is an animated GIF illustrating how RxInfer operates. The model is represented as a graph, where each node passes messages to its neighbors. When messages meet on an edge, the belief about the variable associated with that edge is updated.
+The figure above (a screen recording from the [RxInfer webpage](http://rxinfer.com)) is an animated GIF illustrating how RxInfer operates. The model is represented as a graph in which each node passes messages to its neighbors. When messages meet on an edge, the belief about the variable associated with that edge is updated.
 """
 
 # ╔═╡ a1c957c1-69b7-4178-ab59-c0b2439bb01a
