@@ -159,7 +159,7 @@ You can access all lecture materials online through the links below:
             <td>🔴 Pick-up probabilistic programming assignment A1</td>
             <td></td>
             <td>
-            A1
+            <a href="https://github.com/bmlip/course/blob/main/assignments/A1%20-%20Observational%20astronomy.jl">A1</a>
             </td>
             <td></td>
          </tr>
@@ -196,7 +196,7 @@ You can access all lecture materials online through the links below:
             <td>19-Dec-2025</td>
             <td>🔴 Submission deadline assignment A1</td>
             <td></td>
-            <td><a href="">submit</a>
+            <td><a href="https://canvas.tue.nl/courses/33478/assignments/149316">submit</a>
             </td>
             <td></td>
          </tr>
@@ -245,7 +245,7 @@ You can access all lecture materials online through the links below:
             <td>23-Jan-2026 <em>(Fri)</em></td>
             <td>🔴 Submission deadline assignment A2</td>
             <td></td>
-            <td><a href="">submit</a>
+            <td><a href="https://canvas.tue.nl/courses/33478/assignments/149318">submit</a>
             </td>
             <td></td>
          </tr>
@@ -257,7 +257,7 @@ You can access all lecture materials online through the links below:
             <td> - </td>
             <td>🔴 Pick-up resit programming assignment</td>
             <td></td>
-            <td><a href="https://github.com/bmlip/course/blob/main/assignments/%5B5SSD0%5D%20Probabilistic%20programming%20resit.zip">download</a>
+            <td>not available yet
             </td>
             <td></td>
          </tr>
