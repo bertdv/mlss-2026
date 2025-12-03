@@ -29,6 +29,10 @@ Next, you can install and run **Pluto**. This is easy, because Julia has an easy
 ## 3️⃣ That's it
 Because Pluto has a built-in package manager, this is all you need to do for now. 🌟 When you open a lecture or assignment, Pluto will automatically make sure that the right packages are installed. When a package has not been used for a while, Julia will automatically delete it.
 
+# How to open an assignment
+First, you need to **copy the URL** of the assignment file. This is a github URL, and it should end in `.jl`. 
+
+Next, start Pluto, following the instructions above. You should now see the [Pluto main menu](https://plutojl.org/en/docs/launch-pluto/#main-menu). Now you can **paste the URL** in the textbox, and press Enter or click the "Open" button.
 
 
 

@@ -159,7 +159,7 @@ You can access all lecture materials online through the links below:
             <td>🔴 Pick-up probabilistic programming assignment A1</td>
             <td></td>
             <td>
-            <a href="https://github.com/bmlip/course/blob/main/assignments/A1%20-%20Observational%20astronomy.jl">A1</a>
+            <a href="https://github.com/bmlip/course/blob/main/assignments/A1%20-%20Observational%20astronomy.jl">A1</a> (<a href="https://github.com/bmlip/course/blob/main/Software%20installation.md#how-to-open-an-assignment">how to open</a>)
             </td>
             <td></td>
          </tr>
