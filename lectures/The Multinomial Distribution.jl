@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.19
+# v0.20.21
 
 #> [frontmatter]
 #> description = "Bayesian and maximum likelihood density estimation for discretely valued data sets."
@@ -484,6 +484,40 @@ This decomposition is the natural consequence of doing Bayesian estimation, whic
 		
 		""")
 
+# ╔═╡ 93b8ac65-ac41-4a03-bddd-5f01ccb5b42d
+md"""
+
+#### Evidence for the Multinomial-Dirichlet model (**) 
+
+As above, consider the following model assumptions for $N$ tosses with a $K$-sided die with parameters $\mu = (\mu_1,\mu_2, \ldots,\mu_K)$.  
+
+```math
+\begin{align}
+p(D|\mu) &= \prod_{n=1}^N \mathrm{Cat}(x_n|\mu) = \prod_{k=1}^{K} \mu_k^{m_k} \tag{likelihood}\\
+p(\mu|\alpha) &= \mathrm{Dir}(\mu|\alpha) = \frac{1}{B(\alpha)} \prod_{k=1}^{K} \mu_k^{\alpha_k -1}   \tag{prior}
+\end{align}
+```
+where $B(\alpha) = \frac{\prod_k \Gamma(\alpha_k)}{\Gamma(\sum_k \alpha_k)}$ is known as the [Beta function](https://en.wikipedia.org/wiki/Beta_function).
+
+Work out both the model evidence and the posterior distribution for $\mu$.
+"""
+
+# ╔═╡ 81b5aea0-8101-46e2-a875-1058029ebf99
+hide_solution(
+	md"""
+
+	```math
+	\begin{align}
+	\overbrace{\prod_{k=1}^{K} \mu_k^{m_k}}^{\text{likelihood }p(D|\mu)} \cdot \overbrace{\frac{1}{B(\alpha)} \prod_{k=1}^{K} \mu_k^{\alpha_k -1}}^{\text{prior }p(\mu|\alpha)}  
+	&= \frac{1}{B(\alpha)} \prod_{k=1}^{K} \mu_k^{m_k + \alpha_k -1} \\
+	&= \frac{B(m+\alpha)}{B(\alpha)} \frac{1}{B(m+\alpha)}\prod_{k=1}^{K} \mu_k^{m_k + \alpha_k -1} \\
+	&= \underbrace{\frac{B(m+\alpha)}{B(\alpha)}}_{\text{evidence }p(D|\alpha)} \,\underbrace{\mathrm{Dir}(\mu|m+\alpha)}_{\text{posterior }p(\mu|D,\alpha)} 
+	\end{align} 
+	```
+
+	This equation is the equivalent of the [Gaussian multiplication formula](https://bmlip.github.io/course/lectures/The%20Gaussian%20Distribution.html#(Multivariate)-Gaussian-Multiplication) for discrete data. Note that the evidence is a scalar normalizer for given observations $m$ and pseudo-observations ("prior" observations) $\alpha$.
+	""")
+
 # ╔═╡ 59fb1e66-cf05-4f2b-8027-7ff3b1a57c15
 md"""
 # Code
@@ -898,6 +932,8 @@ version = "17.5.0+2"
 # ╟─448d0679-b47a-4db9-ad7d-a45786350fef
 # ╟─72f24b54-ab22-4a54-9ece-7433048f4769
 # ╟─3c2ee96d-18a6-45d0-a2cf-f2ebbf5e22f0
+# ╟─93b8ac65-ac41-4a03-bddd-5f01ccb5b42d
+# ╟─81b5aea0-8101-46e2-a875-1058029ebf99
 # ╟─59fb1e66-cf05-4f2b-8027-7ff3b1a57c15
 # ╠═d3a4a1dc-3fdf-479d-a51c-a1e23073c556
 # ╟─00000000-0000-0000-0000-000000000001
