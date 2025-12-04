@@ -159,7 +159,7 @@ You can access all lecture materials online through the links below:
             <td>🔴 Pick-up probabilistic programming assignment A1</td>
             <td></td>
             <td>
-            A1
+            <a href="https://github.com/bmlip/course/blob/main/assignments/A1%20-%20Observational%20astronomy.jl">A1</a> (<a href="https://github.com/bmlip/course/blob/main/Software%20installation.md#how-to-open-an-assignment">how to open</a>)
             </td>
             <td></td>
          </tr>
@@ -196,7 +196,7 @@ You can access all lecture materials online through the links below:
             <td>19-Dec-2025</td>
             <td>🔴 Submission deadline assignment A1</td>
             <td></td>
-            <td><a href="">submit</a>
+            <td><a href="https://canvas.tue.nl/courses/33478/assignments/149316">submit</a>
             </td>
             <td></td>
          </tr>
@@ -223,7 +223,7 @@ You can access all lecture materials online through the links below:
             <td>🔴 Pick-up probabilistic programming assignment A2</td>
             <td></td>
             <td>
-            A2
+            A2 (<a href="https://github.com/bmlip/course/blob/main/Software%20installation.md#how-to-open-an-assignment">how to open</a>)
             </td>
             <td></td>
          </tr>
@@ -245,7 +245,7 @@ You can access all lecture materials online through the links below:
             <td>23-Jan-2026 <em>(Fri)</em></td>
             <td>🔴 Submission deadline assignment A2</td>
             <td></td>
-            <td><a href="">submit</a>
+            <td><a href="https://canvas.tue.nl/courses/33478/assignments/149318">submit</a>
             </td>
             <td></td>
          </tr>
@@ -257,7 +257,7 @@ You can access all lecture materials online through the links below:
             <td> - </td>
             <td>🔴 Pick-up resit programming assignment</td>
             <td></td>
-            <td><a href="https://github.com/bmlip/course/blob/main/assignments/%5B5SSD0%5D%20Probabilistic%20programming%20resit.zip">download</a>
+            <td>not available yet
             </td>
             <td></td>
          </tr>
@@ -282,6 +282,51 @@ You can access all lecture materials online through the links below:
          </tr> -->
       </table>
 
+### Mini lectures
+Throughout the course, you can read _Minis_ that deep-dive into specific topics. You can find the full list of minis here:
+
+<table border = "1">
+    <tr>
+        <th>Mini:</th>
+             <td>🟡 Sum and product of Gaussian variables</td>
+        <td><a href="https://bmlip.github.io/course/minis/Sum%20and%20product%20of%20Gaussians.html">link</a></td>
+    </tr>
+    <tr>
+        <th>Mini:</th>
+             <td>🟡 Distributions in Julia</td>
+        <td><a href="https://bmlip.github.io/course/minis/Distributions%20in%20Julia.html">link</a></td>
+    </tr>
+    <tr>
+        <th>Mini:</th>
+             <td>🟡 Basis Functions</td>
+        <td><a href="https://bmlip.github.io/course/minis/Basis%20Functions.html">link</a></td>
+    </tr>
+    <tr>
+        <th>Mini:</th>
+             <td>🟡 The Softmax Function</td>
+        <td><a href="https://bmlip.github.io/course/minis/Softmax.html">link</a></td>
+    </tr>
+    <tr>
+        <th>Mini:</th>
+             <td>🟡 Generative Classification</td>
+        <td><a href="https://bmlip.github.io/course/minis/Generative%20Classification.html">link</a></td>
+    </tr>
+    <tr>
+        <th>Mini:</th>
+             <td>🟡 Laplace Approximation</td>
+        <td><a href="https://bmlip.github.io/course/minis/Laplace%20Approximation.html">link</a></td>
+    </tr>
+    <tr>
+        <th>Mini:</th>
+             <td>🟡 Kullback-Leibler Divergence</td>
+        <td><a href="https://bmlip.github.io/course/minis/KL%20Divergence.html">link</a></td>
+    </tr>
+    <tr>
+        <th>Mini:</th>
+             <td>🟡 How to use this knowledge</td>
+        <td><a href="https://bmlip.github.io/course/minis/How%20to%20use%20this%20knowledge.html">link</a></td>
+    </tr>
+</table>
 
 ## Exams & Assignments
 
