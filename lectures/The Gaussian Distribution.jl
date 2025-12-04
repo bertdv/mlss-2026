@@ -280,7 +280,7 @@ A = \begin{bmatrix} 1 & 1\end{bmatrix}
 ```	
 and
 ```math
-w = \begin{bmatrix} x \\ y\end{bmatrix} \sim \mathcal{N}\left( \begin{bmatrix} x \\ y\end{bmatrix}, \begin{bmatrix} \sigma_x^2 & 0 \\ 0 & \sigma_y^2\end{bmatrix}\right) \,.
+w = \begin{bmatrix} x \\ y\end{bmatrix} \sim \mathcal{N}\left( \begin{bmatrix} \mu_x \\ \mu_y\end{bmatrix}, \begin{bmatrix} \sigma_x^2 & 0 \\ 0 & \sigma_y^2\end{bmatrix}\right) \,.
 ```		
 
 Making use of the above formula for linear transformations, it follows that
