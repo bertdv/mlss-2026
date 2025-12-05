@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.19
+# v0.20.21
 
 #> [frontmatter]
 #> image = "https://i.imgur.com/azbCpRW.png"
@@ -121,7 +121,7 @@ The challenge is to uncover the underlying data-generating process and predict r
 
 ##### Solution
 
-To be solved later in this lecture. 
+To be solved [later in this lecture](#Challenge-Revisited:-Finding-a-Secret-Function). 
 """
 
 # ╔═╡ 234c3684-d294-11ef-1c08-d9d61fc3d471
@@ -155,7 +155,7 @@ p(y_n,x_n) &= p(y_n|x_n) p(x_n) \\
 
 we can focus attention on developing a model for the **conditional distribution** ``p(y_n|x_n)`` only. 
 
-Building a conditional model ``p(y_n|x_n)`` directly for outputs ``y`` and given inputs ``x_n``, is called the **discriminative** approach to Bayesian modelling. We will see more of this approach in the [discriminative classification lecture](https://bmlip.github.io/course/lectures/Discriminative%20Classification.html#Discriminative-Classification). 
+Building a conditional model ``p(y_n|x_n)`` directly for outputs ``y_n`` and given inputs ``x_n``, is called the **discriminative** approach to Bayesian modelling. We will see more of this approach in the [discriminative classification lecture](https://bmlip.github.io/course/lectures/Discriminative%20Classification.html#Discriminative-Classification). 
 
 Next, we discuss (1) model specification, (2) Inference, and (3) a prediction application for a Bayesian linear regression problem. 
 
@@ -383,7 +383,7 @@ We can use this model to approximate the secret function! Let's see it in action
 
 # ╔═╡ b48b93c3-1ff2-4be0-8fad-181035f3e50e
 md"""
-We also have a _prior_ for the weights: ``\mathcal{N}(0,σ_{prior}^2)``. You can control this parameter:
+We also have a _prior_ for the weights: ``w \sim \mathcal{N}(0,σ_{prior}^2)``:
 """
 
 # ╔═╡ 3fe01c67-6f95-4f6d-8c7f-5a389272ff65
@@ -2207,9 +2207,9 @@ version = "1.9.2+0"
 # ╟─f600c228-e048-42aa-b79a-60592b367dec
 # ╟─c0c57aa6-155a-49a9-9ed2-d568de1b5be2
 # ╟─9fd4a9b4-3296-4fe3-931f-17744bc4df81
-# ╟─f9a5c91e-12be-4e8b-930d-74e46e39ea58
 # ╟─b48b93c3-1ff2-4be0-8fad-181035f3e50e
 # ╟─3fe01c67-6f95-4f6d-8c7f-5a389272ff65
+# ╟─f9a5c91e-12be-4e8b-930d-74e46e39ea58
 # ╟─018b6c7b-36bc-4867-a058-3802b43fd1eb
 # ╟─90cb881a-7b5d-44e3-a7d1-bb93bef4a82b
 # ╠═142f4700-ccf4-4019-b3a9-57035c458276
