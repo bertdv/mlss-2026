@@ -37,7 +37,7 @@ title("Mini: Basis Functions")
 # ╔═╡ 3a9f60a8-e4b6-4f0a-881e-ec6ce8098720
 md"""
 
-In the Regression lecture, we will try to approximate a function using the [radial function](https://en.wikipedia.org/wiki/Radial_basis_function) basis. This means that we have a fixed set of basis functions, and we approximate our function as a linear combination of that basis.
+In the Regression lecture, we will try to approximate a function using [radial basis functions](https://en.wikipedia.org/wiki/Radial_basis_function). This means we have a fixed set of basis functions and approximate our function as a linear combination of them.
 
 Let's look at the individual basis functions first:
 """
