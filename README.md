@@ -329,7 +329,7 @@ Throughout the course, you can read _Minis_ that deep-dive into specific topics.
     <tr>
         <th>Mini:</th>
              <td>🟡 RxInfer Tips & Tricks</td>
-        <td><a href="https://bmlip.github.io/course/minis/RxInfer%20tips%20%26%20tricks.html">link</a></td>
+        <td><a href="https://bmlip.github.io/course/minis/RxInfer%20tips%20and%20tricks.html">link</a></td>
     </tr>
 </table>
 
