@@ -95,11 +95,7 @@ md"""
 
 # ╔═╡ 1def182c-a8af-4270-a55e-a2b75bb3443d
 md"""
-Homework exercise:
-
-"Vertel iets dat je verrassend vond!"
-
-(dit kan niet met chatgpt omgg)
+# Appendix
 """
 
 # ╔═╡ 660cead8-1ad9-4c94-8cea-c9db51e272fb
