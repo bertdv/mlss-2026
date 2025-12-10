@@ -141,7 +141,7 @@ md"""
 
 We observe ``N`` IID data **pairs** ``D=\{(x_1,y_1),\dotsc,(x_N,y_N)\}`` with ``x_n \in \mathbb{R}^M`` and ``y_n \in \mathbb{R}``.
 
-Assume that, based on the data set,  we are interested in predicting the response ``y_\bullet`` for a new **given and fixed** input observation ``x_\bullet = a``? 
+Assume that, based on the data set,  we are interested in predicting the response ``y_\bullet`` for a new **given and fixed** input observation ``x_\bullet = a``?
 
 In a Bayesian (generative) modeling context, we should develop a joint model for all variables, i.e., we should develop a model ``p(y_n,x_n)``, but in this case we already know ``p(x_n) = \delta(x_n-a)``.
 
