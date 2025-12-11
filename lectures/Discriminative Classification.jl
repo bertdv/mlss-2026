@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.19
+# v0.20.21
 
 #> [frontmatter]
 #> image = "https://github.com/bmlip/course/blob/v2/assets/figures/Figure4.9.png?raw=true"
@@ -351,25 +351,26 @@ md"""
 The **Laplace Approximation** approximates a function by a Gaussian-shaped function. In this case, we will approximate the weight posterior ``p(w|D)`` by a Gaussian distribution
 
 ```math
-q(w) = \mathcal{N}\left(w\,|\, w_{N}, S_N\right) \tag{B-4.144}
+q(w) = \mathcal{N}\left(w\,|\, m_{N}, S_N\right) \tag{B-4.144}
 ```
 
 with
 
 ```math
 \begin{align}
-w_N &= \arg\max_w \log p(w|D) \\
+m_N &= \arg\max_w \log p(w|D) \\
 S_N^{-1} &= S_0^{-1} + \sum_n \sigma_n (1-\sigma_n) x_n x_n^T \tag{B-4.143}
 \end{align}
 ```
-where we used short-hand ``\sigma_n = \sigma\left((2y_n-1) w_{N}^T x_n\right)``.
+where we used short-hand ``\sigma_n = \sigma\left((2y_n-1) w^T x_n\right)``.
 
 If we substitute the Gaussian approximation from Eq. B-4.143 into the expression for the predictive class distribution (Eq. B-4.145), we obtain (after some additional approximations):
 
 ```math
 \begin{align*}
 p(y_\bullet = 1 \mid x_\bullet, D) &= \int p(y_\bullet = 1 \,|\, x_\bullet, w) \cdot p(w\,|\, D) \,\mathrm{d}w \\
-  &\approx  \int \sigma(w^T x_\bullet) \cdot \mathcal{N}\left(w \,|\, w_N, S_N\right) \,\mathrm{d}w \tag{B-4.145} \\
+&\approx \int p(y_\bullet = 1 \,|\, x_\bullet, w) \cdot q(w) \,\mathrm{d}w \\
+  &=  \int \sigma(w^T x_\bullet) \cdot \mathcal{N}\left(w \,|\, m_N, S_N\right) \,\mathrm{d}w \tag{B-4.145} \\
 &\approx \Phi\left( \frac{\mu_a}{\sqrt(\lambda^{-2} +\sigma_a^2)}\right) \tag{B-4.152}
 \end{align*}
 ```
@@ -379,7 +380,7 @@ where
 ```math
 \begin{align}
 \lambda^2 &= \pi / 8 \\
-\mu_a  &= w^T_{N} x_\bullet \tag{B-4.149} \\
+\mu_a  &= m^T_{N} x_\bullet \tag{B-4.149} \\
 \sigma_a^2 &= x^T_\bullet S_N x_\bullet \tag{B-4.150}
 \end{align}
 ```
