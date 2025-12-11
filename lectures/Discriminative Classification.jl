@@ -415,7 +415,7 @@ keyconcept("",
 md"""
 The Laplace approximation renders a closed-form and interpretable (approximate) solution for the predictive class distribution,
 ```math
-p(y_\bullet = 1 | x_\bullet, D) \approx \Phi\left( \frac{w^T_{N} x_\bullet}{\sqrt{(8/\pi) +x^T_\bullet S_N x_\bullet)}}\right)\,.
+p(y_\bullet = 1 | x_\bullet, D) \approx \Phi\left( \frac{m^T_{N} x_\bullet}{\sqrt{(8/\pi) +x^T_\bullet S_N x_\bullet)}}\right)\,.
 ```
 	
 """)
