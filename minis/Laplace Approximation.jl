@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.19
+# v0.20.21
 
 #> [frontmatter]
 #> image = "https://i.imgur.com/AUaQapv.png"
@@ -299,10 +299,10 @@ OK, not as straightforward as promised, but, in principle, this is standard matr
 
 # ╔═╡ 2096c0e1-c4ff-48ea-92d7-901600a81478
 md"""
-We can now use the gradient ``\nabla_w \log p(w | D)`` to find the **mode** ``w_{N}`` of ``\log p(w|D)`` (e.g., by some gradient-based optimization procedure) and then use the Hessian ``-\left. \nabla\nabla_w \log p(w | D)\right|_{w=w_N}``, evaluated at ``w=w_N``, to get the variance of ``q(w)``, leading to a **Gaussian weights posterior**
+We can now use the gradient ``\nabla_w \log p(w | D)`` to find the **mode** ``m_{N}`` of ``\log p(w|D)`` (e.g., by some gradient-based optimization procedure) and then use the Hessian ``-\left. \nabla\nabla_w \log p(w | D)\right|_{w=m_N}``, evaluated at ``w=m_N``, to get the variance of ``q(w)``, leading to a **Gaussian weights posterior**
 
 ```math
-q(w) = \mathcal{N}\left(w\,|\, w_{N}, S_N\right) \tag{B-4.144}
+q(w) = \mathcal{N}\left(w\,|\, m_{N}, S_N\right) \tag{B-4.144}
 ```
 
 with
@@ -324,7 +324,7 @@ For a new observation ``x_\bullet``, the class probability then evaluates to
 ```math
 \begin{align*}
 p(y_\bullet = 1 \mid x_\bullet, D) &= \int p(y_\bullet = 1 \,|\, x_\bullet, w) \cdot p(w\,|\, D) \,\mathrm{d}w \\
-  &\approx  \int \sigma(w^T x_\bullet) \cdot \mathcal{N}\left(w \,|\, w_N, S_N\right) \,\mathrm{d}w \tag{B-4.145} \\
+  &\approx  \int \sigma(w^T x_\bullet) \cdot \mathcal{N}\left(w \,|\, m_N, S_N\right) \,\mathrm{d}w \tag{B-4.145} \\
 &\approx \Phi\left( \frac{\mu_a}{\sqrt(\lambda^{-2} +\sigma_a^2)}\right) \tag{B-4.152}
 \end{align*}
 ```
@@ -334,7 +334,7 @@ where
 ```math
 \begin{align}
 \lambda^2 &= \pi / 8 \\
-\mu_a  &= w^T_{N} x_\bullet \tag{B-4.149} \\
+\mu_a  &= m^T_{N} x_\bullet \tag{B-4.149} \\
 \sigma_a^2 &= x^T_\bullet S_N x_\bullet \tag{B-4.150}
 \end{align}
 ```
