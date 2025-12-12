@@ -362,7 +362,7 @@ m_N &= \arg\max_w \log p(w|D) \\
 S_N^{-1} &= S_0^{-1} + \sum_n \sigma_n (1-\sigma_n) x_n x_n^T \tag{B-4.143}
 \end{align}
 ```
-where we used short-hand ``\sigma_n = \sigma\left((2y_n-1) w^T x_n\right)``.
+where we used short-hand ``\sigma_n = \sigma\left((2y_n-1) m_N^T x_n\right)``.
 
 If we substitute the Gaussian approximation from Eq. B-4.143 into the expression for the predictive class distribution (Eq. B-4.145), we obtain (after some additional approximations):
 
