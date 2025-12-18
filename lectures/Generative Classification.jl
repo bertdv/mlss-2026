@@ -403,7 +403,7 @@ md"""
 ```math
 \begin{align}
 &\log \frac{{p(\mathcal{C}_k|x,D )}}{{p(\mathcal{C}_j|x,D )}} \overset{!}{=} 0 \\
-\implies &\frac{\beta_k^T x + \gamma_k}{\beta_j^T x + \gamma_j} = 0 \\
+\implies &\frac{\beta_k^T x + \gamma_k}{\beta_j^T x + \gamma_j} = 1 \\
 \implies &\beta_k^T x + \gamma_k = \beta_j^T x + \gamma_j \\
 \implies &\beta_{kj}^T x + \gamma_{kj} = 0 \quad \text{(this is a line)}\,,
 \end{align}
