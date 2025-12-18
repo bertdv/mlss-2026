@@ -645,10 +645,10 @@ md"""
 
 #### Discrimination boundaries (*)
 
-Show that for logistic regression with ``p(y_n =1 \,|\, x_n, w) = \sigma(w^T x_n)``, the discrimination boundary, which can be computed by
+Show that for logistic regression with ``p(y_n =1 \,|\, x_n) = \sigma(w^T x_n)``, the discrimination boundary, which can be computed by
 
 ```math
-\frac{p(y_n\in\mathcal{C}_1|x_n)}{p(y_n\in\mathcal{C}_0|x_n)} \overset{!}{=} 1
+\frac{p(y_n =1|x_n)}{p(y_n =0|x_n)} \overset{!}{=} 1
 ```
 
 is a straight line.
@@ -660,7 +660,7 @@ md"""
 		
 ```math
 \begin{align}
-\frac{ p(y_n \in \mathcal{C}_1 |x_n) }{ p(y_n\in\mathcal{C}_0|x_n) } &= \frac{ \sigma(w^T x_n)}{1 - \sigma(w^T x_n)} \\  
+\frac{ p(y_n =1 |x_n) }{ p(y_n =0|x_n) } &= \frac{ \sigma(w^T x_n)}{1 - \sigma(w^T x_n)} \\  
 &= \frac{ \frac{1}{1+\exp(-w^T x_n)} }{ 1 -\frac{1}{1+\exp(-w^T x_n)} } \\  
 &= \frac{1}{1+\exp(-w^T x_n) - 1}   \\   
 &= \exp(w^T x) 
