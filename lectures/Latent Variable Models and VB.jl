@@ -310,7 +310,7 @@ The CA decomposition cannot be evaluated because it depends on the posterior ``p
 
 Let's now introduce a distribution ``q(z)`` (called the "variational" or "approximate" posterior distribution) that we will use to *approximate* the posterior ``p(z|x)``. Since we propose the distribution ``q(z)`` ourselves, we will assume that ``q(z)`` can be evaluated. 
 
-If will substitute ``q(z)`` for ``p(z|x)`` in the CA decomposition, then we obtain 
+If we substitute ``q(z)`` for ``p(z|x)`` in the CA decomposition, then we obtain 
 
 ```math
  F[q] \triangleq  \underbrace{ \int q(z) \log \frac{q(z)}{p(z)} \mathrm{d}z }_{\text{complexity}} - \underbrace{\int q(z) \log p(x|z) \mathrm{d}z}_{\text{accuracy}}
