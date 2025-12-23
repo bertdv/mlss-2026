@@ -87,35 +87,35 @@ You can access all lecture materials online through the links below:
             <td>12-Nov-2025 <em>(Wed)</em></td>
             <td>⚪️ B0: Course Syllabus<br/>
             ⚪️ B1: Machine Learning Overview</td>
-            <td><a href="https://bmlip.github.io/course/lectures/Course%20Syllabus.html">B0</a>, <a href="https://bmlip.github.io/course/lectures/Machine%20Learning%20Overview.html">B1</a></td>
+            <td><a href="https://github.com/bertdv/mlss/lectures/Course%20Syllabus.html">B0</a>, <a href="https://github.com/bertdv/mlss/lectures/Machine%20Learning%20Overview.html">B1</a></td>
             <td></td>
             <td> <a href="https://youtu.be/GtukVrtcXe8">B0</a>,  <a href="https://youtu.be/mPc3j7XgZHM">B1</a></td>
          </tr>
          <tr>
             <td>14-Nov-2025 <em>(Fri)</em></td>
             <td>⚪️ B2: Probability Theory Review</td>
-            <td><a href="https://bmlip.github.io/course/lectures/Probability%20Theory%20Review.html">B2</a></td>
+            <td><a href="https://github.com/bertdv/mlss/lectures/Probability%20Theory%20Review.html">B2</a></td>
             <td></td>
             <td><a href="https://youtu.be/PGbN5rv6HL4">B2.1</a>, <a href="https://youtu.be/LKh2ypFVGwY">B2.2</a></td>
          </tr>
          <tr>
             <td>19-Nov-2025 <em>(Wed)</em></td>
             <td>⚪️ B3: Bayesian Machine Learning</td>
-            <td><a href="https://bmlip.github.io/course/lectures/Bayesian%20Machine%20Learning.html">B3</a></td>
+            <td><a href="https://github.com/bertdv/mlss/lectures/Bayesian%20Machine%20Learning.html">B3</a></td>
             <td></td>
             <td> <a href="https://youtu.be/OPGrqnnEfU0">B3.1</a>, <a href="https://youtu.be/BOUmzY1Nx5g">B3.2</a> </td>
          </tr>
          <tr>
             <td >21-Nov-2025 <em>(Fri)</em></td>
             <td >⚪️ B4: Factor Graphs and the Sum-Product Algorithm</td>
-            <td><a href="https://bmlip.github.io/course/lectures/Factor%20Graphs.html">B4</a></td>
+            <td><a href="https://github.com/bertdv/mlss/lectures/Factor%20Graphs.html">B4</a></td>
              <td></td>
              <td><a href="https://youtu.be/C2vvsf_Ts2g">B4.1</a>, <a href="https://youtu.be/HbUuYBMZOKw">B4.2</a></td>
          </tr>
          <tr>
             <td>26-Nov-2025 <em>(Wed)</em></td>
             <td>🟢 Introduction to Julia</td>
-            <td><a href="https://bmlip.github.io/course/probprog/Intro%20to%20Julia.html">W0</a></td>
+            <td><a href="https://github.com/bertdv/mlss/probprog/Intro%20to%20Julia.html">W0</a></td>
             <td></td>
             <td></td>
          </tr>
@@ -128,20 +128,20 @@ You can access all lecture materials online through the links below:
          <tr>
             <td>28-Nov-2025 <em>(Fri)</em></td>
             <td>⚪️ B5: Continuous Data and the Gaussian Distribution</td>
-            <td><a href="https://bmlip.github.io/course/lectures/The%20Gaussian%20Distribution.html">B5</a></td>
+            <td><a href="https://github.com/bertdv/mlss/lectures/The%20Gaussian%20Distribution.html">B5</a></td>
             <td></td>
             <td> <a href="https://youtu.be/WS6gWO5vgtc">B5.1</a>, <a href="https://youtu.be/Ma3jXNbNCyc">B5.2 </a> </td>
          </tr>
          <tr>
             <td>03-Dec-2025 <em>(Wed)</em> </td>
             <td>⚪️ B6: Discrete Data and the Multinomial Distribution</td>
-            <td><a href="https://bmlip.github.io/course/lectures/The%20Multinomial%20Distribution.html">B6</a></td>
+            <td><a href="https://github.com/bertdv/mlss/lectures/The%20Multinomial%20Distribution.html">B6</a></td>
             <td></td>
             <td><a href="https://youtu.be/vyh8RvXxnT8">B6</a> </td>
          <tr >
             <td>05-Dec-2025 <em>(Fri)</em></td>
             <td>🟢 Probabilistic Programming 1 - Bayesian inference with conjugate models</td>
-            <td><a href="https://bmlip.github.io/course/probprog/PP1%20-%20Bayesian%20inference%20in%20conjugate%20models.html">W1</a></td>
+            <td><a href="https://github.com/bertdv/mlss/probprog/PP1%20-%20Bayesian%20inference%20in%20conjugate%20models.html">W1</a></td>
             <td></td>
             <td> <a href="https://youtu.be/ynfvgtjOnqo">W1.1</a>, <a href="https://youtu.be/h9nODl50m_M">W1.2 </a> </td>
                      </tr>
@@ -166,7 +166,7 @@ You can access all lecture materials online through the links below:
          <tr>
             <td>10-Dec-2025 <em>(Wed)</em></td>
             <td>⚪️ B7: Regression</td>
-            <td><a href="https://bmlip.github.io/course/lectures/Regression.html">B7</a></td>
+            <td><a href="https://github.com/bertdv/mlss/lectures/Regression.html">B7</a></td>
             <td></td>
             <td> <a href="https://youtu.be/2llpaRSN2Wc">B7.1</a>, <a href="https://youtu.be/TSoYnO6oXhw">B7.2 </a></td>
          </tr>
@@ -174,21 +174,21 @@ You can access all lecture materials online through the links below:
             <td>12-Dec-2025 <em>(Fri)</em></td>
             <td>⚪️ B8: Generative Classification <br/>⚪️ B9: Discriminative Classification
             </td>
-            <td><a href="https://bmlip.github.io/course/lectures/Generative%20Classification.html">B8</a>, <a href="https://bmlip.github.io/course/lectures/Discriminative%20Classification.html">B9</a></td>
+            <td><a href="https://github.com/bertdv/mlss/lectures/Generative%20Classification.html">B8</a>, <a href="https://github.com/bertdv/mlss/lectures/Discriminative%20Classification.html">B9</a></td>
             <td></td>
             <td><a href="https://youtu.be/IzNDzIcrhLA">B8</a>, <a href="https://youtu.be/Y7q0JQKNfjM">B9</a></td>
          </tr>
          <tr>
             <td>17-Dec-2025 <em>(Wed)</em></td>
             <td>🟢 Probabilistic Programming 2 - Bayesian regression & classification</td>
-            <td><a href="https://bmlip.github.io/course/probprog/PP2%20-%20Bayesian%20regression%20and%20classification.html">W2</a></td>
+            <td><a href="https://github.com/bertdv/mlss/probprog/PP2%20-%20Bayesian%20regression%20and%20classification.html">W2</a></td>
             <td></td>
             <td><a href="https://youtu.be/TKvI5uUYY8A">W2.1</a>, <a href="https://youtu.be/WCtInHz5-zA">W2.2</a></td>
          </tr>
          <tr>
             <td>19-Dec-2025 <em>(Fri)</em></td>
             <td>⚪️ B10: Latent Variable Models and Variational Bayes</td>
-            <td><a href="https://bmlip.github.io/course/lectures/Latent%20Variable%20Models%20and%20VB.html">B10</a></td>
+            <td><a href="https://github.com/bertdv/mlss/lectures/Latent%20Variable%20Models%20and%20VB.html">B10</a></td>
             <td></td>
             <td><a href="https://youtu.be/pVWdm9fQT6Y">B10.1</a>, <a href="https://youtu.be/mg9HGykqEbw">B10.2</a></td>
          </tr>
@@ -206,7 +206,7 @@ You can access all lecture materials online through the links below:
          <tr>
             <td>07-Jan-2026 <em>(Wed)</em></td>
             <td>🟢 Probabilistic Programming 3 - Variational Bayesian inference</td>
-            <td><a href="https://bmlip.github.io/course/probprog/PP3%20-%20variational%20Bayesian%20inference.html">W3</a></td>
+            <td><a href="https://github.com/bertdv/mlss/probprog/PP3%20-%20variational%20Bayesian%20inference.html">W3</a></td>
             <td></td>
             <td><a href="https://youtu.be/z_hKaRqpNQM">W3.1</a>, <a href="https://youtu.be/FLKbzyiQlLo">W3.2</a></td>
          </tr>
@@ -214,7 +214,7 @@ You can access all lecture materials online through the links below:
          <tr>
             <td>09-Jan-2026 <em>(Fri)</em></td>
             <td>⚪️ B11: Dynamic Models</td>
-            <td><a href="https://bmlip.github.io/course/lectures/Dynamic%20Models.html">B11</a></td>
+            <td><a href="https://github.com/bertdv/mlss/lectures/Dynamic%20Models.html">B11</a></td>
             <td></td>
             <td><a href="https://youtu.be/W1AkZJAjvqI">B11</a></td>
          </tr>
@@ -230,14 +230,14 @@ You can access all lecture materials online through the links below:
          <tr>
             <td>14-Jan-2026 <em>(Wed)</em></td>
             <td>⚪️ B12: Intelligent Agents and Active Inference</td>
-            <td><a href="https://bmlip.github.io/course/lectures/Intelligent%20Agents%20and%20Active%20Inference.html">B12,</a><br/> <a href="https://github.com/bmlip/course/blob/main/lectures/bdv-Nov2025-AIF-lecture.ppsx">slides</a> </td>
+            <td><a href="https://github.com/bertdv/mlss/lectures/Intelligent%20Agents%20and%20Active%20Inference.html">B12,</a><br/> <a href="https://github.com/bmlip/course/blob/main/lectures/bdv-Nov2025-AIF-lecture.ppsx">slides</a> </td>
             <td></td>
             <td><a href="https://youtu.be/fBm1oAzlv0w">B12.1</a>,  <a href="https://youtu.be/UbOuLxv9EdI">B12.2</a> </td>
          </tr>
          <tr>
             <td>16-Jan-2026 <em>(Fri)</em></td>
             <td>🟢 Probabilistic Programming 4 - Bayesian filters & smoothers</td>
-            <td><a href="https://bmlip.github.io/course/probprog/PP4%20-%20Bayesian%20filtering%20and%20smoothing.html">W4</a></td>
+            <td><a href="https://github.com/bertdv/mlss/probprog/PP4%20-%20Bayesian%20filtering%20and%20smoothing.html">W4</a></td>
             <td></td>
             <td><a href="https://youtu.be/Yp2vhndnjng">W4.1</a>, <a href="https://youtu.be/qnWofDRh5eo">W4.2</a></td>
          </tr>
@@ -289,47 +289,47 @@ Throughout the course, you can read _Minis_ that deep-dive into specific topics.
     <tr>
         <th>Mini:</th>
              <td>🟡 Sum and product of Gaussian variables</td>
-        <td><a href="https://bmlip.github.io/course/minis/Sum%20and%20product%20of%20Gaussians.html">link</a></td>
+        <td><a href="https://github.com/bertdv/mlss/minis/Sum%20and%20product%20of%20Gaussians.html">link</a></td>
     </tr>
     <tr>
         <th>Mini:</th>
              <td>🟡 Distributions in Julia</td>
-        <td><a href="https://bmlip.github.io/course/minis/Distributions%20in%20Julia.html">link</a></td>
+        <td><a href="https://github.com/bertdv/mlss/minis/Distributions%20in%20Julia.html">link</a></td>
     </tr>
     <tr>
         <th>Mini:</th>
              <td>🟡 Basis Functions</td>
-        <td><a href="https://bmlip.github.io/course/minis/Basis%20Functions.html">link</a></td>
+        <td><a href="https://github.com/bertdv/mlss/minis/Basis%20Functions.html">link</a></td>
     </tr>
     <tr>
         <th>Mini:</th>
              <td>🟡 The Softmax Function</td>
-        <td><a href="https://bmlip.github.io/course/minis/Softmax.html">link</a></td>
+        <td><a href="https://github.com/bertdv/mlss/minis/Softmax.html">link</a></td>
     </tr>
     <tr>
         <th>Mini:</th>
              <td>🟡 Generative Classification</td>
-        <td><a href="https://bmlip.github.io/course/minis/Generative%20Classification.html">link</a></td>
+        <td><a href="https://github.com/bertdv/mlss/minis/Generative%20Classification.html">link</a></td>
     </tr>
     <tr>
         <th>Mini:</th>
              <td>🟡 Laplace Approximation</td>
-        <td><a href="https://bmlip.github.io/course/minis/Laplace%20Approximation.html">link</a></td>
+        <td><a href="https://github.com/bertdv/mlss/minis/Laplace%20Approximation.html">link</a></td>
     </tr>
     <tr>
         <th>Mini:</th>
              <td>🟡 Kullback-Leibler Divergence</td>
-        <td><a href="https://bmlip.github.io/course/minis/KL%20Divergence.html">link</a></td>
+        <td><a href="https://github.com/bertdv/mlss/minis/KL%20Divergence.html">link</a></td>
     </tr>
     <tr>
         <th>Mini:</th>
              <td>🟡 How to use this knowledge</td>
-        <td><a href="https://bmlip.github.io/course/minis/How%20to%20use%20this%20knowledge.html">link</a></td>
+        <td><a href="https://github.com/bertdv/mlss/minis/How%20to%20use%20this%20knowledge.html">link</a></td>
     </tr>
     <tr>
         <th>Mini:</th>
              <td>🟡 RxInfer Tips & Tricks</td>
-        <td><a href="https://bmlip.github.io/course/minis/RxInfer%20tips%20and%20tricks.html">link</a></td>
+        <td><a href="https://github.com/bertdv/mlss/minis/RxInfer%20tips%20and%20tricks.html">link</a></td>
     </tr>
 </table>
 
@@ -410,7 +410,7 @@ The first question of the exam will be an open question: "You get 5 minutes to t
 For instructors:
 
 > [!IMPORTANT]
-> The Pluto notebooks in this repository (`.jl` files) are automatically rendered on our website. You can view them online at https://bmlip.github.io/course/, and copy URLs from this index to use in the course schedule.
+> The Pluto notebooks in this repository (`.jl` files) are automatically rendered on our website. You can view them online at https://github.com/bertdv/mlss/, and copy URLs from this index to use in the course schedule.
 >
 > *Status for live interactivity (PlutoSliderServer):* [![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/1svzl.svg)](https://tue-bmlip.betteruptime.com/)
 
