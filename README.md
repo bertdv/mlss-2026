@@ -35,7 +35,7 @@ You can access all lecture materials online through the links below:
             5: factor graphs (optional)
             </td>
             <td><a href="https://bertdv.github.io/mlss-2026/lectures/Latent%20Variable%20Models%20and%20VB.html">VI</a> <br/> <a href="https://bertdv.github.io/mlss-2026/lectures/lectures/Intelligent%20Agents%20and%20Active%20Inference.html">AIF</a> <br/>
-            <a href="https://bertdv.github.io/mlss-2026/lectures/lectures/Factor%20Graphs.html">FFG</a>     
+            <a href="https://bertdv.github.io/mlss-2026/lectures/Factor%20Graphs.html">FFG</a>     
             </td>
          </tr>
       </table>
