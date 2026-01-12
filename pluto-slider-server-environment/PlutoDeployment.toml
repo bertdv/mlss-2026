@@ -10,7 +10,7 @@ exclude = [
 baked_state = false
 baked_notebookfile = false
 # create_pluto_featured_index = true
-slider_server_url = "https://bmlip-surfer-mlss.plutojl.org/"
+slider_server_url = "https://surfer-mlss.bmlip.nl/"
 exclude = [
     "tools/jupyter conversion script.jl",
 ]
