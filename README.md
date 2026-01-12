@@ -410,7 +410,7 @@ The first question of the exam will be an open question: "You get 5 minutes to t
 For instructors:
 
 > [!IMPORTANT]
-> The Pluto notebooks in this repository (`.jl` files) are automatically rendered on our website. You can view them online at https://github.com/bertdv/mlss/, and copy URLs from this index to use in the course schedule.
+> The Pluto notebooks in this repository (`.jl` files) are automatically rendered on our website. You can view them online at https://bertdv.github.io/mlss-2026/, and copy URLs from this index to use in the course schedule.
 >
 > *Status for live interactivity (PlutoSliderServer):* [![Better Stack Badge](https://uptime.betterstack.com/status-badges/v1/monitor/1svzl.svg)](https://tue-bmlip.betteruptime.com/)
 
