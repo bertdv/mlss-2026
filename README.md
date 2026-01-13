@@ -9,11 +9,9 @@ This site contains the lecture materials for the **Bayesian Machine Learning** l
 
 ### Materials
 
+#### Online lecture notes
 
-
-#### <a name="lectures">Online lecture notes</a>
-
-You can access all lecture materials online through the links below:
+You can access all lecture materials online through the links in the table below:
 
 <table border = "1">
          <tr>
