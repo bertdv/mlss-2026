@@ -23,14 +23,14 @@ macro bind(def, element)
     #! format: on
 end
 
+# ╔═╡ b305a905-06c2-4a15-8042-72ef6375720f
+using BmlipTeachingTools
+
 # ╔═╡ eeb9a1f5-b857-4843-920b-2e4a9656f66b
 using Plots, LaTeXStrings
 
 # ╔═╡ 5394e37c-ae00-4042-8ada-3bbf32fbca9e
 using Distributions
-
-# ╔═╡ b305a905-06c2-4a15-8042-72ef6375720f
-using BmlipTeachingTools
 
 # ╔═╡ 42b47af6-b850-4987-a2d7-805a2cb64e43
 # The Disease Diagnosis example uses a combination of:
@@ -92,7 +92,7 @@ Boolean logic provides the rules of inference for **deductive reasoning** and un
 
 # ╔═╡ 3e1889b8-d294-11ef-17bb-496655fbd618
 md"""
-## Probability as Degree-of-Belief
+## Probability as a Degree-of-Belief
 
 In the real world, we are rarely completely certain about anything. Rather than assigning a binary truth value to a proposition ``A``, we associate it with a degree of belief 
 ```math
@@ -176,14 +176,15 @@ md"""
 ```
 
 Cox’s Theorem derives the rules of probability theory from first principles, not as arbitrary postulates but as consequences of rational reasoning. 
-In other words: **Probability = extended logic**.
+In other words: **probability theory = extended logic**.
 """
 
 # ╔═╡ 3e18e4bc-d294-11ef-38bc-cb97cb4e0963
 keyconcept(" ", 
 	md"""
 	
-	When assigning real numbers to **degrees of belief**, logical consistency forces adherence to the sum and product rules of probability theory. This makes probability theory the optimal framework for information processing in the face of uncertainty.
+	When real numbers are used to represent **degrees of belief**, logical consistency enforces the sum and product rules of probability theory, making probability theory the optimal framework for information processing under uncertainty.
+
 	
 	"""
 )
@@ -435,9 +436,6 @@ md"""
 # Examples
 """
 
-# ╔═╡ ab223dea-8ba8-4d30-94f4-72c8e070aadf
-θ_bond = @bind θ Scrubbable(0.0:0.02:1; format=".2f");
-
 # ╔═╡ 922770f4-ddc8-4089-b378-f14088276b43
 exercise_statement("Which color does the ball have?"; prefix="Inference ")
 
@@ -546,852 +544,6 @@ navigate_prev_next(
 	"https://bertdv.github.io/mlss-2026/lectures/Bayesian%20Machine%20Learning.html"
 )
 
-# ╔═╡ 03692f4d-0daf-4dfc-a7ff-6b954326e4d0
-exercises()
-
-
-# ╔═╡ 3a1d380e-df80-4727-9772-f199214cf05d
-md"""
-##### The Sum Rule (**)
-
-Derive the general sum rule,
-```math
-p(A + B) = p(A) + p(B) - p(A,B)
-```
-from the elementary sum rule ``p(A) + p(\bar A) = 1`` and the sum and product rules.
- 
-"""
-
-# ╔═╡ 99d9099f-4908-4bb3-8d59-da9cb69af04c
-hint(
-	md"""
-	Here, you may make use of the (Boolean logic) fact that ``A + B = \overline {\bar A \bar B }``. 
-	"""
-)
-
-# ╔═╡ 3b1b0869-b815-4697-9dba-3c4b4cb5ac47
-hide_solution( 
-md"""
-```math
-\begin{align}
-p\left( A + B \right)  &\underset{\mathrm{bool}}{=}  p\left( \overline {\bar A \bar B }  \right) \\
-  &\underset{\mathrm{sum}}{=} 1 - p\left( \bar{A} \bar{B} \right) \\
-  &\underset{\mathrm{prod}}{=} 1 - p\left( \bar{A} |\bar{B} \right) p\left(\bar{B}  \right) \\
-  &\underset{\mathrm{sum}}{=} 1 - \left( 1 - p\left(A|\bar B \right) \right) \left( 1 - p\left( B \right) \right) \\
-  &= p(B) + \left( {1 - p\left( B \right)} \right)p\left( {A|\bar B } \right)  \\
-  &\underset{\mathrm{prod}}{=} p(B) + \left( 1 - p\left( B \right) \right) p\left( \bar{B} |A \right) \frac{ p\left( A \right) }{ p\left(\bar{B}\right)} \\
-    &\underset{\mathrm{sum}}{=} p(B) + p\left(\bar{B} |A \right) p\left( A \right) \\
-    &\underset{\mathrm{sum}}{=} p(B) + \left( 1 - p\left( {B|A} \right) \right) p\left( A \right)  \\
-   &\underset{\mathrm{sum}}{=} p\left( A \right) + p(B) - p\left( A,B \right) 
-\end{align}
-```
-Note that, aside from the first boolean rewrite, everything follows straight application of sum and product rules. 
-
-		
-""")
-
-# ╔═╡ 5f377237-d9a5-4778-aa4d-1c6ce109b705
-md"""
-##### Apples and Oranges
-
-Box 1 contains 8 apples and 4 oranges. Box 2 contains 10 apples and 2 oranges. Boxes are chosen with equal probability. You pick a box and then select a fruit from that box.
-- (a) (*) What is the probability of choosing an apple?  
-- (b) (**) If an apple is chosen, what is the probability that it came from box 1?
-"""
-
-# ╔═╡ 5613e9b7-ff0d-435a-9de6-aaf293ebf592
-hide_solution(
-md"""
-The following probabilities are given in the problem statement,
-```math
-\begin{align}
-p(b_1) &= p(b_2) = 1/2  \\
-p(a|b_1) &= 8/12,  \quad p(a|b_2) = 10/12 \\
-p(o|b_1) &= 4/12,  \quad p(o|b_2) = 2/12
-\end{align}
-```
-(a)
-```math 
-p(a) = \sum_i p(a,b_i) = \sum_i p(a|b_i)p(b_i)=\frac{8}{12}\cdot\frac{1}{2} + \frac{10}{12}\cdot\frac{1}{2} = \frac{3}{4}
-```
-(b)		
-```math 
-p(b_1|a) = \frac{p(a,b_1)}{p(a)} = \frac{p(a|b_1)p(b_1)}{p(a)} = \frac{\frac{8}{12}\cdot\frac{1}{2}}{\frac{3}{4}} = \frac{4}{9}
-```
-"""
-)
-
-# ╔═╡ fc3151f9-e143-4e31-b7b7-3f25b4fe9dab
-md"""
-##### What is a Random Signal? (*)
-Is a speech signal a "probabilistic" (random) or a deterministic signal?
-"""
-
-# ╔═╡ 66ebe33c-8360-4938-9b51-625e5bed176c
-hide_solution(
-md"""
-That depends. The term “probabilistic” refers to a state-of-knowledge (or beliefs) about something—in this case, about the values of a speech signal. The key point is that the signal itself is neither inherently probabilistic nor deterministic; these labels describe our knowledge about it.
-
-If you had a perfect microphone and recorded the speech signal flawlessly at its source, you would know all its values exactly—no uncertainty—so you could call it deterministic.
-
-However, before making the recording, how would you represent your knowledge about the signal values you are going to measure? You face uncertainty, so the appropriate description is a probability distribution over all possible signal values.
-""")
-
-# ╔═╡ 5b681e41-ad14-4c58-8ea0-4b6d85885c51
-md"""
-##### Who Speaks the Truth? (***)
-The inhabitants of an island tell the truth one-third of the time. They lie with probability ``2/3``. On an occasion, after one of them made a statement, you ask another person "was that statement true?" and he says "yes". What is the probability that the statement was indeed true?
-
-"""
-
-# ╔═╡ 91dd40f0-c373-48b3-b83b-6e8df2c43e5a
-hide_solution(
-md"""
-We use variables ``S_1 \in \{\text{t},\text{f}\}`` and ``S_2 \in \{\text{y},\text{n}\}`` for statements 1 and 2 and shorthand "y", "n", "t" and "f" for "yes", "no", "true" and "false", respectively. The problem statement provides us with the following probabilities,
-```math		
-\begin{align}
-p(S_1=\text{t}) &= 1/3 \\
-p(S_1=\text{f}) &= 1 - p(S_1=\text{t}) = 2/3\\
-p(S_2=\text{y} | S_1=\text{t}) &= 1/3 \\
-p(S_2=\text{y} | S_1=\text{f}) &= 2/3
-\end{align}
-```
-We are asked to compute ``p(S_1=\text{t} | S_2=\text{y})``. Use Bayes rule,
-```math			
-\begin{align}
-p(S_1=\text{t} | S_2=\text{y}) &= \frac{p(S_1=\text{t},S_2=\text{y})}{p(S_2=\text{y})} \\
-&= \frac{\overbrace{p(S_2=\text{y}|S_1=\text{t})p(S_1=\text{t})}^{\text{both speak the truth}}}{\underbrace{p(S_2=\text{y}|S_1=\text{t})p(S_1=\text{t})}_{\text{both speak the truth}}+\underbrace{p(S_2=\text{y}|S_1=\text{f})p(S_1=\text{f})}_{\text{both lie}}}\\
-&= \frac{\frac{1}{3}\cdot\frac{1}{3}}{\frac{1}{3}\cdot\frac{1}{3}+\frac{2}{3}\cdot\frac{2}{3}} = \frac{1}{5}
-\end{align}
-```
-""")
-
-# ╔═╡ a8d4a517-84a7-426e-a49e-482c5fd047ae
-md"""
-##### The Likelihood Function is a Function of What? (*)
-
-When considering the distribution ``p(D|\theta)``, is it more correct to speak about the likelihood of the model parameters ``\theta`` than about the likelihood of the observed data set ``D``. And why?
-
-"""
-
-# ╔═╡ d3b003c6-70ca-419f-a343-e35b266323f3
-hide_solution(
-md"""
-Yes, it’s more correct to speak about the likelihood of the model parameters, not of the observed data set. Once ``D`` has been observed, it is no longer a random variable; it’s just a fixed outcome. What varies is ``\theta``, so ``L(\theta) = p(D|\theta)`` is a function of the parameters, not of the data.
-
-Saying “likelihood of the data” is misleading because it confuses likelihood with the sampling distribution ``p(D|\theta)`` seen as a function of ``D`` (where ``\theta`` is fixed). The latter is a probability distribution over possible data sets before observing them.
-""")
-
-# ╔═╡ be66b697-f920-4361-9ff2-b12cc50ae8c9
-md"""
-# Optional Slides
-"""
-
-# ╔═╡ 3e1803d0-d294-11ef-0304-df2b9b698cd1
-md"""
-## Preliminaries
-
-##### Goal 
-
-- Review of Probability Theory as a theory for rational/logical reasoning with uncertainties (i.e., a Bayesian interpretation)
-
-##### Materials        
-
-- Mandatory
-
-  - These lecture notes
-
-- Optional
-
-  - Bishop pp. 12-24
-
-  - [3Blue1Brown, YouTube video on Bayes theorem (2019)](https://youtu.be/HZGCoVF3YvM?si=JaXdesPjU8B_BtrC)
-    - Nice animated tutorial on Bayes rule.
-      
-  - **Edwin Jaynes, Probability Theory–The Logic of Science (2003)** 
-    - Brilliant book on the Bayesian view of probability theory. Just for fun, scan the annotated bibliography and references.
-
-  - [Aubrey Clayton, Bernoulli's Fallacy–Statistical Illogic and the Crisis of Modern Science (2021)](https://aubreyclayton.com/bernoulli)
-    - A very readable account of the history of statistics and probability theory. Discusses why most popular statistics recipes are very poor scientific analysis tools. Use probability theory instead!
-
-  - [Ariel Caticha, Entropic Inference and the Foundations of Physics (2012)](https://github.com/bmlip/course/blob/main/assets/files/Caticha-2012-Entropic-Inference-and-the-Foundations-of-Physics.pdf), pp.7-56 (ch.2: probability)
-    - Great introduction to probability theory, in particular w.r.t. its correct interpretation as a state-of-knowledge.
-    - Absolutely worth your time to read the whole chapter, even if you skip section 2.2.4 (pp.15-18) on Cox's proof.
-
-  - [Joram Soch et al ., The Book of Statistical Proofs (2023 - )](https://statproofbook.github.io/)
-    - Online resource for proofs in probability theory and statistical inference.
-
-"""
-
-# ╔═╡ 3e18f18c-d294-11ef-33e4-b7f9495e0508
-md"""
-## Why Probability Theory for Machine Learning?
-
-Machine learning concerns updating our beliefs about appropriate settings for model parameters from new information (namely a data set), and therefore PT provides the *optimal calculus for machine learning*. 
-
-"""
-
-# ╔═╡ 3e1906ea-d294-11ef-236e-c966a9474170
-md"""
-In general, nearly all interesting questions in machine learning (and information processing in general) can be stated in the following form (a conditional probability):
-
-```math
-p(\texttt{whatever-we-want-to-know}\, | \,\texttt{whatever-we-do-know})
-```
-
-where ``p(A|B)`` means the probability that ``A`` is true, given that ``B`` is true.
-
-"""
-
-# ╔═╡ 3e191b6c-d294-11ef-3174-d1b4b36e252b
-md"""
-##### Examples
-
-  * Predictions
-
-```math
-p(\,\texttt{future-observations}\,|\,\texttt{past-observations}\,)
-```
-
-  * Classify a received data point ``x`` 
-
-```math
-p(\,x\texttt{-belongs-to-class-}k \,|\,x\,)
-```
-
-  * Update a model based on a new observation
-
-```math
-p(\,\texttt{model-parameters} \,|\,\texttt{new-observation},\,\texttt{past-observations}\,)
-```
-
-"""
-
-# ╔═╡ 3e192ef4-d294-11ef-1fc4-87175eeec5eb
-md"""
-## Frequentist vs. Bayesian Interpretation of Probabilities
-
-The interpretation of a probability as a **degree-of-belief** about the truth value of an event is also called the **Bayesian** interpretation.  
-
-"""
-
-# ╔═╡ 3e19436c-d294-11ef-11c5-f9914f7a3a57
-md"""
-In the **Bayesian** interpretation, the probability is associated with a **state-of-knowledge** (usually held by a person, but formally by a rational agent). 
-
-  * For instance, in a coin tossing experiment, ``p(\texttt{outcome} = \texttt{tail}) = 0.4`` should be interpreted as the belief that there is a 40% chance that ``\texttt{tail}`` comes up if the coin were tossed.
-  * Under the Bayesian interpretation, PT calculus (sum and product rules) **extends boolean logic to rational reasoning with uncertainty**.
-
-"""
-
-# ╔═╡ 4edf38ab-a940-4ab0-be22-fa95cf571146
-md"""
-In the Bayesian interpretation, all probabilities are, in principle, conditional probabilities of the type ``p(A|I)``, since there is always some background knowledge. However, we often write ``p(A)`` rather than ``p(A|I)`` if the background knowledge ``I`` is assumed to be obviously present. E.g., we usually write ``p(A)`` rather than ``p(\,A\,|\,\text{the-sun-comes-up-tomorrow}\,)``.
-
-"""
-
-# ╔═╡ 3e194ef2-d294-11ef-3b38-1ddc3063ff35
-md"""
-The Bayesian interpretation contrasts with the **frequentist** interpretation of a probability as the relative frequency that an event would occur under repeated execution of an experiment.
-
-  * For instance, if the experiment is tossing a coin, then ``p(\texttt{outcome} = \texttt{tail}) = 0.4`` means that in the limit of a large number of coin tosses, 40% of outcomes turn up as ``\texttt{tail}``.
-
-"""
-
-# ╔═╡ 3e1964b4-d294-11ef-373d-712257fc130f
-md"""
-The Bayesian viewpoint is more generally applicable than the frequentist viewpoint, e.g., it is hard to apply the frequentist viewpoint to events like ``\texttt{"it will rain tomorrow"}``. 
-
-"""
-
-# ╔═╡ 3e196d6a-d294-11ef-0795-41c045079251
-md"""
-The Bayesian viewpoint is clearly favored in the machine learning community. (In this class, we also strongly favor the Bayesian interpretation). 
-
-"""
-
-# ╔═╡ 3e198336-d294-11ef-26fd-03cd15876486
-md"""
-Aubrey Clayton, in his wonderful book [Bernoulli's fallacy](https://aubreyclayton.com/bernoulli) (2021), writes about this issue: 
-
-> “Compared with Bayesian methods, standard [frequentist] statistical techniques use only a small fraction of the available information about a research hypothesis (how well it predicts some observation), so naturally they will struggle when that limited information proves inadequate. Using standard statistical methods is like driving a car at night on a poorly lit highway: to keep from going in a ditch, we could build an elaborate system of bumpers and guardrails and equip the car with lane departure warnings and sophisticated navigation systems, and even then we could at best only drive to a few destinations. Or we could turn on the headlights.”
-
-
-"""
-
-# ╔═╡ 3e198ba6-d294-11ef-3fe7-d70bf4833fa6
-md"""
-In this class, we aim to turn on the headlights and illuminate the elegance and power of the Bayesian approach to information processing. 
-
-"""
-
-# ╔═╡ 3e19e95a-d294-11ef-3da4-6d23922a5150
-md"""
-## Variable Assignments as Propositions 
-
-
-"""
-
-# ╔═╡ 3e1a69f4-d294-11ef-103e-efc47025fb8f
-md"""
-If ``X`` is a variable, then an *assignment* ``X=x`` (where ``x`` is a value, e.g., ``X=5``) can be interpreted as an event. Hence, the expression ``p(X=5)`` should be interpreted as the *degree-of-belief of the event* that variable ``X`` takes on the value ``5``. 
-
-"""
-
-# ╔═╡ 3e1a7c8e-d294-11ef-1f97-55e608d49141
-md"""
-If ``X`` is a *discretely* valued variable, then ``p(X=x)`` is a probability *mass* function (PMF) with ``0\le p(X=x)\le 1`` and normalization ``\sum_x p(x) =1``. 
-
-"""
-
-# ╔═╡ 3e1a8eca-d294-11ef-1ef0-c15b24d05990
-md"""
-If ``X`` is *continuously* valued, then ``p(X=x)`` is a probability *density* function (PDF) with ``p(X=x)\ge 0``  and normalization ``\int_x p(x)\mathrm{d}x=1``. 
-
-  * Note that if ``X`` is continuously valued, then the value of ``p(x)`` is not necessarily ``\le 1``. E.g., a uniform distribution on the continuous domain ``[0,.5]`` has value ``p(x) = 2`` over its domain.
-
-"""
-
-# ╔═╡ 3e1bffec-d294-11ef-2a49-9ff0f6331add
-md"""
-## Bayes Rule Nomenclature
-
-Some nomenclature associated with Bayes rule:
-
-```math
-\underbrace{p(\theta | D)}_{\text{posterior}} = \frac{\overbrace{p(D|\theta)}^{\text{likelihood}} \times \overbrace{p(\theta)}^{\text{prior}}}{\underbrace{p(D)}_{\text{evidence}}}
-```
-
-"""
-
-# ╔═╡ 3e1c0e80-d294-11ef-0d19-375e01988f16
-md"""
-Note that the evidence (a.k.a. *marginal likelihood* ) can be computed from the numerator through marginalization since
-
-```math
- p(D) = \int p(D,\theta) \,\mathrm{d}\theta = \int p(D|\theta)\,p(\theta) \,\mathrm{d}\theta
-```
-
-"""
-
-# ╔═╡ 3e1c1e3e-d294-11ef-0955-bdf9d0ba3c53
-md"""
-Hence, having access to likelihood and prior is in principle sufficient to compute both the evidence and the posterior. To emphasize that point, Bayes rule is sometimes written as a transformation:
-
-```math
- \underbrace{\underbrace{p(\theta|D)}_{\text{posterior}}\cdot \underbrace{p(D)}_{\text{evidence}}}_{\text{this is what we want to compute}} = \underbrace{\underbrace{p(D|\theta)}_{\text{likelihood}}\cdot \underbrace{p(\theta)}_{\text{prior}}}_{\text{this is available}}
-```
-
-"""
-
-# ╔═╡ 3e1c4224-d294-11ef-2707-49470aaae6eb
-md"""
-For a given data set ``D``, the posterior probabilities of the parameters scale relatively against each other as
-
-```math
-p(\theta|D) \propto p(D|\theta) p(\theta)
-```
-
-Hence, all that we can learn from the observed data is contained in the likelihood function ``p(D|\theta)``. This is called the **likelihood principle**.
-
-"""
-
-# ╔═╡ 3e1c51e2-d294-11ef-2c6d-d32a98308c6f
-md"""
-## The Likelihood Function vs the Sampling Distribution
-
-Consider a distribution ``p(D|\theta)``, where ``D`` relates to variables that are observed (i.e., a "data set") and ``\theta`` are model parameters.
-
-"""
-
-# ╔═╡ 3e1c60ba-d294-11ef-3a01-cf9e97512857
-md"""
-In general, ``p(D|\theta)`` is just a function of the two variables ``D`` and ``\theta``. We distinguish two interpretations of this function, depending on which variable is observed (or given by other means). 
-
-"""
-
-# ╔═╡ 3e1c70be-d294-11ef-14ed-0d46515541c5
-md"""
-The **sampling distribution** (a.k.a. the **data-generating** distribution) 
-
-```math
-p(D|\theta=\theta_0)
-```
-
-(which is a function of ``D`` only) describes a probability distribution for data ``D``, assuming that it is generated by the given model with parameters fixed at ``\theta = \theta_0``.
-
-"""
-
-# ╔═╡ 3e1c806a-d294-11ef-1fad-17e5625279f7
-md"""
-In a machine learning context, often the data is observed, and ``\theta`` is the free variable. In that case, for given observations ``D=D_0``, the **likelihood function** (which is a function only of the model parameters ``\theta``) is defined as 
-
-```math
-L(\theta) \triangleq p(D=D_0|\theta)
-```
-
-"""
-
-# ╔═╡ 3e1c9184-d294-11ef-3e35-5393d97fbc44
-md"""
-Note that ``L(\theta)`` is not a probability distribution for ``\theta`` since in general ``\sum_\theta L(\theta) \neq 1``.
-
-"""
-
-# ╔═╡ e3157dc0-5a64-4479-a37a-40fe25cccc07
-code_example("Sampling Distribution and Likelihood Function for the Coin Toss")
-
-# ╔═╡ d93f73d4-2783-4777-b0ce-cdc0444cb300
-md"""
-
-Consider the following simple model for the outcome ``y \in \{0,1\}`` (tail = ``0``, head = ``1``) of a biased coin toss with a real parameter $θ_bond ``= \theta \in [0,1]``:
-
-```math
-\begin{align*}
-p(y|\theta) = \theta^y (1-\theta)^{1-y}\\
-\end{align*}
-```
-
-Next, we use Julia to plot both the sampling distribution 
-
-"""
-
-# ╔═╡ 7d493e09-f7cc-4e13-a506-b792edcbf390
-md"""
-
-and the likelihood function 
-
-```math
-L(\theta) \triangleq p(y=1|\theta) = \theta \,.
-```
-
-"""
-
-# ╔═╡ b7445b9b-7fbb-4560-b947-a23af0fcf101
-md"""
-Click and drag this number to change ``\theta``: $θ_bond.
-"""
-
-# ╔═╡ 3e1d20e0-d294-11ef-2044-e1fe6590a600
-md"""
-!!! note
-	The (discrete) sampling distribution is a valid probability distribution. 
-	
-	However, the likelihood function ``L(\theta)`` clearly isn't, since ``\int_0^1 L(\theta) \mathrm{d}\theta = 0.5 \neq 1``. 
-"""
-
-# ╔═╡ fc733d61-fd0f-4a13-9afc-4505ac0253df
-f(y,θ) = θ.^y .* (1 .- θ).^(1 .- y) # p(y|θ)
-
-# ╔═╡ 8a7dd8b7-5faf-4091-8451-9769f842accb
-let
-	p1 = plot(
-			[0,1], f([0,1], θ);
-			line=:stem, 
-			marker=:circle, 
-			xrange=(-0.5, 1.5), yrange=(0,1), 
-			title="Sampling Distribution", 
-			xlabel="y", ylabel=L"p(y|θ=%$θ)", label=""
-		 )
-	
-	_θ = 0:0.01:1
-	y=1
-	p2 = plot(
-			_θ, f(y, _θ);
-			ylabel=L"p(y=%$y | θ)", xlabel=L"θ", 
-			title="Likelihood Function", label=""
-		 )
-	scatter!(p2,
-			[θ], [f(y, θ)];
-			label=nothing,
-			)
-	
-	plot(p1, p2)
-end
-
-# ╔═╡ ef264651-854e-4374-8ea8-5476c85150c4
-md"# Moments and Transformations"
-
-# ╔═╡ 3e1e4dda-d294-11ef-33b7-4bbe3300ca22
-md"""
-## Moments of the PDF
-
-Distributions can often usefully be summarized by a set of values known as moments of the distribution.  
-
-Consider a distribution ``p(x)``. The first moment, also known as **expected value** or **mean** of ``p(x)`` is defined as 
-
-```math
-\mu_x = \mathbb{E}[x] \triangleq  \int x \,p(x) \,\mathrm{d}{x}
-```
-
-"""
-
-# ╔═╡ 3e1e5a5a-d294-11ef-2fdf-efee4eb1a0f2
-md"""
-The second central moment, also known as **variance** of ``x`` is defined as 
-
-```math
-\Sigma_x \triangleq \mathbb{E} \left[(x-\mu_x)(x-\mu_x)^T \right]
-```
-
-"""
-
-# ╔═╡ 3e1e7742-d294-11ef-1204-f9be24da07ab
-md"""
-The **covariance** matrix between *vectors* ``x`` and ``y`` is a mixed central moment, defined as
-
-```math
-\begin{align*}
-    \Sigma_{xy} &\triangleq \mathbb{E}\left[ (x-\mu_x) (y-\mu_y)^T \right]\\
-    &= \mathbb{E}\left[ (x-\mu_x) (y^T-\mu_y^T) \right]\\
-    &= \mathbb{E}[x y^T] - \mu_x \mu_y^T
-\end{align*}
-```
-
-Clearly, if ``x`` and ``y`` are independent, then ``\Sigma_{xy} = 0``, since in that case ``\mathbb{E}[x y^T] = \mathbb{E}[x] \mathbb{E}[y^T] = \mu_x \mu_y^T``.
-
-Home exercise: Prove that ``\Sigma_{xy} = \Sigma_{yx}^{T}`` (making use of ``(AB)^T = B^TA^T``).
-
-"""
-
-# ╔═╡ 3e1e9224-d294-11ef-38b3-137c2be22400
-md"""
-## Linear Transformations
-
-Consider an arbitrary distribution ``p(x)`` with mean ``\mu_x`` and covariance matrix ``\Sigma_x``. Define
-
-```math
-z = A x + b \,.
-```
-
-No matter the specification of ``p(x)``, the mean and covariance matrix for ``z`` are given by
-```math
-\begin{align*}
-\mu_z &= A\mu_x + b \\
-\Sigma_z &= A\,\Sigma_x\,A^T 
-\end{align*}
-```
-
-
-"""
-
-# ╔═╡ d2202628-e4f9-4289-b48e-23b5a0073f94
-hide_proof(
-md"""
-Let ``\mathbb{E}[\cdot]`` refer to the expectation (mean) operator. By linearity of expectation and the fact that ``A`` and ``b`` are constants,
-```math 
-\mu_z = \mathbb{E}[z] = \mathbb{E}[A x + b] = A\,\mathbb{E}[x] + b = A\mu_x + b\,.
-```
-For the covariance matrix,
-```math
-\begin{align}
-\Sigma_z &= \mathbb{E}\big[(z-\mu_z)(z-\mu_z)^T \big] \\
-&= \mathbb{E}\big[(Ax + b - (A\mu_x + b))(Ax + b - (A\mu_x + b))^T \big] \\  
-&= \mathbb{E}\big[(Ax - A\mu_x)(Ax - A\mu_x)^T \big]	 \\	
-&= A\,\mathbb{E}\big[(x-\mu_x)(x-\mu_x)^\top\big]A^T \\
-&= A\Sigma_x A^T \,.
-\end{align}
-```		
-"""			   
-)
-
-# ╔═╡ 726e7e9f-3d68-4d02-9954-1edd98b74fdc
-keyconcept("",
-md"""
-No matter the specification of ``p(x)``, the mean and covariance matrix for ``z=Ax + b`` are given by
-```math
-\begin{align}
-\mu_z &= A\mu_x + b \\
-\Sigma_z &= A\,\Sigma_x\,A^T 
-\end{align}
-```
-""")
-
-# ╔═╡ 58f70d3e-4b64-414e-b560-327be2a0c4c2
-exercise_statement("The PDF for the Sum of Two Variables")
-
-# ╔═╡ 3e1ea442-d294-11ef-1364-8dd9986325f7
-md"""
-
-You should now be able to derive the following: for any distribution of variables ``X`` and ``Y``, show that the mean and variance of the sum ``Z = X+Y`` is given by
-
-```math
-\begin{align*}
-    \mu_z &= \mu_x + \mu_y \\
-    \Sigma_z &= \Sigma_x + \Sigma_y + \Sigma_{xy} + \Sigma_{yx} 
-\end{align*}
-```
-where ``\Sigma_{yx} = \Sigma_{xy}^T``.
-"""
-
-# ╔═╡ 6d07be25-53d0-46b9-b197-a3680d830952
-hide_solution(
-md"""
-Define ``A = \begin{pmatrix} I & I \end{pmatrix}`` and ``w = \begin{pmatrix} x \\ y \end{pmatrix}``, where ``I`` is the identity matrix. Then 
-```math
-z = A w\,. 
-```
-Let ``\mathbb{E}[\cdot]`` refer to the expectation operator. Now apply the formula for the mean and variance of a variable after a linear transformation:
-
-```math
-\mathbb{E}[z] = \mathbb{E}[Aw]  = \mathbb{E}[x+y] = \mathbb{E}[x] + \mathbb{E}[y] \,. 
-```
-For the covariance matrix, first note that
-```math
-\begin{align}
-		\Sigma_w &= \mathbb{E} \bigg[ \begin{pmatrix} x - \mu_x \\ y- \mu_y\end{pmatrix} \begin{pmatrix} x - \mu_x \\ y- \mu_y\end{pmatrix}^T \bigg] \\
-	&= \begin{pmatrix} \Sigma_x &  \Sigma_{xy} \\ \Sigma_{yx} & \Sigma_y\end{pmatrix}
-\end{align} 
-```
-and we note that ``\Sigma_{yx} = \Sigma_{xy}^T``. Then, ``\Sigma_z`` evaluates to		
-```math
-\begin{align}
-\Sigma_z &= A \Sigma_w A^T \\
-  &= \begin{pmatrix} I & I \end{pmatrix}  \begin{pmatrix} \Sigma_x &  \Sigma_{xy} \\ \Sigma_{yx} & \Sigma_y\end{pmatrix} \begin{pmatrix}I \\ I \end{pmatrix} \\
-  &= \Sigma_x +  \Sigma_y + \Sigma_{xy} + \Sigma_{yx} \,.
-\end{align}
-```		
-"""		)
-
-# ╔═╡ 3e1eba72-d294-11ef-2f53-b56f1862fcbb
-md"""
-Clearly, it follows that if ``X`` and ``Y`` are **independent**, then
-
-```math
-\Sigma_z = \Sigma_x + \Sigma_y 
-```
-
-"""
-
-# ╔═╡ 3e1ed1a4-d294-11ef-2de4-d7cc540e06a1
-md"""
-More generally, assume two jointly continuous variables ``X`` and ``Y``, with joint PDF ``p_{xy}(x,y)``. Let ``Z=X+Y``, then
-
-```math
-\begin{align*}
-\text{Prob}(Z\leq z) &= \text{Prob}(X+Y\leq z)\\
-&= \int_{-\infty}^\infty \biggl( \int_{-\infty}^{z-x} p_{xy}(x,y) \mathrm{d}y \biggr) \mathrm{d}x \\
-&= \int_{-\infty}^\infty \biggl( \int_{-\infty}^{z} p_{xy}(x,t-x) \mathrm{d}t \biggr) \mathrm{d}x \\
-&= \int_{-\infty}^z \biggl( \underbrace{\int_{-\infty}^{\infty} p_{xy}(x,t-x) \mathrm{d}x}_{p_z(t)} \biggr) \mathrm{d}t
-\end{align*}
-```
-
-Hence, the PDF for the sum ``Z`` is given by ``p_z(z) = \int_{-\infty}^{\infty} p_{xy}(x,z-x) \mathrm{d}x``.
-
-In particular, if ``X`` and ``Y`` are **independent** variables, then
-
-```math
-p_z (z) = \int_{-\infty}^{\infty}  p_x(x) p_y(z - x)\,\mathrm{d}{x} = p_x(z) * p_y(z)\,,
-```
-
-which is the **convolution** of the two marginal PDFs. 
-
-"""
-
-# ╔═╡ 3e1eeb14-d294-11ef-1702-f5d2cf6fe60a
-md"""
-[Wikipedia's List of convolutions of probability distributions](https://en.wikipedia.org/wiki/List_of_convolutions_of_probability_distributions) shows how these convolutions work out for a few common probability distributions. 
-
-"""
-
-# ╔═╡ e5902178-6df2-4eb4-ac13-7370b3d00c9c
-md"""
-## Working with Distributions in code
-
-Take a look at this mini lecture to see some simple examples of using distributions in Julia:
-"""
-
-# ╔═╡ 6bc443b4-1a07-4f56-99fb-c30a4370da92
-NotebookCard("https://bmlip.github.io/course/minis/Distributions%20in%20Julia.html")
-
-# ╔═╡ 3e1f225a-d294-11ef-04c6-f3ca018ab286
-md"""
-$(code_example("Sum of Two Gaussian-distributed Variables"; big=true, header_level=2))  
-
-Consider two independent Gaussian-distributed variables ``X`` and ``Y`` (see [wikipedia normal distribution](https://en.wikipedia.org/wiki/Normal_distribution) for definition of a Gaussian (=Normal) distribution):
-
-```math
-\begin{align*}
-p_X(x) &= \mathcal{N}(\,x\,|\,\mu_X,\sigma_X^2\,) \\ 
-p_Y(y) &= \mathcal{N}(\,y\,|\,\mu_Y,\sigma_Y^2\,) 
-\end{align*}
-```
-
-Let ``Z = X + Y``. Performing the convolution (nice exercise) yields a Gaussian PDF for ``Z``: 
-
-```math
-p_Z(z) = \mathcal{N}(\,z\,|\,\mu_X+\mu_Y,\sigma_X^2+\sigma_Y^2\,).
-```
-
-We illustrate the distributions for ``X``, ``Y`` and ``Z`` using Julia:
-
-"""
-
-# ╔═╡ 98fa17a6-7c8b-46e4-b32d-52db183d88f8
-md"""
-Set the parameters for the distributions of ``X`` and ``Y``:
-"""
-
-# ╔═╡ 27ec154a-a4c3-4d71-b2a0-45f2b456a8e4
-μx = 2.0; σx = 1.0;
-
-# ╔═╡ de4dbfc9-9340-4ae2-b323-49abfd77f198
-μy = 2.0; σy = 0.5;
-
-# ╔═╡ 1cb8b2c4-e1ae-4973-ba53-fc6c7fe1f37a
-md"""
-Compute the parameters for the distribution of ``Z = X + Y``:
-"""
-
-# ╔═╡ 91a91472-ee6d-416b-b18e-acbedc03a7fe
-μz = μx + μy
-
-# ╔═╡ 6485575d-c5a5-4891-8210-f50d6f75476f
-σz = sqrt(σx^2 + σy^2)
-
-# ╔═╡ 0abaed25-decc-4dcd-aa04-b68ec0d5c73e
-
-
-# ╔═╡ 218d3b6e-50b6-4b98-a00c-a19dd33d2c03
-md"""
-Let's plot the distributions for ``X``, ``Y``, and ``Z``
-"""
-
-# ╔═╡ e836f877-5ed6-4865-ba3a-1ca5a86b2349
-begin
-	x = Normal(μx, σx)
-	y = Normal(μy, σy)
-	z = Normal(μz, σz)
-end;
-
-# ╔═╡ c0ea3253-a06b-426c-91a3-a6dd33e42779
-let
-	
-	# Calculate the x-range for plotting
-	range_min = min(μx-2*σx, μy-2*σy, μz-2*σz)
-	range_max = max(μx+2*σx, μy+2*σy, μz+2*σz)
-	range_grid = range(range_min, stop=range_max, length=100)
-	
-	plot(range_grid, t -> pdf(x,t), label=L"p_x", fill=(0, 0.1))
-	plot!(range_grid, t -> pdf(y,t), label=L"p_y", fill=(0, 0.1))
-	plot!(range_grid, t -> pdf(z,t), label=L"p_z", fill=(0, 0.1))
-end
-
-# ╔═╡ 3e1f4f46-d294-11ef-29b8-69e546763781
-md"""
-## PDF for the Product of Two Variables
-
-For two continuous **independent** variables ``X`` and ``Y``, with PDF's ``p_x(x)`` and ``p_y(y)``, the PDF of  ``Z = X Y`` is given by 
-
-```math
-p_z(z) = \int_{-\infty}^{\infty} p_x(x) \,p_y(z/x)\, \frac{1}{|x|}\,\mathrm{d}x\,.
-```
-
-For proof, see [https://en.wikipedia.org/wiki/Product_distribution](https://en.wikipedia.org/wiki/Product_distribution).
-
-"""
-
-# ╔═╡ 3e1f68fa-d294-11ef-31b2-e7670da8c08c
-md"""
-Generally, this integral does not lead to an analytical expression for ``p_z(z)``. 
-
-As a crucial example, [the product of two independent variables that are both Gaussian-distributed does **not** lead to a Gaussian distribution](https://bmlip.github.io/course/minis/Sum%20and%20product%20of%20Gaussians.html).
-
-  * Exception: the distribution of the product of two variables that both have [log-normal distributions](https://en.wikipedia.org/wiki/Log-normal_distribution) is again a lognormal distribution. (If ``X`` has a normal distribution, then ``Y=\exp(X)`` has a log-normal distribution.)
-
-"""
-
-# ╔═╡ 3e1f7d5e-d294-11ef-2878-05744036f32c
-md"""
-## General Variable Transformations
-
-Suppose ``x`` is a **discrete** variable with probability **mass** function ``P_x(x)``, and ``y = h(x)`` is a one-to-one function with ``x = g(y) = h^{-1}(y)``. Then
-
-```math
-P_y(y) = P_x(g(y))\,.
-```
-
-"""
-
-# ╔═╡ 3e1f8e48-d294-11ef-0f8a-b58294a8543d
-hide_proof(
-md"""
-```math		
-P_y(\hat{y}) = P(y=\hat{y}) = P(h(x)=\hat{y}) = P(x=g(\hat{y})) = P_x(g(\hat{y})) \,.
-```
-""")
-
-# ╔═╡ 3e1fa04a-d294-11ef-00c3-a51d1aaa5553
-md"""
-If ``x`` is defined on a **continuous** domain, and ``p_x(x)`` is a probability **density** function, then probability mass is represented by the area under a (density) curve. In that case, 
-```math
-p_y(y) = p_x(g(y)) g^\prime(y)\,,
-```
-
-which is also known as the [Change-of-Variable theorem](https://en.wikipedia.org/wiki/Probability_density_function#Function_of_random_variables_and_change_of_variables_in_the_probability_density_function). 
-
-
-"""
-
-# ╔═╡ 50bdc2fe-f48d-4c4e-8b4e-170782681366
-hide_proof(
-md"""
-We assume again that ``y = h(x)`` is a one-to-one function with ``x = g(y) = h^{-1}(y)``. Let ``a=g(c)`` and ``b=g(d)``. Then
-
-```math
-\begin{align}
-P(a ≤ x ≤ b) &= \int_a^b p_x(x)\mathrm{d}x \\
-  &= \int_{g(c)}^{g(d)} p_x(x)\mathrm{d}x \\
-  &= \int_c^d p_x(g(y))\mathrm{d}g(y) \\
-  &= \int_c^d \underbrace{p_x(g(y)) g^\prime(y)}_{p_y(y)}\mathrm{d}y \\  
-  &= P(c ≤ y ≤ d)
-\end{align}
-```
-
-Equating the two probability masses, ``p_y(y)\mathrm{d}y = p_x(x)\mathrm{d}x``, leads to the identification of the relation 
-```math
-p_y(y) = p_x(g(y)) g^\prime(y)\,,
-```
-"""
-)
-
-# ╔═╡ db73766d-643c-41d7-a1eb-f376c657f860
-md"""
-If the transformation ``y=h(x)`` is not invertible, then ``x=g(y)`` does not exist. In that case, you can still work out the transformation by equating equivalent probability masses in the two domains.
-"""
-
-# ╔═╡ 3e1fb370-d294-11ef-1fb6-63a41a024691
-md"""
-$(exercise_statement("Transformation of a Gaussian Variable"; big=true, header_level=2))  
-
-##### Problem
-
-Let ``p_x(x) = \mathcal{N}(x|\mu,\sigma^2)`` and ``y = \frac{x-\mu}{\sigma}``. 
-Evaluate ``p_y(y)`` as a Gaussian distribution. 
-
-"""
-
-# ╔═╡ 317707a3-9ef1-4c67-b451-6adcfcff50f0
-hide_solution(
-md"""
-Note that ``h(x)`` is invertible with ``x = g(y) = \sigma y + \mu``. The change-of-variable formula leads to
-
-```math
-\begin{align*}
-p_y(y) &= p_x(g(y)) \cdot g^\prime(y) \\
-  &= p_x(\sigma y + \mu) \cdot \sigma \\
-  &= \frac{1}{\sigma\sqrt(2 \pi)} \exp\left( - \frac{(\sigma y + \mu - \mu)^2}{2\sigma^2}\right) \cdot \sigma \\
-  &=  \frac{1}{\sqrt(2 \pi)} \exp\left( - \frac{y^2 }{2}\right)\\
-  &= \mathcal{N}(y|0,1) 
-\end{align*}
-```
-
-In the statistics literature, ``y = \frac{x-\mu}{\sigma}`` is called the **standardized** variable since it transforms a general normal variable into a standard normal one.)
-""")
-
-# ╔═╡ 337e61ec-4da8-4f90-9592-e05d52da8df8
-
-
 # ╔═╡ dd31ec7c-708d-4fd7-958d-f9887798a5bc
 md"""
 # Code
@@ -1460,16 +612,6 @@ Many people have trouble distinguishing ``p(A|B)`` from ``p(B|A)`` in their head
 """)
 end
 
-# ╔═╡ 079157c9-5d97-4dbc-8c47-afa8b661db06
-let
-	θ_str = n(θ)
-	@mdx """
-	```math
-	p(y|\\theta=$(n(θ))) = \\begin{cases} $(n(1-θ)) & \\text{if }y=0 \\\\ $(n(θ)) & \\text{if } y=1 \\end{cases}
-	```
-	"""
-end
-
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -1479,22 +621,15 @@ LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 MarkdownLiteral = "736d6165-7244-6769-4267-6b50796e6954"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
-
-[compat]
-BmlipTeachingTools = "~1.4.1"
-Distributions = "~0.25.123"
-LaTeXStrings = "~1.4.0"
-MarkdownLiteral = "~0.1.2"
-Plots = "~1.41.4"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.2"
+julia_version = "1.12.1"
 manifest_format = "2.0"
-project_hash = "50127658cdb93f0469899e6ee5e1cc0a9d056b1e"
+project_hash = "a1e15c856e4508c94cd4cfc63e75a81afbe12859"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -1527,9 +662,9 @@ version = "0.1.9"
 
 [[deps.BmlipTeachingTools]]
 deps = ["HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoTeachingTools", "PlutoUI", "Reexport"]
-git-tree-sha1 = "721865ca80c702e053b7d3958c5de5295ad84eca"
+git-tree-sha1 = "806eadb642467b05f9d930f0d127f1e6fa5130f0"
 uuid = "656a7065-6f73-6c65-7465-6e646e617262"
-version = "1.4.1"
+version = "1.3.1"
 
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1633,9 +768,9 @@ version = "1.9.1"
 
 [[deps.Distributions]]
 deps = ["AliasTables", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SpecialFunctions", "Statistics", "StatsAPI", "StatsBase", "StatsFuns"]
-git-tree-sha1 = "fbcc7610f6d8348428f722ecbe0e6cfe22e672c6"
+git-tree-sha1 = "3bc002af51045ca3b47d2e1787d6ce02e68b943a"
 uuid = "31c24e10-a181-5473-b8eb-7969acd0382f"
-version = "0.25.123"
+version = "0.25.122"
 
     [deps.Distributions.extensions]
     DistributionsChainRulesCoreExt = "ChainRulesCore"
@@ -1655,7 +790,7 @@ version = "0.9.5"
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
-version = "1.7.0"
+version = "1.6.0"
 
 [[deps.EpollShim_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1683,9 +818,9 @@ version = "0.4.5"
 
 [[deps.FFMPEG_jll]]
 deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "LAME_jll", "Libdl", "Ogg_jll", "OpenSSL_jll", "Opus_jll", "PCRE2_jll", "Zlib_jll", "libaom_jll", "libass_jll", "libfdk_aac_jll", "libvorbis_jll", "x264_jll", "x265_jll"]
-git-tree-sha1 = "01ba9d15e9eae375dc1eb9589df76b3572acd3f2"
+git-tree-sha1 = "ccc81ba5e42497f4e76553a5545665eed577a663"
 uuid = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
-version = "8.0.1+0"
+version = "8.0.0+0"
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
@@ -1921,7 +1056,7 @@ version = "0.6.4"
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "OpenSSL_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "8.15.0+0"
+version = "8.11.1+1"
 
 [[deps.LibGit2]]
 deps = ["LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
@@ -2096,7 +1231,7 @@ version = "1.6.1"
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "3.5.4+0"
+version = "3.5.1+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl"]
@@ -2106,9 +1241,9 @@ version = "0.5.6+0"
 
 [[deps.Opus_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "39a11854f0cba27aa41efaedf43c77c5daa6be51"
+git-tree-sha1 = "c392fc5dd032381919e3b22dd32d6443760ce7ea"
 uuid = "91d4177d-7536-5919-b921-800302f37372"
-version = "1.6.0+0"
+version = "1.5.2+0"
 
 [[deps.OrderedCollections]]
 git-tree-sha1 = "05868e21324cede2207c6f0f466b4bfef6d5e7ee"
@@ -2171,9 +1306,9 @@ version = "1.4.4"
 
 [[deps.Plots]]
 deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "JLFzf", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "PrecompileTools", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "RelocatableFolders", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "TOML", "UUIDs", "UnicodeFun", "Unzip"]
-git-tree-sha1 = "063ef757a1e0e15af77bbe92be92da672793fd4e"
+git-tree-sha1 = "459d8913a8b83c7222eb629664283653dadfe2b6"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.41.4"
+version = "1.41.3"
 
     [deps.Plots.extensions]
     FileIOExt = "FileIO"
@@ -2197,9 +1332,9 @@ version = "0.4.6"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "6122f9423393a2294e26a4efdf44960c5f8acb70"
+git-tree-sha1 = "6ed167db158c7c1031abf3bd67f8e689c8bdf2b7"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.78"
+version = "0.7.77"
 
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
@@ -2406,9 +1541,9 @@ version = "1.5.2"
 
 [[deps.StructUtils]]
 deps = ["Dates", "UUIDs"]
-git-tree-sha1 = "b0290a55d9e047841d7f5c472edbdc39c72cd0ce"
+git-tree-sha1 = "79529b493a44927dd5b13dde1c7ce957c2d049e4"
 uuid = "ec057cc2-7a8d-4b58-b3b3-92acb9f63b42"
-version = "2.6.1"
+version = "2.6.0"
 
     [deps.StructUtils.extensions]
     StructUtilsMeasurementsExt = ["Measurements"]
@@ -2501,9 +1636,9 @@ version = "1.24.0+0"
 
 [[deps.XZ_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "9cce64c0fdd1960b597ba7ecda2950b5ed957438"
+git-tree-sha1 = "fee71455b0aaa3440dfdd54a9a36ccef829be7d4"
 uuid = "ffd25f8a-64ca-5728-b0f7-c24cf3aae800"
-version = "5.8.2+0"
+version = "5.8.1+0"
 
 [[deps.Xorg_libICE_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -2731,9 +1866,9 @@ uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
 version = "1.64.0+1"
 
 [[deps.p7zip_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
+deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
-version = "17.7.0+0"
+version = "17.5.0+2"
 
 [[deps.x264_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -2783,7 +1918,6 @@ version = "1.13.0+0"
 # ╟─3e1d33c8-d294-11ef-0a08-bdc419949925
 # ╟─3e1b05ee-d294-11ef-33de-efed64d01c0d
 # ╟─b176ceae-884e-4460-9f66-020c1ac447f1
-# ╟─ab223dea-8ba8-4d30-94f4-72c8e070aadf
 # ╟─922770f4-ddc8-4089-b378-f14088276b43
 # ╟─3e1de32c-d294-11ef-1f63-f190c8361404
 # ╟─4c639e65-e06b-4c5e-b6e7-aabed6b6c0b4
@@ -2799,93 +1933,11 @@ version = "1.13.0+0"
 # ╟─9b92fc89-2036-4525-979b-d296ab29329c
 # ╟─5da42e9a-4318-48ea-9f43-4c1e1c97bceb
 # ╟─bbce1c6f-6f13-4449-9215-bd8ed839a44b
-# ╟─03692f4d-0daf-4dfc-a7ff-6b954326e4d0
-# ╟─3a1d380e-df80-4727-9772-f199214cf05d
-# ╟─99d9099f-4908-4bb3-8d59-da9cb69af04c
-# ╟─3b1b0869-b815-4697-9dba-3c4b4cb5ac47
-# ╟─5f377237-d9a5-4778-aa4d-1c6ce109b705
-# ╟─5613e9b7-ff0d-435a-9de6-aaf293ebf592
-# ╟─fc3151f9-e143-4e31-b7b7-3f25b4fe9dab
-# ╟─66ebe33c-8360-4938-9b51-625e5bed176c
-# ╟─5b681e41-ad14-4c58-8ea0-4b6d85885c51
-# ╟─91dd40f0-c373-48b3-b83b-6e8df2c43e5a
-# ╟─a8d4a517-84a7-426e-a49e-482c5fd047ae
-# ╟─d3b003c6-70ca-419f-a343-e35b266323f3
-# ╟─be66b697-f920-4361-9ff2-b12cc50ae8c9
-# ╟─3e1803d0-d294-11ef-0304-df2b9b698cd1
-# ╟─3e18f18c-d294-11ef-33e4-b7f9495e0508
-# ╟─3e1906ea-d294-11ef-236e-c966a9474170
-# ╟─3e191b6c-d294-11ef-3174-d1b4b36e252b
-# ╟─3e192ef4-d294-11ef-1fc4-87175eeec5eb
-# ╟─3e19436c-d294-11ef-11c5-f9914f7a3a57
-# ╟─4edf38ab-a940-4ab0-be22-fa95cf571146
-# ╟─3e194ef2-d294-11ef-3b38-1ddc3063ff35
-# ╟─3e1964b4-d294-11ef-373d-712257fc130f
-# ╟─3e196d6a-d294-11ef-0795-41c045079251
-# ╟─3e198336-d294-11ef-26fd-03cd15876486
-# ╟─3e198ba6-d294-11ef-3fe7-d70bf4833fa6
-# ╟─3e19e95a-d294-11ef-3da4-6d23922a5150
-# ╟─3e1a69f4-d294-11ef-103e-efc47025fb8f
-# ╟─3e1a7c8e-d294-11ef-1f97-55e608d49141
-# ╟─3e1a8eca-d294-11ef-1ef0-c15b24d05990
-# ╟─3e1bffec-d294-11ef-2a49-9ff0f6331add
-# ╟─3e1c0e80-d294-11ef-0d19-375e01988f16
-# ╟─3e1c1e3e-d294-11ef-0955-bdf9d0ba3c53
-# ╟─3e1c4224-d294-11ef-2707-49470aaae6eb
-# ╟─3e1c51e2-d294-11ef-2c6d-d32a98308c6f
-# ╟─3e1c60ba-d294-11ef-3a01-cf9e97512857
-# ╟─3e1c70be-d294-11ef-14ed-0d46515541c5
-# ╟─3e1c806a-d294-11ef-1fad-17e5625279f7
-# ╟─3e1c9184-d294-11ef-3e35-5393d97fbc44
-# ╟─e3157dc0-5a64-4479-a37a-40fe25cccc07
-# ╟─d93f73d4-2783-4777-b0ce-cdc0444cb300
-# ╟─079157c9-5d97-4dbc-8c47-afa8b661db06
-# ╟─7d493e09-f7cc-4e13-a506-b792edcbf390
-# ╟─8a7dd8b7-5faf-4091-8451-9769f842accb
-# ╟─b7445b9b-7fbb-4560-b947-a23af0fcf101
-# ╟─3e1d20e0-d294-11ef-2044-e1fe6590a600
-# ╠═fc733d61-fd0f-4a13-9afc-4505ac0253df
-# ╟─ef264651-854e-4374-8ea8-5476c85150c4
-# ╟─3e1e4dda-d294-11ef-33b7-4bbe3300ca22
-# ╟─3e1e5a5a-d294-11ef-2fdf-efee4eb1a0f2
-# ╟─3e1e7742-d294-11ef-1204-f9be24da07ab
-# ╟─3e1e9224-d294-11ef-38b3-137c2be22400
-# ╟─d2202628-e4f9-4289-b48e-23b5a0073f94
-# ╟─726e7e9f-3d68-4d02-9954-1edd98b74fdc
-# ╟─58f70d3e-4b64-414e-b560-327be2a0c4c2
-# ╟─3e1ea442-d294-11ef-1364-8dd9986325f7
-# ╟─6d07be25-53d0-46b9-b197-a3680d830952
-# ╟─3e1eba72-d294-11ef-2f53-b56f1862fcbb
-# ╟─3e1ed1a4-d294-11ef-2de4-d7cc540e06a1
-# ╟─3e1eeb14-d294-11ef-1702-f5d2cf6fe60a
-# ╟─e5902178-6df2-4eb4-ac13-7370b3d00c9c
-# ╟─6bc443b4-1a07-4f56-99fb-c30a4370da92
-# ╟─3e1f225a-d294-11ef-04c6-f3ca018ab286
-# ╟─98fa17a6-7c8b-46e4-b32d-52db183d88f8
-# ╠═27ec154a-a4c3-4d71-b2a0-45f2b456a8e4
-# ╠═de4dbfc9-9340-4ae2-b323-49abfd77f198
-# ╟─1cb8b2c4-e1ae-4973-ba53-fc6c7fe1f37a
-# ╠═91a91472-ee6d-416b-b18e-acbedc03a7fe
-# ╠═6485575d-c5a5-4891-8210-f50d6f75476f
-# ╟─0abaed25-decc-4dcd-aa04-b68ec0d5c73e
-# ╟─218d3b6e-50b6-4b98-a00c-a19dd33d2c03
-# ╠═e836f877-5ed6-4865-ba3a-1ca5a86b2349
-# ╟─c0ea3253-a06b-426c-91a3-a6dd33e42779
-# ╟─3e1f4f46-d294-11ef-29b8-69e546763781
-# ╟─3e1f68fa-d294-11ef-31b2-e7670da8c08c
-# ╟─3e1f7d5e-d294-11ef-2878-05744036f32c
-# ╟─3e1f8e48-d294-11ef-0f8a-b58294a8543d
-# ╟─3e1fa04a-d294-11ef-00c3-a51d1aaa5553
-# ╟─50bdc2fe-f48d-4c4e-8b4e-170782681366
-# ╟─db73766d-643c-41d7-a1eb-f376c657f860
-# ╟─3e1fb370-d294-11ef-1fb6-63a41a024691
-# ╟─317707a3-9ef1-4c67-b451-6adcfcff50f0
-# ╠═337e61ec-4da8-4f90-9592-e05d52da8df8
 # ╟─dd31ec7c-708d-4fd7-958d-f9887798a5bc
+# ╠═b305a905-06c2-4a15-8042-72ef6375720f
 # ╠═eeb9a1f5-b857-4843-920b-2e4a9656f66b
 # ╠═5394e37c-ae00-4042-8ada-3bbf32fbca9e
-# ╠═b305a905-06c2-4a15-8042-72ef6375720f
-# ╟─70d79732-0f55-40ba-929d-fba431318848
+# ╠═70d79732-0f55-40ba-929d-fba431318848
 # ╠═4f6dd225-c64d-4b76-b075-0bf71c863b5a
 # ╟─a8046381-ff11-40af-ae2b-078d71c586e7
 # ╠═42b47af6-b850-4987-a2d7-805a2cb64e43

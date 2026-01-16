@@ -99,7 +99,7 @@ Crucially, **all information processing in Bayesian machine learning is governed
 """
 
 # ╔═╡ 55dec435-aa78-41ba-aad5-9d79ce292f42
-keyconcept("", "Bayesian machine learning is a subfield of machine learning that commits entirely to probability theory as the framework for all information-processing tasks. This is well justified, because probability theory is the optimal calculus for representing and manipulating states of knowledge.")
+keyconcept("", "Bayesian machine learning is a subfield of machine learning that commits entirely to probability theory as the framework for all information processing tasks. This is well justified, because probability theory is the optimal calculus for representing and manipulating states of knowledge.")
 
 # ╔═╡ 6a24cee0-d294-11ef-35cb-71ab9ef935e5
 md"""
@@ -620,12 +620,8 @@ The above integral computes the mean of a beta distribution, which is given by `
 
 """
 
-# ╔═╡ 95a3e1f8-2ff5-4168-9988-b033fe35a751
-md"""
-#### Different priors
-If, instead of a _uniform prior_, we use our priors ``m_1`` and ``m_2``, we get:
-
-"""
+# ╔═╡ dbedbac5-84a3-45f8-b364-05034d829086
+TODO("Fons: In the above equations, can you let n display as a changing number, when we change D?")
 
 # ╔═╡ 6a2a1daa-d294-11ef-2a67-9f2ac60a14c5
 md"""
@@ -1069,33 +1065,15 @@ let
 	n = sum(tosses)
 	N = N_tosses
 	@mdx("""
-	Finally, we're ready to solve our challenge: for the generated ``D`` and **uniform prior** (``\\alpha=\\beta=1``), we get
-	
-	```math
-	 p(x_\\bullet=1|D)=\\frac{n+1}{N+2} = \\frac{$n+1}{$N+2} = \\frac{$(n+1)}{$(N+2)} \\approx $(@sprintf("%.3f", (n+1)/(N+2)))
-	```
-	
-	In other words, given the model assumptions (the Bernoulli data-generating distribution and Beta prior as specified above), and the observations ``D``, the probability for observing heads (outcome=``1``) on the next toss is ``\\frac{$(n+1)}{$(N+2)}``.
-	
-	""")
-end
-
-# ╔═╡ cb2d4c88-cc9c-4e56-8939-e0d2a4c9d1c3
-let
-	n = sum(tosses)
-	N = N_tosses
-	@mdx("""
-	
-	```math
+Finally, we're ready to solve our challenge: for the generated ``D``, we get
+		 
+```math
 	\\begin{align}
-	 p(x_\\bullet=1|D,m_1) &= \\frac{n+100}{N+100+500} &\\approx $(@sprintf("%.3f", (n+100)/(N+100+500))) \\\\[.6em]
-
-	 
+	 p(x_\\bullet=1|D,m_1) &= \\frac{n+100}{N+100+500} &\\approx $(@sprintf("%.3f", (n+100)/(N+100+500))) \\\\[0.6em]	 
 	 p(x_\\bullet=1|D,m_2) &= \\frac{n+8}{N+8+13} &\\approx $(@sprintf("%.3f", (n+8)/(N+8+13)))
 	\\end{align}
-	```
-	
-	
+```
+
 	""")
 end
 
@@ -1361,7 +1339,7 @@ StatsPlots = "~0.15.8"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.2"
+julia_version = "1.12.1"
 manifest_format = "2.0"
 project_hash = "206dfe952f1432d3257e6acee1d0f2be8d6357b0"
 
@@ -1802,7 +1780,7 @@ version = "0.7.16"
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
-version = "1.7.0"
+version = "1.6.0"
 
 [[deps.EnumX]]
 git-tree-sha1 = "bddad79635af6aec424f53ed8aad5d7555dc6f00"
@@ -2187,7 +2165,7 @@ version = "0.6.4"
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "OpenSSL_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "8.15.0+0"
+version = "8.11.1+1"
 
 [[deps.LibGit2]]
 deps = ["LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
@@ -2406,7 +2384,7 @@ version = "1.6.1"
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "3.5.4+0"
+version = "3.5.1+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl"]
@@ -3147,9 +3125,9 @@ uuid = "1317d2d5-d96f-522e-a858-c73665f53c3e"
 version = "2022.0.0+1"
 
 [[deps.p7zip_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
+deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
-version = "17.7.0+0"
+version = "17.5.0+2"
 
 [[deps.x264_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -3242,8 +3220,7 @@ version = "1.13.0+0"
 # ╟─6a2a000e-d294-11ef-17d6-bdcddeedc65d
 # ╟─bd0058fe-3b38-49f5-af3c-c1e7678dd431
 # ╟─6a2a0f18-d294-11ef-02c2-ef117377ca66
-# ╟─95a3e1f8-2ff5-4168-9988-b033fe35a751
-# ╟─cb2d4c88-cc9c-4e56-8939-e0d2a4c9d1c3
+# ╟─dbedbac5-84a3-45f8-b364-05034d829086
 # ╟─6a2a1daa-d294-11ef-2a67-9f2ac60a14c5
 # ╟─6a2a2af2-d294-11ef-0072-bdc3c6f95bb3
 # ╟─6a2a389e-d294-11ef-1b8c-b55de794b65c

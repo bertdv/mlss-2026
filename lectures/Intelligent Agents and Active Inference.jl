@@ -27,41 +27,32 @@ PlutoUI.TableOfContents()
 
 # ╔═╡ 27839788-d294-11ef-30a2-8ff6357aa68b
 md"""
-## Preliminaries
+## Materials
 
-##### Goal 
 
-  * Introduction to Active Inference and application to the design of synthetic intelligent agents
+  * Noumenal labs (2025), [WTF is the FEP? A short explainer on the free energy principle](https://www.noumenal.ai/post/wtf-is-the-fep-a-short-explainer-on-the-free-energy-principle
+    *  A concise, accessible introduction to the Free Energy Principle, aimed at demystifying it for a broader audience—matching the tone and intent suggested by the playful but clear title.   
 
-##### Materials        
+  * De Vries et al. (2025), [Expected Free Energy-based Planning as Variational Inference](https://arxiv.org/pdf/2504.14898)
+    * On minimizing expected free energy by variational free energy minimization.
 
-  * Mandatory
+  * Friston et al. (2023), [Path integrals, particular kinds, and strange things](https://doi.org/10.1016/j.plrev.2023.08.016)
+    *  The most recent formal developments of the Free Energy Principle (FEP). This paper frames FEP as a principle of least action over trajectories. 
 
-      * These lecture notes
+  * Bert de Vries, Tim Scarfe, and Keith Duggar (2023), Podcast on [Active Inference](https://youtu.be/2wnJ6E6rQsU?si=I4_k40j42_8E4igP). Machine Learning Street Talk podcast
+    * Quite extensive discussion on many aspects regarding the Free Energy Principle and Active Inference, in particular relating to its implementation.
+
+  * Friston et al. (2022), [Designing Ecosystems of Intelligence from First Principles](https://arxiv.org/abs/2212.01354)
+    * Friston's vision on the future of AI.
+
+  * Bert de Vries (2021), Presentation on [Beyond deep learning: natural AI systems](https://youtu.be/QYbcm6G_wsk?si=G9mkjmnDrQH9qk5k) (video)
+    * 30-minute introduction to active inference from an engineering point of view.
      
-  * Optional
-
-     * Noumenal labs (2025), [WTF is the FEP? A short explainer on the free energy principle](https://www.noumenal.ai/post/wtf-is-the-fep-a-short-explainer-on-the-free-energy-principle)
-        *  A concise, accessible introduction to the Free Energy Principle, aimed at demystifying it for a broader audience—matching the tone and intent suggested by the playful but clear title.   
-
-     * De Vries et al. (2025), [Expected Free Energy-based Planning as Variational Inference](https://arxiv.org/pdf/2504.14898)
-        * On minimizing expected free energy by variational free energy minimization.
-
-     * Friston et al. (2023), [Path integrals, particular kinds, and strange things](https://doi.org/10.1016/j.plrev.2023.08.016)
-        *  The most recent formal developments of the Free Energy Principle (FEP). This paper frames FEP as a principle of least action over trajectories. 
-
-     * Bert de Vries, Tim Scarfe and Keith Duggar (2023), Podcast on [Active Inference](https://youtu.be/2wnJ6E6rQsU?si=I4_k40j42_8E4igP). Machine Learning Street Talk podcast
-        * Quite extensive discussion on many aspect regarding the Free Energy Principle and Active Inference, in particular relating to its implementation.
-
-     * Friston et al. (2022), [Designing Ecosystems of Intelligence from First Principles](https://arxiv.org/abs/2212.01354)
-       * Friston's vision on the future of AI.
-
-     * Bert de Vries (2021), Presentation on [Beyond deep learning: natural AI systems](https://youtu.be/QYbcm6G_wsk?si=G9mkjmnDrQH9qk5k) (video)
-        * 30-minute introduction to active inference from an engineering point of view.
-     * Raviv (2018), [The Genius Neuroscientist Who Might Hold the Key to True AI](https://github.com/bmlip/course/blob/main/assets/files/WIRED-Friston.pdf).
-        * Interesting article on Karl Friston, who is a leading theoretical neuroscientist working on a theory that relates life and intelligent behavior to physics (and Free Energy minimization). (**highly recommended**)
-     * Karl Friston (2011), [What Is Optimal about Motor Control?](https://doi.org/10.1016/j.neuron.2011.10.018), Neuron 72-3, p488-498
-        * This work critiques classical optimal control theory for being an insufficient model of biological motor control, and instead advocates active inference as a more suitable framework.
+  * Raviv (2018), [The Genius Neuroscientist Who Might Hold the Key to True AI](https://github.com/bmlip/course/blob/main/assets/files/WIRED-Friston.pdf).
+    * Interesting article on Karl Friston, who is a leading theoretical neuroscientist working on a theory that relates life and intelligent behavior to physics (and Free Energy minimization). (**highly recommended**)
+    
+  * Karl Friston (2011), [What Is Optimal about Motor Control?](https://doi.org/10.1016/j.neuron.2011.10.018), Neuron 72-3, p488-498
+    * This work critiques classical optimal control theory for being an insufficient model of biological motor control, and instead advocates active inference as a more suitable framework.
  
 
  
@@ -570,68 +561,10 @@ md"""
 # ╔═╡ c51232ba-9908-476a-949f-d5d0949d7960
 keyconceptsummary()
 
-# ╔═╡ aed24f2d-105e-4583-b9d6-24d1886002d8
-exercises(header_level=1)
-
-# ╔═╡ acefdbf6-1beb-4ce5-9106-0fc7be63dabe
-md"""
-There are no more exercises. If you understand the Free Energy Principle and active inference, you now hold a lens for seeing into the mechanics of life, consciousness, and intelligent behavior. The next insights are yours to discover.
-"""
-
-# ╔═╡ 6d697856-cc58-4d6a-afd3-c0c6bfbc0d88
-md"""
-# Optional Slides
-"""
-
-# ╔═╡ 8627b90a-79d8-43bf-8d53-1043f6e816ab
-md"""
-
-## The FEP is a Least Action Principle for "Things"
-
-Almost all of physics can be described as processes that minimize energy differences. This is formalized in the celebrated [Principle of Least Action](https://en.wikipedia.org/wiki/Action_principles) (PLA).
-
-For example, Newton’s second law ``F = ma`` [can be derived from minimizing the "action"](https://vixra.org/pdf/2501.0036v1.pdf)—the time integral of the difference between kinetic and potential energy for a particle. Many branches of physics that describe motion can be formulated through similar derivations.
-
-"""
-
-# ╔═╡ 58c51f5e-69a0-4802-892b-0a52462c4e55
-Resource("https://github.com/bmlip/course/blob/v4/assets/figures/FEP.png?raw=true", :style => "background: white; border-radius: 1em;")
-
-# ╔═╡ 14ef2403-cba3-4e76-91c7-4655656a632d
-md"""
-
-The Free Energy Principle (FEP) can be viewed as a kind of PLA as well—one that governs the necessary “motion” of beliefs (ie, necessary information processing) in systems that maintain their structural and functional integrity over time. All living systems fall under its scope.
-
-"""
-
-# ╔═╡ 54cc2500-f06f-4f39-95f3-8d9d09c37234
-md"""
-## Active Inference and The Scientific Inquiry Loop
-
-In the [Machine Learning Overview lecture](https://bmlip.github.io/course/lectures/Machine%20Learning%20Overview.html), we introduced a picture illustrating the [Scientific Inquiry Loop](https://bmlip.github.io/course/lectures/Machine%20Learning%20Overview.html#Machine-Learning-and-the-Scientific-Inquiry-Loop). 
-
-Active inference completes this “scientific loop” as a fully variational inference process. Under the FEP, all processes, including state updating, learning, and trial design (in living systems: perception, learning, and control/behavior, respectively) are driven by VFE minimization. Bayesian probability theory, together with the FEP, provides all the equations needed to run the process of scientific inquiry.
-
-The figure below illustrates this process. We do not depict the epistemic priors as an external input, since they can be computed internally by the agent itself.
-"""
-
-# ╔═╡ b900b7d4-3a49-4651-a94b-74fdbbf094d9
-Resource("https://github.com/bmlip/course/blob/v4/assets/figures/AIF-agent-loop.png?raw=true", :style => "background: white; border-radius: 1em;")
-
-# ╔═╡ cd2dafbe-5131-4ee0-8eb7-33bd04f3133f
-md"""
-If an agent has no goal priors, then active inference reduces to an automated (Bayes-optimal) scientist: the agent’s generative model will converge to a veridical (“true”) description of the environment. With goal priors, however, an active inference agent becomes a (Bayes-optimal) engineer: its model converges to beliefs that generate purposeful behavior. For example, the goal prior “I will not get hit by a car” leads to the inference of actions that allow safe crossing of the road. In the same way, carefully structured goal priors enable the brain to develop solutions for tasks such as object recognition, locomotion, and speech generation.
-
-In short, **AIF is an automated (Bayes-optimal) engineering design loop**.
-
-The challenge is computational efficiency: the human brain runs on about 20 [W], with the neocortex using just 4 [W], roughly the power of a bicycle light, yet performs tasks that would consume millions of times more power on current silicon hardware.
-
-"""
-
 # ╔═╡ ac66d105-0533-4946-98c3-dd04bd77f8c0
 navigate_prev_next(
-	"https://bertdv.github.io/mlss-2026/lectures/Factor%20Graphs.html",
-	nothing
+	"https://bertdv.github.io/mlss-2026/lectures/Latent%20Variable%20Models%20and%20VB.html",
+	"https://bertdv.github.io/mlss-2026/lectures/Factor%20Graphs.html"
 )
 
 # ╔═╡ be0dc5c0-6340-4d47-85ae-d70e06df1676
@@ -654,7 +587,7 @@ RxInfer = "~4.6.6"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.2"
+julia_version = "1.12.1"
 manifest_format = "2.0"
 project_hash = "04fba8eac6dd4959d3f683890478cee8287e6240"
 
@@ -1018,7 +951,7 @@ version = "0.7.16"
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
-version = "1.7.0"
+version = "1.6.0"
 
 [[deps.EnumX]]
 git-tree-sha1 = "bddad79635af6aec424f53ed8aad5d7555dc6f00"
@@ -1335,7 +1268,7 @@ version = "0.6.4"
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "OpenSSL_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "8.15.0+0"
+version = "8.11.1+1"
 
 [[deps.LibGit2]]
 deps = ["LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
@@ -1486,7 +1419,7 @@ version = "1.6.1"
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "3.5.4+0"
+version = "3.5.1+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl"]
@@ -1917,9 +1850,9 @@ uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
 version = "1.64.0+1"
 
 [[deps.p7zip_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
+deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
-version = "17.7.0+0"
+version = "17.5.0+2"
 """
 
 # ╔═╡ Cell order:
@@ -1967,15 +1900,6 @@ version = "17.7.0+0"
 # ╟─df4950bc-4532-44e3-b8c7-18dd62fdfb09
 # ╟─c51232ba-9908-476a-949f-d5d0949d7960
 # ╟─ac66d105-0533-4946-98c3-dd04bd77f8c0
-# ╟─aed24f2d-105e-4583-b9d6-24d1886002d8
-# ╟─acefdbf6-1beb-4ce5-9106-0fc7be63dabe
-# ╟─6d697856-cc58-4d6a-afd3-c0c6bfbc0d88
-# ╟─8627b90a-79d8-43bf-8d53-1043f6e816ab
-# ╟─58c51f5e-69a0-4802-892b-0a52462c4e55
-# ╟─14ef2403-cba3-4e76-91c7-4655656a632d
-# ╟─54cc2500-f06f-4f39-95f3-8d9d09c37234
-# ╟─b900b7d4-3a49-4651-a94b-74fdbbf094d9
-# ╟─cd2dafbe-5131-4ee0-8eb7-33bd04f3133f
 # ╟─be0dc5c0-6340-4d47-85ae-d70e06df1676
 # ╠═97a0384a-0596-4714-a3fc-bf422aed4474
 # ╟─00000000-0000-0000-0000-000000000001

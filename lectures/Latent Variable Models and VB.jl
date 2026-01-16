@@ -58,10 +58,10 @@ The goal of Bayesian inference is to transform the (known) *likelihood-times-pri
  \underbrace{p(x|z) p(z)}_{\text{what we know}} \rightarrow \underbrace{p(z|x) p(x)}_{\text{what we want}} 
 ```
 
-Remember from the [Bayesian machine learning lesson](https://bmlip.github.io/course/lectures/Bayesian%20Machine%20Learning.html#Bayesian-model-evidence) that negative log-evidence can be decomposed as "complexity" minus "accuracy" terms (the CA decomposition):
+Remember from the [Bayesian machine learning lesson](https://bmlip.github.io/course/lectures/Bayesian%20Machine%20Learning.html#Bayesian-model-evidence) that negative log-evidence ("surprisal") can be decomposed as "complexity" minus "accuracy" terms (the CA decomposition):
 
 ```math
- -\log p(x) =  \underbrace{ \int p(z|x) \log \frac{p(z|x)}{p(z)} \mathrm{d}z }_{\text{complexity}} - \underbrace{\int p(z|x) \log p(x|z) \mathrm{d}z}_{\text{accuracy}}
+ \underbrace{-\log p(x)}_{\text{surprisal}} =  \underbrace{ \int p(z|x) \log \frac{p(z|x)}{p(z)} \mathrm{d}z }_{\text{complexity}} - \underbrace{\int p(z|x) \log p(x|z) \mathrm{d}z}_{\text{accuracy}}
  
 ```
 
@@ -365,10 +365,18 @@ Bayes rule is the global solution of constrained VFEM when all constraints are d
  
 """
 
+# ╔═╡ 4ee79cfd-8c20-404f-9c0b-a74c160fc067
+md"""
+# Summary
+"""
+
+# ╔═╡ 4acccdc1-a8d4-4b66-9db1-35d138dcfab8
+keyconceptsummary()
+
 # ╔═╡ ec14b649-bbba-483e-925e-bef3201e0371
 navigate_prev_next(
 	"https://bertdv.github.io/mlss-2026/lectures/Bayesian%20Machine%20Learning.html",
-	"https://bertdv.github.io/mlss-2026/lectures/Factor%20Graphs.html"
+	"https://bertdv.github.io/mlss-2026/lectures/Intelligent%20Agents%20and%20Active%20Inference.html"
 )
 
 # ╔═╡ 55570464-89c8-4d9b-b667-dfa64ac62294
@@ -884,7 +892,7 @@ StatsPlots = "~0.15.8"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.2"
+julia_version = "1.12.1"
 manifest_format = "2.0"
 project_hash = "aad8bb8e06349ef2cc9b62f36df29440d28e88f2"
 
@@ -1133,7 +1141,7 @@ version = "0.9.5"
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
 uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
-version = "1.7.0"
+version = "1.6.0"
 
 [[deps.EpollShim_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1447,7 +1455,7 @@ version = "0.6.4"
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "OpenSSL_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "8.15.0+0"
+version = "8.11.1+1"
 
 [[deps.LibGit2]]
 deps = ["LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
@@ -1648,7 +1656,7 @@ version = "1.6.1"
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "3.5.4+0"
+version = "3.5.1+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl"]
@@ -2360,9 +2368,9 @@ uuid = "1317d2d5-d96f-522e-a858-c73665f53c3e"
 version = "2022.0.0+1"
 
 [[deps.p7zip_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
+deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
-version = "17.7.0+0"
+version = "17.5.0+2"
 
 [[deps.x264_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -2412,6 +2420,8 @@ version = "1.13.0+0"
 # ╟─16d90f11-5933-4145-b219-19774eba25d6
 # ╟─bcdbf717-5c2b-4347-b1cc-1239e95c441e
 # ╟─b3bb7349-1965-4734-83ed-ba6fef0ccc41
+# ╟─4ee79cfd-8c20-404f-9c0b-a74c160fc067
+# ╟─4acccdc1-a8d4-4b66-9db1-35d138dcfab8
 # ╟─ec14b649-bbba-483e-925e-bef3201e0371
 # ╟─55570464-89c8-4d9b-b667-dfa64ac62294
 # ╠═df171940-eb54-48e2-a2b8-1a8162cabf3e
