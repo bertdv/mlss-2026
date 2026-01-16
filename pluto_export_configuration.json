@@ -1,0 +1,14 @@
+{
+    
+    "title": "MLSS 2026",
+    "description": "Course materials for the course Machine Learning Summer School 2026",
+    
+    "collections": [
+        {
+            "title": "Lectures",
+            "description": "",
+            "tags": ["lecture"]
+        }
+    ]
+    
+}
