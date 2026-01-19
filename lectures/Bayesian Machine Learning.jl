@@ -621,7 +621,7 @@ The above integral computes the mean of a beta distribution, which is given by `
 """
 
 # ╔═╡ dbedbac5-84a3-45f8-b364-05034d829086
-TODO("Fons: In the above equations, can you let n display as a changing number, when we change D?")
+TODO("Fons: In the above equations, can you let n and N display as changing numbers, when we change the slider for D?")
 
 # ╔═╡ 6a2a1daa-d294-11ef-2a67-9f2ac60a14c5
 md"""
