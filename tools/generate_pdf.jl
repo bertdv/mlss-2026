@@ -101,7 +101,6 @@ generate_pdf_collection(
     lecture_urls,
     "MLSS",
     "https://bertdv.github.io/mlss-2026/lectures/",
-    "B Lectures"
 )
 
 try
