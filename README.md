@@ -49,3 +49,18 @@ If necessary, you can download the lecture notes in PDF format here:
 - [lecture notes PDF](https://github.com/bertdv/mlss-2026/blob/main/lectures/pdf/BMLIP_MLSS_Lectures.pdf) version 21-Jan-2026.
 
 However, we recommend that you read the lecture notes in your browser to take advantage of the interactive materials that we prepared for this course, based on [Pluto.jl](https://plutojl.org/).
+
+### BELOW HERE ONLY FOR INSTRUCTOR
+
+#### How to generate a new PDF bundle for the lecture notes?
+
+- brew install `poppler`
+- Open a terminal in the `mlss-2026` folder
+- Run `julia tools/generate_pdf.jl` in the root folder
+
+This gives an output PDF file. Then you should:
+
+1. Go to https://github.com/bertdv/mlss-2026/releases and make a new release (mlss2, mlss3, etc)
+2. Attach the PDF as "Binary" of the release, and publish
+3. Take the new PDF URL, and write it in README.md
+
