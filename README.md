@@ -46,6 +46,6 @@ The course materials are derived from a full MSc-level course on [Bayesian Machi
 
 If necessary, you can download the lecture notes in PDF format here:
 
-- [lecture notes PDF](https://github.com/bertdv/mlss-2026/releases/download/mlss1/BMLIP_MLSS_Lectures.pdf) version 19-Jan-2026.
+- [lecture notes PDF](https://github.com/bertdv/mlss-2026/blob/main/lectures/pdf/BMLIP_MLSS_Lectures.pdf) version 21-Jan-2026.
 
 However, we recommend that you read the lecture notes in your browser to take advantage of the interactive materials that we prepared for this course, based on [Pluto.jl](https://plutojl.org/).
