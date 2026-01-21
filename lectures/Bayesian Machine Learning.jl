@@ -565,7 +565,7 @@ p(\mu|D) = \mathrm{Beta}(\mu|\,n+\alpha, N-n+\beta)
 # ╔═╡ 6a2af90a-d294-11ef-07bd-018326577791
 md"""
 
-For each model, we plot the parameter **posteriors** ``p(\mu|D_n,m_\bullet)`` computed after ``n`` iterations.
+For both models ``m_1`` and ``m_2``, we plot below the **parameter posteriors** ``p(\mu|D_n,m_\bullet)``, computed after ``N`` coin tosses. Use the slider to change ``N``. 
 """
 
 # ╔═╡ 6a29d548-d294-11ef-1361-ad2230cad02b
@@ -620,9 +620,6 @@ The above integral computes the mean of a beta distribution, which is given by `
 
 """
 
-# ╔═╡ dbedbac5-84a3-45f8-b364-05034d829086
-TODO("Fons: In the above equations, can you let n and N display as changing numbers, when we change the slider for D?")
-
 # ╔═╡ 6a2a1daa-d294-11ef-2a67-9f2ac60a14c5
 md"""
 Be aware that there is no such thing as an "objective" or "correct" prediction. Every prediction is conditional on the selected model and the used data set. 
@@ -633,7 +630,7 @@ Be aware that there is no such thing as an "objective" or "correct" prediction. 
 md"""
 ## All Learning is Interpretable as Correcting Prediction Errors 
 
-What did we learn from the data? Before seeing any data, we think that the probability for throwing heads is 
+What did we learn from the data? Before seeing any data, we stated that the probability of throwing heads is 
 
 ```math
 \left. p(x_\bullet=1|D) \right|_{n=N=0} = \left.\frac{n+\alpha}{N+\alpha+\beta}\right|_{n=N=0} = \frac{\alpha}{\alpha + \beta}\,.
@@ -690,7 +687,7 @@ md"""
 
 # ╔═╡ 6a2a9faa-d294-11ef-1284-cfccb1da444e
 md"""
-Let's interpret this decomposition of the posterior prediction. Before the data ``D`` was observed, our model generated a *prior prediction* ``p(x_\bullet=1) = \frac{\alpha}{\alpha+\beta}``. Next, the degree to which the actually observed data matches this prediction is represented by the *prediction error* ``\frac{n}{N} - \frac{\alpha}{\alpha-\beta}``. The prior prediction is then updated to a *posterior prediction* ``p(x_\bullet=1|D)`` by adding a fraction ``0\leq \frac{N}{N+\alpha+\beta} \lt 1`` of the prediction error to the prior prediction. Hence, the **prediction error** plays the role of "correcting" the prior prediction. 
+Let's interpret this decomposition of the posterior prediction. Before the data ``D`` was observed, our model generated a *prior prediction* ``p(x_\bullet=1) = \frac{\alpha}{\alpha+\beta}``. Next, the mismatch between the actually observed data and this prediction is represented by the *prediction error* ``\frac{n}{N} - \frac{\alpha}{\alpha-\beta}``. The prior prediction is then updated to a *posterior prediction* ``p(x_\bullet=1|D)`` by adding a fraction ``0\leq \frac{N}{N+\alpha+\beta} \lt 1`` of the prediction error to the prior prediction. Hence, the **prediction error** is used to "correct" the prior prediction. 
 
 """
 
@@ -707,8 +704,7 @@ example("Bayesian Linear Regression",header_level=2)
 md"""
 
 ##### Data
-Assume a set of noisy observations ``D=\{(x_1,y_1), (x_2,y_2), \ldots, (x_N,y_N)\}``, where each observation satisfies ``y_n = f(x_n) + \varepsilon_n``. The goal is to infer the underlying function ``f`` from these data. 
-
+Assume a set of noisy observations ``D=\{(x_1,y_1), (x_2,y_2), \ldots, (x_N,y_N)\}``, where each observation satisfies ``y_n = f(x_n) + \varepsilon_n``. 
 
 """
 
@@ -725,6 +721,14 @@ end
 begin
 	N_bond = @bindname N Slider(1:150; show_value=true, default=13)
 end
+
+# ╔═╡ 4fd66a9f-b6d9-4c49-a4ad-acfed9db6118
+md"""
+
+##### Challenge
+The goal is to infer the underlying function ``f`` from the observed data points. 
+
+"""
 
 # ╔═╡ 0e2ea2e9-061a-4266-af22-1f829272767f
 md"""
@@ -762,37 +766,69 @@ N_bond
 # ╔═╡ 679ef9d1-cc1c-4fc1-bf82-caa967c196c2
 example("Bayesian Logistic Regression (Classification)",header_level=2)
 
-# ╔═╡ 2be6440b-4f94-4632-8f9b-0d20bf69ac39
-TODO("introduction")
+# ╔═╡ 3594875e-c5b9-4afc-8eb3-69cd4419479c
+md"""
+##### Data
+
+Assume a set of observations ``D=\{(x_1,y_1), (x_2,y_2), \ldots, (x_N,y_N)\}``, where each observation ``(x_n,y_n)`` holds a 2-dimensional **feature** vector ``x_n \in \mathbb{R}^2`` and a **class label** ``y_n \in \{0,1\}``. Move the slider to generate more (or fewer) samples. 
+
+"""
 
 # ╔═╡ 13cca61b-ee30-4cbc-b267-d77b1f51be6c
 begin
 	N2_bond = @bindname N2 Slider(8:200; default=120, show_value=true)
 end
 
-# ╔═╡ 3f6cf81b-8d43-4c46-a3dc-c7517f53322c
+# ╔═╡ 856877b7-3fdb-45d5-8e54-438bb8e968b5
 md"""
-### Generative classification
+##### Challenge
+
+The (classification) challenge is to predict the class label for a new (unlabelled) sample ``x_\bullet`` that is drawn from the same underlying process. 
 """
-
-# ╔═╡ ed550951-58ad-4b29-baac-1cc6b8681b4b
-TODO("Feel free to remove this if not needed")
-
-# ╔═╡ 27d3631b-cd58-4098-9ea8-b8bbdb7bb8c2
-N2_bond
 
 # ╔═╡ a893baee-217a-4dfe-9641-2d98cd769956
 md"""
-### Discriminative classifcation
+##### Model Specification
+
+In a **logistic regression** model, we assume that the class labels are generated from given features by the following model (see the [Discriminative Classification](https://bmlip.github.io/course/lectures/Discriminative%20Classification.html#Challenge-Revisited:-Bayesian-Logistic-Regression) lecture for more details):
+```math
+\begin{align}
+p(y_n=1|x_n,w) &= \sigma(w^Tx_m) \\
+p(w) &= \mathcal{N}(w | m_0, S_0)
+\end{align}
+```
+where ``\sigma(a) = \frac{1}{1+e^{-a}}`` is the [logistic function](https://bmlip.github.io/course/minis/Softmax.html#The-logistic-function). 
+"""
+
+# ╔═╡ 238f9fe2-078b-4c30-913e-f76e4e1ead0b
+md"""
+#### Results
+
+After incorporating the data set ``D`` into the posterior (through Bayes rule) 
+
+```math
+p(w | D) = \mathcal{N}(w | m_N, S_N),
+```
+
+the predicted class label ``y_\bullet``, given a new feature vector ``x_\bullet`` and the data set ``D``, can be worked out to ([as shown in this reference](https://bmlip.github.io/course/lectures/Discriminative%20Classification.html))
+
+```math
+\begin{align}
+p(y_\bullet=1|x_\bullet,D) &= \int p(y_\bullet=1|x_\bullet,w) p(w|D) \mathrm{d}w \\
+&\approx \Phi\bigg(\frac{m^T_N x_\bullet}{\sqrt{(8/\pi) + x_\bullet^T S_N x_\bullet}}\bigg)
+\end{align}
+```
+where ``\Phi(\cdot)`` is the cumulative Gaussian distribution. 
+
+The predicted class label distribution is shown in the heatmap below. The line indicates the discrimination boundary where 
+```math
+p(y_\bullet=1|x_\bullet,D) = p(y_\bullet=0|x_\bullet,D) = 0.5
+```
+
 """
 
 # ╔═╡ 4d38fa93-ddac-4e73-b2c5-f1d8c6fb9b38
 N2_bond
-
-# ╔═╡ b5d0f64a-82bf-4fe3-a1c8-696d6ef29d11
-md"""
-See [Bayesian Logistic Regression lecture](https://bmlip.github.io/course/lectures/Discriminative%20Classification.html#Challenge-Revisited:-Bayesian-Logistic-Regression).
-"""
 
 # ╔═╡ 47842de0-d17e-460e-b3b7-b2e642569e25
 md"""
@@ -919,119 +955,12 @@ begin
 	end
 end;
 
-# ╔═╡ 3437b7a6-56f3-4cfa-bec1-d5b39612d9d0
-md"""
-### Bayesian Linear regression code
-"""
-
-# ╔═╡ 0e2e6382-0527-4233-801e-b91073490d48
-const Layout = PlutoUI.ExperimentalLayout
-
-# ╔═╡ f50ba7ef-c0b1-4f73-a8fe-7caa8760ab3d
-const deterministic_randomness = MersenneTwister
-
-# ╔═╡ 0912cba6-8e80-4ba9-8017-f80b4957b0f9
-σ_data_noise² = σ_data_noise^2
-
-# ╔═╡ 182a8212-93b7-449c-94a8-fc535a5c9392
-σ_w_prior² = σ_w_prior^2
-
-# ╔═╡ b4ba2dfd-13af-4e2c-a3a6-e3b92756c03b
-const μ_basis = range(0.0, 1.0; length=10);
-
-# ╔═╡ b8b5601b-72e3-431d-b23a-e91936205320
-const σ_basis² = 0.01;
-
-# ╔═╡ 77c16302-e429-465f-80e7-6f9253c28607
-D = let
-	xs = rand(deterministic_randomness(19), Uniform(0,1), N)
-
-	ys_exact = secret_function.(xs)
-
-	rng = deterministic_randomness(37)
-	ys = [
-		rand(rng, Normal(y, sqrt(σ_data_noise²)))
-		for y in ys_exact
-	 ]
-
-	collect(zip(xs, ys))
-end
-
-# ╔═╡ ae4fe5a3-01e2-4594-a592-6b04173f77be
-baseplot(args...; kwargs...) = plot(args...; size=(650,400), xlim=(-0.0, 1.0), ylim=(-1.2,1.2), kwargs...)
-
-# ╔═╡ 9c8fe04a-acdf-4c1b-8f57-1c4238defe1a
-function plot_data!(D)
-	plot!(; legend=:bottomleft)
-	plot!(secret_function;
-		  label="True function",
-		  color=3,
-		  lw=3,
-			linestyle=:dash,
-		 )
-	scatter!(
-		D; 
-		label="Observations",
-		color=1,
-		# markerstrokewidth=0,
-	)
-end
-
-# ╔═╡ 2dce3e82-5242-4740-b032-fe8a3a24f369
-let
-	baseplot()
-	plot_data!(D)
-end
-
-# ╔═╡ bc88e2d6-e1ca-4f3c-b42c-da8cb0c5eca4
-ϕ(μ, x) = exp(-(x - μ)^2 / σ_basis²);
-
-# ╔═╡ cd1f1a99-0f28-4825-8e57-011550a3ae4b
-function f(w, x)
-	sum(enumerate(μ_basis)) do (i, μ)
-		w[i] * ϕ(μ, x)
-	end
-end;
-
-# ╔═╡ a987582b-b4b3-4676-92ea-28ae4dc38f3f
-# This is called the "design matrix"
-Φ = [
-	ϕ(μ, datum[1])
-	for datum in D, μ in μ_basis
-];
-
-# ╔═╡ e2b74ada-3dab-401f-aa44-a4ecda4d6496
-weights_posterior = MvNormalCanon(
-	# Posterior potential vector
-	Φ' * last.(D) / σ_data_noise²,
-	# Posterior precision matrix (inverse covariance)
-	Φ' * Φ / σ_data_noise² + I / σ_w_prior²
-);
-
-# ╔═╡ 1211336b-5fb0-415e-92a8-6ba2b061cb43
-let
-	baseplot()
-	if true
-		for i in 1:40
-			w = rand(weights_posterior)
-			plot!(
-				x -> f(w, x);
-				opacity=.3, 
-				color=2, 
-				label=i==1 ? "Posterior samples" : nothing,
-			)
-		end
-	end
-
-	plot_data!(D)
-end
-
 # ╔═╡ d1521061-211f-49fc-9463-82f01c79e2f6
 
 
 # ╔═╡ 5ca4e81f-4a63-472e-bb9e-7b8200de579a
 md"""
-## 🪙 Coin toss sample controls
+### Coin toss sample controls
 """
 
 # ╔═╡ 8c91dcc3-32e2-4c09-aea1-af8ce5c805dc
@@ -1152,6 +1081,113 @@ D_sample_controls
 # ╔═╡ bd0058fe-3b38-49f5-af3c-c1e7678dd431
 D_sample_controls
 
+# ╔═╡ 3437b7a6-56f3-4cfa-bec1-d5b39612d9d0
+md"""
+### Bayesian Linear regression code
+"""
+
+# ╔═╡ 0e2e6382-0527-4233-801e-b91073490d48
+const Layout = PlutoUI.ExperimentalLayout
+
+# ╔═╡ f50ba7ef-c0b1-4f73-a8fe-7caa8760ab3d
+const deterministic_randomness = MersenneTwister
+
+# ╔═╡ 0912cba6-8e80-4ba9-8017-f80b4957b0f9
+σ_data_noise² = σ_data_noise^2
+
+# ╔═╡ 182a8212-93b7-449c-94a8-fc535a5c9392
+σ_w_prior² = σ_w_prior^2
+
+# ╔═╡ b4ba2dfd-13af-4e2c-a3a6-e3b92756c03b
+const μ_basis = range(0.0, 1.0; length=10);
+
+# ╔═╡ b8b5601b-72e3-431d-b23a-e91936205320
+const σ_basis² = 0.01;
+
+# ╔═╡ 77c16302-e429-465f-80e7-6f9253c28607
+D = let
+	xs = rand(deterministic_randomness(19), Uniform(0,1), N)
+
+	ys_exact = secret_function.(xs)
+
+	rng = deterministic_randomness(37)
+	ys = [
+		rand(rng, Normal(y, sqrt(σ_data_noise²)))
+		for y in ys_exact
+	 ]
+
+	collect(zip(xs, ys))
+end
+
+# ╔═╡ ae4fe5a3-01e2-4594-a592-6b04173f77be
+baseplot(args...; kwargs...) = plot(args...; size=(650,400), xlim=(-0.0, 1.0), ylim=(-1.2,1.2), kwargs...)
+
+# ╔═╡ 9c8fe04a-acdf-4c1b-8f57-1c4238defe1a
+function plot_data!(D)
+	plot!(; legend=:bottomleft)
+	plot!(secret_function;
+		  label="True function",
+		  color=3,
+		  lw=3,
+			linestyle=:dash,
+		 )
+	scatter!(
+		D; 
+		label="Observations",
+		color=1,
+		# markerstrokewidth=0,
+	)
+end
+
+# ╔═╡ 2dce3e82-5242-4740-b032-fe8a3a24f369
+let
+	baseplot()
+	plot_data!(D)
+end
+
+# ╔═╡ bc88e2d6-e1ca-4f3c-b42c-da8cb0c5eca4
+ϕ(μ, x) = exp(-(x - μ)^2 / σ_basis²);
+
+# ╔═╡ cd1f1a99-0f28-4825-8e57-011550a3ae4b
+function f(w, x)
+	sum(enumerate(μ_basis)) do (i, μ)
+		w[i] * ϕ(μ, x)
+	end
+end;
+
+# ╔═╡ a987582b-b4b3-4676-92ea-28ae4dc38f3f
+# This is called the "design matrix"
+Φ = [
+	ϕ(μ, datum[1])
+	for datum in D, μ in μ_basis
+];
+
+# ╔═╡ e2b74ada-3dab-401f-aa44-a4ecda4d6496
+weights_posterior = MvNormalCanon(
+	# Posterior potential vector
+	Φ' * last.(D) / σ_data_noise²,
+	# Posterior precision matrix (inverse covariance)
+	Φ' * Φ / σ_data_noise² + I / σ_w_prior²
+);
+
+# ╔═╡ 1211336b-5fb0-415e-92a8-6ba2b061cb43
+let
+	baseplot()
+	if true
+		for i in 1:40
+			w = rand(weights_posterior)
+			plot!(
+				x -> f(w, x);
+				opacity=.3, 
+				color=2, 
+				label=i==1 ? "Posterior samples" : nothing,
+			)
+		end
+	end
+
+	plot_data!(D)
+end
+
 # ╔═╡ 830e8d28-2b0a-48f2-829b-6254fa6de065
 md"""
 ### Discriminative classification
@@ -1206,33 +1242,6 @@ end
 
 # ╔═╡ ccbf6bd8-3b77-4a3b-9272-6e63495ddaf3
 plot_dataset()
-
-# ╔═╡ 4093dea9-2ad3-4384-a414-06a6726d4660
-let
-	d1 = fit_mle(MvNormal, X_c1')
-	d2 = fit_mle(MvNormal, X_c2')
-
-	plot_dataset()
-	
-	xrange = range(-1.6, 9; length=20)
-	yrange = range(-2, 7; length=15)
-	
-	contour!(
-		xrange, yrange,
-		(x,y) -> pdf(d1, [x,y]);
-		opacity=.4,
-		color=:blues,
-	)
-
-	
-	contour!(
-		xrange, yrange,
-		(x,y) -> pdf(d2, [x,y]);
-		opacity=.4,
-		color=:red,
-		colorbar=nothing,
-	)
-end
 
 # ╔═╡ f2340f0e-a170-4386-a616-47edd748704d
 """
@@ -1339,7 +1348,7 @@ StatsPlots = "~0.15.8"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.2"
+julia_version = "1.12.4"
 manifest_format = "2.0"
 project_hash = "206dfe952f1432d3257e6acee1d0f2be8d6357b0"
 
@@ -2315,7 +2324,7 @@ version = "1.11.0"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
-version = "2025.5.20"
+version = "2025.11.4"
 
 [[deps.MultivariateStats]]
 deps = ["Arpack", "Distributions", "LinearAlgebra", "SparseArrays", "Statistics", "StatsAPI", "StatsBase"]
@@ -2451,7 +2460,7 @@ version = "0.44.2+0"
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-version = "1.12.0"
+version = "1.12.1"
 weakdeps = ["REPL"]
 
     [deps.Pkg.extensions]
@@ -3220,7 +3229,6 @@ version = "1.13.0+0"
 # ╟─6a2a000e-d294-11ef-17d6-bdcddeedc65d
 # ╟─bd0058fe-3b38-49f5-af3c-c1e7678dd431
 # ╟─6a2a0f18-d294-11ef-02c2-ef117377ca66
-# ╟─dbedbac5-84a3-45f8-b364-05034d829086
 # ╟─6a2a1daa-d294-11ef-2a67-9f2ac60a14c5
 # ╟─6a2a2af2-d294-11ef-0072-bdc3c6f95bb3
 # ╟─6a2a389e-d294-11ef-1b8c-b55de794b65c
@@ -3235,24 +3243,22 @@ version = "1.13.0+0"
 # ╟─cd892634-2e64-4865-8ab4-da4c3269685e
 # ╟─f432e6e0-2db5-467a-9da4-c575495a36af
 # ╟─2dce3e82-5242-4740-b032-fe8a3a24f369
+# ╟─4fd66a9f-b6d9-4c49-a4ad-acfed9db6118
 # ╟─0e2ea2e9-061a-4266-af22-1f829272767f
 # ╟─4e1770a4-20ea-4491-9fb2-15c41693b76d
 # ╟─29d9d0e8-7af0-430f-9cce-3f83e9cccb7e
 # ╟─7ab2cbcd-55c1-480e-a611-10e783358d1d
-# ╟─1211336b-5fb0-415e-92a8-6ba2b061cb43
 # ╟─74640c85-8589-4121-8fdf-d71cb29532b8
+# ╟─1211336b-5fb0-415e-92a8-6ba2b061cb43
 # ╟─679ef9d1-cc1c-4fc1-bf82-caa967c196c2
-# ╟─2be6440b-4f94-4632-8f9b-0d20bf69ac39
+# ╟─3594875e-c5b9-4afc-8eb3-69cd4419479c
 # ╟─13cca61b-ee30-4cbc-b267-d77b1f51be6c
 # ╟─ccbf6bd8-3b77-4a3b-9272-6e63495ddaf3
-# ╟─3f6cf81b-8d43-4c46-a3dc-c7517f53322c
-# ╟─ed550951-58ad-4b29-baac-1cc6b8681b4b
-# ╟─27d3631b-cd58-4098-9ea8-b8bbdb7bb8c2
-# ╟─4093dea9-2ad3-4384-a414-06a6726d4660
+# ╟─856877b7-3fdb-45d5-8e54-438bb8e968b5
 # ╟─a893baee-217a-4dfe-9641-2d98cd769956
+# ╟─238f9fe2-078b-4c30-913e-f76e4e1ead0b
 # ╟─4d38fa93-ddac-4e73-b2c5-f1d8c6fb9b38
 # ╟─60095e6e-be1e-411c-8c89-753bc8604950
-# ╟─b5d0f64a-82bf-4fe3-a1c8-696d6ef29d11
 # ╟─47842de0-d17e-460e-b3b7-b2e642569e25
 # ╟─b273c8bc-3819-4f63-801a-acf0ee78ef1d
 # ╟─18b16578-32fc-43bc-a8d6-9bf8eb07e2d1
@@ -3273,6 +3279,13 @@ version = "1.13.0+0"
 # ╠═e99e7650-bb72-4576-8f2a-c3994533b644
 # ╠═7a624d2f-812a-47a0-a609-9fe299de94f5
 # ╠═758a13d7-5c4b-498c-8c37-c3ba9b4daf48
+# ╟─d1521061-211f-49fc-9463-82f01c79e2f6
+# ╠═5ca4e81f-4a63-472e-bb9e-7b8200de579a
+# ╠═8c91dcc3-32e2-4c09-aea1-af8ce5c805dc
+# ╠═11cd5f2e-d64b-440a-bf88-6f7e09e5377c
+# ╠═26369851-1d00-4f48-9e64-6b576af61066
+# ╠═280c69a5-b7a4-400f-a810-3b846ff27ec2
+# ╠═0a81b382-b01b-459a-8955-9ec8640a57d1
 # ╠═3437b7a6-56f3-4cfa-bec1-d5b39612d9d0
 # ╠═0e2e6382-0527-4233-801e-b91073490d48
 # ╠═f50ba7ef-c0b1-4f73-a8fe-7caa8760ab3d
@@ -3287,13 +3300,6 @@ version = "1.13.0+0"
 # ╠═cd1f1a99-0f28-4825-8e57-011550a3ae4b
 # ╠═a987582b-b4b3-4676-92ea-28ae4dc38f3f
 # ╠═e2b74ada-3dab-401f-aa44-a4ecda4d6496
-# ╟─d1521061-211f-49fc-9463-82f01c79e2f6
-# ╟─5ca4e81f-4a63-472e-bb9e-7b8200de579a
-# ╠═8c91dcc3-32e2-4c09-aea1-af8ce5c805dc
-# ╠═11cd5f2e-d64b-440a-bf88-6f7e09e5377c
-# ╠═26369851-1d00-4f48-9e64-6b576af61066
-# ╠═280c69a5-b7a4-400f-a810-3b846ff27ec2
-# ╠═0a81b382-b01b-459a-8955-9ec8640a57d1
 # ╟─830e8d28-2b0a-48f2-829b-6254fa6de065
 # ╟─6c6b7c68-2e5f-44f8-be0b-11777e46a767
 # ╠═d5955286-15c0-4723-b418-da54f675c59e
