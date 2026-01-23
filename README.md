@@ -51,10 +51,21 @@ If necessary, you can download the lecture notes in PDF format here:
 However, we recommend that you read the lecture notes in your browser to take advantage of the interactive materials that we prepared for this course, based on [Pluto.jl](https://plutojl.org/).
 
 
-
-
-
-
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 
 
