@@ -1,4 +1,4 @@
-if !isdir("pluto-slider-server-environment") || length(ARGS) != 2
+if !isdir("pluto-deployment-environment") || length(ARGS) != 2
     error("""
     Run me from the root of the repository directory, using:
 
@@ -14,7 +14,7 @@ if !(v"1.12.0-aaa" < VERSION < v"1.13.0")
 end
 
 import Pkg
-Pkg.activate("./pluto-slider-server-environment")
+Pkg.activate("./pluto-deployment-environment")
 Pkg.instantiate()
 
 import Pluto
